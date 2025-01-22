@@ -34,3 +34,20 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+
+## TODOs
+- [ ] YouTrack client integration (projects, issues, time reports)
+- [ ] Project tables (k-clients, k-employees, k-projects)
+- [ ] Sync data
+- [ ] Authentication: Login with YouTrack
+- [ ] Dashboard: who is absent today? 
+- [ ] payroll ocr?
+- [ ] payroll estimates
+- [ ] estimated annual turnover
+- [ ] estimated annual profit
+- [ ] fatture in cloud integration (generate invoices based on time reports & tasks & and send them)
+- [ ] k-employee profile: remember a field that allows to set the hourly rate
+- [ ] github stats: pr stats? line of code stats?
+- [ ] youtrack stats: issues stats? time reports stats? open issues stats? closed issues stats?
+- [ ] k-employee stats: earned until today? worked hours until today? reported worked hours until today? vacanze? malattie? ferie? expected worked hours from contract?
