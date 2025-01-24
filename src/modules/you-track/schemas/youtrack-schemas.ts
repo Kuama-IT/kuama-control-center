@@ -48,6 +48,8 @@ export const projectResponseSchema = z.object({
   archived: z.boolean(),
 });
 
+export type ProjectTeamResponse = z.infer<typeof projectTeamResponseSchema>;
+
 export const projectWithTeamUsersResponseSchema = projectResponseSchema.extend({
   team: projectTeamWithUsersResponseSchema,
 });
@@ -104,6 +106,7 @@ export const workTimeResponseSchema = z.object({
   }),
   issue: z.object({
     idReadable: z.string(),
+    id: z.string(),
     summary: z.string(),
     project: z.object({
       ringId: z.string(),

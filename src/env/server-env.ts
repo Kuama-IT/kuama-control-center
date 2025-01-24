@@ -9,6 +9,8 @@ const serverEnvSchema = z
     GITHUB_PERSISTENT_TOKEN: z.string().nonempty(),
     YOUTRACK_API_ENDPOINT: z.string().nonempty().endsWith("/"),
     YOUTRACK_PERSISTENT_TOKEN: z.string().nonempty(),
+    CURRANT_GITLAB_ENDPOINT: z.string().nonempty().endsWith("/"),
+    CURRANT_GITLAB_PERSISTENT_TOKEN: z.string().nonempty(),
   })
   .transform((data) => {
     return {
@@ -20,6 +22,8 @@ const serverEnvSchema = z
       githubPersistentToken: data.GITHUB_PERSISTENT_TOKEN,
       youtrackApiEndpoint: data.YOUTRACK_API_ENDPOINT,
       youtrackPersistentToken: data.YOUTRACK_PERSISTENT_TOKEN,
+      currantGitlabEndpoint: data.CURRANT_GITLAB_ENDPOINT,
+      currantGitlabPersistentToken: data.CURRANT_GITLAB_PERSISTENT_TOKEN,
     };
   });
 

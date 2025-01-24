@@ -16,7 +16,7 @@ import {
 
 class YoutrackApiClient {
   private static readonly workItemFields: string =
-    "id,ringId,date,duration(presentation,minutes),type(name),issue(project(ringId),id,idReadable,summary)";
+    "id,date,duration(presentation,minutes),type(name),issue(project(ringId),id,idReadable,summary)";
 
   private static readonly projectFields: string =
     "$type,archived,ringId,id,leader($type,id,login,ringId),name,shortName,iconUrl,team(id,ringId)";
@@ -49,7 +49,11 @@ class YoutrackApiClient {
     return `${this.endpoint}hub`;
   }
 
-  async getWorkItems(email: string): Promise<undefined | WorkTimeListResponse> {
+  async getWorkItems(
+    email: string,
+    startDate: string | undefined = undefined, // YYYY-MM-DD
+    endDate: string | undefined = undefined, // YYYY-MM-DD
+  ): Promise<undefined | WorkTimeListResponse> {
     const users = await this.getUsers();
 
     const user = users.find((it) => it.email === email);
@@ -57,10 +61,21 @@ class YoutrackApiClient {
     if (!user) {
       return;
     }
+    const params = ["$top=-1"];
+    if (startDate) {
+      params.push(`startDate=${startDate}`);
+    }
+
+    if (endDate) {
+      params.push(`endDate=${endDate}`);
+    }
+
+    params.push(`author=${user.login}`);
+    params.push(`fields=${YoutrackApiClient.workItemFields}`);
 
     // sadly, the client does not support asking for issue's work field
     const workItemsJson = await this.fetchWithAuth(
-      `${this.baseEndpoint}/api/workItems?author=${user.login}&fields=${YoutrackApiClient.workItemFields}&$top=-1`,
+      `${this.baseEndpoint}/api/workItems?${params.join("&")}`,
     );
     return workTimeListResponseSchema.parse(workItemsJson);
   }

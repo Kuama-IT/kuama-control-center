@@ -41,6 +41,7 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 - [ ] Project tables (k-clients, k-employees, k-projects)
 - [ ] Sync data
 - [ ] Authentication: Login with YouTrack
+- [ ] Gitlab client integration (projects, issues, time reports)
 - [ ] Dashboard: who is absent today? 
 - [ ] payroll ocr?
 - [ ] payroll estimates

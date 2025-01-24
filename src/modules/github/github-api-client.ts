@@ -12,10 +12,11 @@ import {
   restEndpointMethods,
 } from "@octokit/plugin-rest-endpoint-methods";
 
+// TODO does our token have access to PortIT repositories?
 class GithubApiClient {
   constructor(
     public readonly organization: string,
-    public readonly token: string,
+    token: string,
   ) {
     const MyOctokit = Octokit.plugin(restEndpointMethods);
     this.octokit = new MyOctokit({ auth: token });
@@ -69,6 +70,7 @@ class GithubApiClient {
     return repositories;
   }
 
+  // TODO we may be better off by fetching user stats https://docs.github.com/en/rest/metrics/statistics?apiVersion=2022-11-28
   async getRepositoryCommits(repository: string) {
     let commits: GithubCommits[] = [];
     let page = 1;
