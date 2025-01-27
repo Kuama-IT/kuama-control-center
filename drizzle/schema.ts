@@ -17,16 +17,25 @@ export const codeRepositoryPlatform = pgEnum("code_repository_platform", [
 // Currently represent either a set of organization/token to fetch data from GitHub, or a set of  endpoint/token to fetch data from GitLab
 export const kPlatformCredentials = pgTable("k_platform_credentials", {
   id: serial().primaryKey(),
-  platform: codeRepositoryPlatform(),
-  organization: varchar({ length: 256 }),
-  persistentToken: text(),
-  endpoint: varchar({ length: 500 }),
+  platform: codeRepositoryPlatform().notNull(),
+  name: varchar({ length: 256 }).notNull(),
+  persistentToken: text().notNull(),
+  endpoint: varchar({ length: 500 }).notNull(),
+  clientId: serial()
+    .references(() => kClients.id)
+    .notNull(),
+  projectId: serial().references(() => kProjects.id),
 });
 
-export const kClients = pgTable("k_clients", {});
+export const kClients = pgTable("k_clients", {
+  id: serial().primaryKey(),
+  name: varchar({ length: 256 }).notNull(),
+  vat: varchar({ length: 256 }),
+  avatarUrl: text(),
+  youTrackRingId: varchar({ length: 256 }).unique(),
+});
 
 export const kPayrolls = pgTable("k_payrolls", {});
-// TODO relatedUserIds
 export const kEmployees = pgTable("k_employees", {
   id: serial().primaryKey(),
   email: varchar({ length: 256 }).unique(), // key for external services like dipendenti in cloud, gitlab, github..
@@ -37,12 +46,6 @@ export const kEmployees = pgTable("k_employees", {
   avatarUrl: text(),
 });
 
-export const kEmployeeRelations = relations(kEmployees, ({ many }) => {
-  return {
-    tasks: many(kTasks),
-  };
-});
-
 export const kTimesheetDays = pgTable("k_timesheet_days", {});
 
 export const kProjects = pgTable("k_projects", {
@@ -50,6 +53,13 @@ export const kProjects = pgTable("k_projects", {
   name: varchar({ length: 256 }),
   description: text(),
   youTrackRingId: varchar({ length: 256 }).unique(),
+  clientId: serial().references(() => kClients.id),
+});
+
+export const kProjectMedias = pgTable("k_project_medias", {
+  id: serial().primaryKey(),
+  url: text(),
+  projectId: serial().references(() => kProjects.id),
 });
 
 export const kTasks = pgTable("k_tasks", {
@@ -57,31 +67,25 @@ export const kTasks = pgTable("k_tasks", {
   name: varchar({ length: 256 }),
   description: text(),
   youTrackId: varchar({ length: 256 }).unique(),
-  projectId: serial(),
-  employeeId: serial(),
+  projectId: serial().references(() => kProjects.id),
+  employeeId: serial().references(() => kEmployees.id),
+  creationDate: date(),
 });
 
 export const kSpentTimes = pgTable("k_spent_times", {
   id: serial().primaryKey(),
-  duration: interval(),
+  duration: interval({ fields: "minute" }),
   date: date(),
   description: text(),
   youTrackId: varchar({ length: 256 }).unique(),
-  taskId: serial(),
+  taskId: serial().references(() => kTasks.id),
 });
 
-export const kTasksRelations = relations(kTasks, ({ many }) => {
-  return {
-    kSpentTimes: many(kSpentTimes),
-  };
+export const kTeams = pgTable("k_teams", {
+  id: serial().primaryKey(),
+  employeeId: serial().references(() => kEmployees.id),
+  projectId: serial().references(() => kProjects.id),
 });
 
-export const kProjectsRelations = relations(kProjects, ({ many }) => {
-  return {
-    tasks: many(kTasks),
-  };
-});
-
-export const kTeams = pgTable("k_teams", {});
 export const kCommits = pgTable("k_commits", {});
 export const kRepositories = pgTable("k_commits", {});

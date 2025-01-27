@@ -1,0 +1,60 @@
+import { db } from "@/drizzle/drizzle-db";
+import { and, eq, gte, lte } from "drizzle-orm";
+import { kClients, kSpentTimes } from "@/drizzle/schema";
+import { endOfMonth, format, startOfMonth } from "date-fns";
+
+export const kClientGetOneAction = async (id: string, date: Date) => {
+  const queryResult = await db.query.kClients.findFirst({
+    where: eq(kClients.id, parseInt(id)),
+    with: {
+      kProjects: {
+        with: {
+          kTeams: {
+            with: {
+              kEmployee: true,
+            },
+          },
+          kProjectMedias: true,
+          kTasks: {
+            with: {
+              kSpentTimes: {
+                where: and(
+                  gte(
+                    kSpentTimes.date,
+                    format(startOfMonth(date), "yyyy-MM-dd"),
+                  ),
+                  lte(kSpentTimes.date, format(endOfMonth(date), "yyyy-MM-dd")),
+                ),
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+
+  const allTimeTasksCount = queryResult?.kProjects.reduce(
+    (acc, project) => acc + project.kTasks.length,
+    0,
+  );
+  const kProjects = queryResult?.kProjects.map((project) => ({
+    ...project,
+    kTeams: project.kTeams.map((team) => ({
+      ...team,
+      kEmployee: {
+        ...team.kEmployee,
+        avatarUrl: team.kEmployee.avatarUrl,
+      },
+    })),
+  }));
+  return {
+    ...queryResult,
+    kProjects,
+    avatarUrl: queryResult?.avatarUrl,
+    allTimeTasksCount,
+  };
+};
+
+export type KClientGetOneResult = Awaited<
+  ReturnType<typeof kClientGetOneAction>
+>;

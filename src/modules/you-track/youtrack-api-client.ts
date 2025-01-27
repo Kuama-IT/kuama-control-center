@@ -16,7 +16,7 @@ import {
 
 class YoutrackApiClient {
   private static readonly workItemFields: string =
-    "id,date,duration(presentation,minutes),type(name),issue(project(ringId),id,idReadable,summary)";
+    "id,date,duration(presentation,minutes),type(name),issue(project(ringId),id,idReadable,summary,created)";
 
   private static readonly projectFields: string =
     "$type,archived,ringId,id,leader($type,id,login,ringId),name,shortName,iconUrl,team(id,ringId)";
@@ -35,6 +35,21 @@ class YoutrackApiClient {
   ];
 
   private static readonly adminLogins = ["Dan", "marco.marti"];
+
+  private static readonly loginsToAssociate: { [key in string]: string[] } = {
+    "daniele@kuama.net": [
+      "Daniele.De.Matteo",
+      "d.dematteo@portit.io",
+      "daniele.dematteo",
+    ],
+    "simone@kuama.net": ["s.bressan@portit.io"],
+    "andrea.p@kuama.net": ["a.pasquetto@portit.io"],
+    "marco@kuama.it": ["Marco.Martini"],
+    "francesco@kuama.net": ["Francesco.Fortin"],
+    "elhan@kuama.net": ["Elhan.Emrovski"],
+    "matteo@kuama.net": ["Matteo.Valerio"],
+    "mario@kuama.net": ["mario.kuama"],
+  };
 
   constructor(
     public readonly endpoint: string,
@@ -86,26 +101,41 @@ class YoutrackApiClient {
     );
     const allUsers = rawReducedUserListResponseSchema.parse(usersJson);
 
+    const loginsToAssociate = Object.values(
+      YoutrackApiClient.loginsToAssociate,
+    ).flat();
     const activeUsers = allUsers.filter(
-      ({ banned, login }) =>
-        !banned && !YoutrackApiClient.loginsToIgnore.includes(login),
+      ({ banned, login, email }) =>
+        !banned &&
+        !YoutrackApiClient.loginsToIgnore.includes(login) &&
+        !loginsToAssociate.includes(login) &&
+        !loginsToAssociate.includes(email ?? ""),
     );
-
     const inactiveUsers = allUsers.filter(
-      ({ banned, login }) =>
-        banned && !YoutrackApiClient.loginsToIgnore.includes(login),
+      ({ banned, login, email }) =>
+        banned ||
+        YoutrackApiClient.loginsToIgnore.includes(login) ||
+        loginsToAssociate.includes(login) ||
+        loginsToAssociate.includes(email ?? ""),
     );
 
     const activeUsersWithRelatedUsers = activeUsers.map((user) => {
-      const relatedUserIds = inactiveUsers
-        .filter((it) => {
-          return it.fullName === user.fullName;
-        })
-        .map(({ id }) => id);
+      let relatedUserEmails: string[] = [];
+      if (user.email && YoutrackApiClient.loginsToAssociate[user.email]) {
+        const relatedLogins = YoutrackApiClient.loginsToAssociate[user.email];
+        relatedUserEmails = inactiveUsers
+          .filter(
+            (it) =>
+              relatedLogins.includes(it.login) ||
+              relatedLogins.includes(it.email ?? ""),
+          )
+          .filter((it) => it.email)
+          .map(({ email }) => email!);
+      }
 
       return {
         ...user,
-        relatedUserIds,
+        relatedUserEmails,
       };
     });
 

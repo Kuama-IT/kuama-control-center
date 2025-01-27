@@ -13,10 +13,11 @@ describe("youtrack api client", () => {
   //   expect(workItems?.length).greaterThan(10);
   // });
   //
-  // test("get all youtrack users", async () => {
-  //   const users = await youtrackApiClient.getUsers();
-  //   expect(users.length).greaterThan(10);
-  // });
+  test("get all youtrack users", async () => {
+    const users = await youtrackApiClient.getUsers();
+    console.log(users);
+    expect(users.length).greaterThan(10);
+  });
   //
   // test("get all youtrack projects", async () => {
   //   const projects = await youtrackApiClient.getProjects();

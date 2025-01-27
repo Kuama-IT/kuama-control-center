@@ -1,8 +1,12 @@
 import { youtrackApiClient } from "@/modules/you-track/youtrack-api-client";
 import { db } from "@/drizzle/drizzle-db";
 import { kProjects } from "@/drizzle/schema";
+import { KProjectsRead } from "@/drizzle/drizzle-types";
+import { OrganizationListResponse } from "@/modules/you-track/schemas/youtrack-schemas";
 
-export const syncYouTrackProjects = async () => {
+export const syncYouTrackProjects = async (
+  projectOrganizationMap: Map<string, number>,
+): Promise<KProjectsRead[]> => {
   const projects = await youtrackApiClient.getProjects();
 
   await db.transaction(async (tx) => {
@@ -11,11 +15,15 @@ export const syncYouTrackProjects = async () => {
       const projectPayload: typeof kProjects.$inferInsert = {
         name: project.name,
         youTrackRingId: project.ringId,
+        clientId: projectOrganizationMap.get(project.ringId),
       };
+      console.log(`syncYouTrackProjects -> ${project.name}`);
       await tx.insert(kProjects).values(projectPayload).onConflictDoUpdate({
         target: kProjects.youTrackRingId,
         set: projectPayload,
       });
     }
   });
+
+  return db.select().from(kProjects);
 };

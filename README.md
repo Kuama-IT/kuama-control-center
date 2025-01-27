@@ -37,7 +37,7 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 
 ## TODOs
-- [ ] YouTrack client integration (projects, issues, time reports)
+- [x] YouTrack client integration (projects, issues, time reports)
 - [ ] Project tables (k-clients, k-employees, k-projects)
 - [ ] Sync data
 - [ ] Authentication: Login with YouTrack
@@ -48,7 +48,14 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 - [ ] estimated annual turnover
 - [ ] estimated annual profit
 - [ ] fatture in cloud integration (generate invoices based on time reports & tasks & and send them)
-- [ ] k-employee profile: remember a field that allows to set the hourly rate
-- [ ] github stats: pr stats? line of code stats?
-- [ ] youtrack stats: issues stats? time reports stats? open issues stats? closed issues stats?
+- [ ] k-employee profile: remember a field that allows to set the hourly cost of the employee
+- [ ] GitHub stats: pr stats? line of code stats?
+- [ ] YouTrack stats: issues stats? time reports stats? open issues stats? closed issues stats?
 - [ ] k-employee stats: earned until today? worked hours until today? reported worked hours until today? vacanze? malattie? ferie? expected worked hours from contract?
+
+## Gotchas
+A project may have
+- a monthly amount to invoice (with invoice row description)
+- a daily rate to be multiplied by the number of days worked (with invoice row description)
+Invoices should be managed by client, and should propose a first version of the rows of the invoice, that can be edited by the user before sending the invoice.
+- If invoicing for a given project is based on time spent not reported to YT, we should be able to say "hey, this is the provider, go reading the time reports from this provider and generate the invoice based on that". Current providers that need support are easyredmine and Jira. Otherwise, spent time should be read from YT

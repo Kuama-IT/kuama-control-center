@@ -99,19 +99,26 @@ export const sourcedProjectRolesListResponseSchema = z.object({
   sourcedprojectroles: z.array(sourcedProjectRolesResponseSchema),
 });
 
+export const durationSchema = z.object({
+  minutes: z.number(),
+  presentation: z.string(),
+});
+
+export const issueResponseSchema = z.object({
+  idReadable: z.string(),
+  id: z.string(),
+  created: z.number(), // The timestamp in milliseconds indicating the moment when the issue was created. Stored as a unix timestamp at UTC. Read-only.
+  summary: z.string(),
+  project: z.object({
+    ringId: z.string(),
+  }),
+});
+
+export type YouTrackIssue = z.infer<typeof issueResponseSchema>;
+
 export const workTimeResponseSchema = z.object({
-  duration: z.object({
-    minutes: z.number(),
-    presentation: z.string(),
-  }),
-  issue: z.object({
-    idReadable: z.string(),
-    id: z.string(),
-    summary: z.string(),
-    project: z.object({
-      ringId: z.string(),
-    }),
-  }),
+  duration: durationSchema,
+  issue: issueResponseSchema,
   type: z
     .object({
       name: z.string(), // TODO this can be an enum
@@ -139,7 +146,7 @@ export const rawReducedUserSchema = z.object({
 
 export const reducedUserSchema = rawReducedUserSchema.extend({
   email: z.string().email(),
-  relatedUserIds: z.array(z.string()), // a user may be linked to multiple (usually banned) other users, due to the sync of our YT with external issue trackers
+  relatedUserEmails: z.array(z.string()), // a user may be linked to multiple (usually banned) other users, due to the sync of our YT with external issue trackers
 });
 
 export type ReducedUser = z.infer<typeof reducedUserSchema>;
