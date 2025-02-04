@@ -19,7 +19,7 @@ export const KClientCard = ({ client, index }: Props) => {
       <div className="flex items-center relative group">
         <div
           style={style}
-          className={`rounded-xl p-8 shadow-lg flex flex-col gap-4 transition-all hover:shadow-xl hover:translate-x-1.5 animate-fade-in-from-left stagger-animation-100 bg-slate-900 flex-1 relative`}
+          className={`rounded-xl p-8 shadow-lg flex flex-col gap-4 transition-all hover:shadow-xl hover:translate-x-1.5 animate-fade-in-from-left stagger-animation-100 bg-background/15 flex-1 relative`}
         >
           <Suspense>
             <div className="absolute inset-0 opacity-50 pointer-events-none">

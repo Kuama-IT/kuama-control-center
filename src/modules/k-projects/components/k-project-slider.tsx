@@ -45,7 +45,7 @@ export const ProjectSlider = ({
   return (
     <div
       style={{ height: `${(windowHeight / 3) * 2}px` }}
-      className={`overflow-hidden relative z-0`}
+      className={`overflow-hidden relative z-0 p-8 shadow-2xl bg-accent`}
       ref={containerRef}
     >
       <div

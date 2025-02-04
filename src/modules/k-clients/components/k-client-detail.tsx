@@ -54,17 +54,18 @@ const InnerHeader = ({ client }: { client: KClientGetOneResult }) => {
         {client.name}
       </h2>
       <div className="flex-1"></div>
-      <div className="aspect-square p-4 rounded bg-slate-900 h-32 flex flex-col gap-4 items-center justify-center text-white animate-fade-in-from-left  stagger-animation-900">
+      <div className="aspect-square p-4 rounded bg-accent h-32 flex flex-col gap-4 items-center justify-center text-foreground animate-fade-in-from-left stagger-animation-900">
         <h3 className="text-3xl mono">{client.allTimeTasksCount}</h3>
         <p className="text-xs italic">All time tasks</p>
       </div>
-      <div className="aspect-square p-4 rounded bg-slate-900 h-32 flex flex-col gap-4 items-center justify-center text-white animate-fade-in-from-left  stagger-animation-900">
+      <div className="aspect-square p-4 rounded bg-accent h-32 flex flex-col gap-4 items-center justify-center text-foreground animate-fade-in-from-left  stagger-animation-900">
         <h3 className="text-3xl mono">{client.kProjects?.length ?? 0}</h3>
         <p className="text-xs italic">projects</p>
       </div>
-      <div className=" p-4 rounded bg-slate-900 h-32 flex flex-col gap-4 items-center justify-center text-white animate-fade-in-from-left  stagger-animation-900">
+      <div className=" p-4 rounded bg-accent h-32 flex flex-col gap-4 items-center justify-center text-foreground animate-fade-in-from-left  stagger-animation-900">
         <Suspense fallback={"loading client month spent time total"}>
           <KClientSpentTime
+            className="text-3xl mono"
             date={new Date()}
             projects={client.kProjects?.map((it) => it.id) ?? []}
           />
