@@ -5,7 +5,7 @@ import KClientSpentTime from "@/modules/k-clients/components/k-client-spent-time
 import KClientReportedSpentTimeGraph from "@/modules/k-clients/components/k-client-reported-spent-time-graph";
 
 import { KClientGetOneResult } from "@/modules/k-clients/actions/k-client-get-one-action";
-import { BackButton } from "@/modules/ui/components/BackButton";
+import { BackButton } from "@/modules/ui/components/back-button";
 import { KProject } from "@/modules/k-projects/components/k-project";
 import KPlatformCredentialsList from "@/modules/k-platform-credentials/components/k-platform-credentials-list";
 

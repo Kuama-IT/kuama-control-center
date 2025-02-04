@@ -7,11 +7,11 @@ import {
   text,
   varchar,
 } from "drizzle-orm/pg-core";
-import { relations } from "drizzle-orm";
 
 export const codeRepositoryPlatform = pgEnum("code_repository_platform", [
   "github",
   "gitlab",
+  "jira",
 ]);
 
 // Currently represent either a set of organization/token to fetch data from GitHub, or a set of  endpoint/token to fetch data from GitLab
