@@ -12,6 +12,7 @@ export const codeRepositoryPlatform = pgEnum("code_repository_platform", [
   "github",
   "gitlab",
   "jira",
+  "easyredmine",
 ]);
 
 // Currently represent either a set of organization/token to fetch data from GitHub, or a set of  endpoint/token to fetch data from GitLab
@@ -24,7 +25,6 @@ export const kPlatformCredentials = pgTable("k_platform_credentials", {
   clientId: serial()
     .references(() => kClients.id)
     .notNull(),
-  projectId: serial().references(() => kProjects.id),
 });
 
 export const kClients = pgTable("k_clients", {

@@ -1,8 +1,6 @@
 "use client";
 
 import { UploadButton } from "@/modules/uploadthing/utils";
-import { startTransition } from "react";
-import { kProjectsServer } from "@/modules/k-projects/k-projects-server";
 import { useRouter } from "next/navigation";
 
 export const AddImageToProject = ({ projectId }: { projectId: number }) => {

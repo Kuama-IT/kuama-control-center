@@ -1,5 +1,4 @@
 "use client";
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   kPlatformCredentialsFormSchema,
@@ -17,7 +16,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { useTransition } from "react";
 import {
   Form,
   FormControl,
@@ -28,35 +26,51 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
+import { kPlatformCredentialsServer } from "@/modules/k-platform-credentials/k-platform-credentials-server";
+import { createKPlatformCredentials } from "@/modules/k-platform-credentials/actions/k-platform-credentials-create";
+import { useTransition } from "react";
+import { useRouter } from "next/navigation";
 
 type Props = {
   clientId: number;
-  onCredentialsValid: (credentials: KPlatformCredentialsValidForm) => void;
 };
 
-export const KPlatformCredentialsForm = ({
-  clientId,
-  onCredentialsValid,
-}: Props) => {
-  const [isPending, startTransition] = useTransition();
-
+export const KPlatformCredentialsForm = ({ clientId }: Props) => {
   const form = useForm<KPlatformCredentialsValidForm>({
     resolver: zodResolver(kPlatformCredentialsFormSchema),
+    defaultValues: {
+      platform: KSupportedPlatforms.options[0],
+      name: "",
+      persistentToken: "",
+      endpoint: "",
+    },
   });
+  const router = useRouter();
+
+  const [isPending, startTransition] = useTransition();
+
+  const onCredentialsValidAction = async (
+    credentials: KPlatformCredentialsValidForm,
+  ) => {
+    startTransition(async () => {
+      await createKPlatformCredentials({ ...credentials, clientId });
+      router.refresh();
+    });
+  };
 
   return (
     <Form {...form}>
       <form
-        className="flex flex-col gap-4 min-w-48 p-8"
-        onSubmit={form.handleSubmit(onCredentialsValid, console.error)}
+        className="flex flex-col gap-4 min-w-48 p-8 bg-accent rounded text-foreground"
+        onSubmit={form.handleSubmit(onCredentialsValidAction, console.error)}
       >
-        <p className="text-2xl uppercase font-bold">Add new credential</p>
+        <p className="text-2xl uppercase font-bold">Add new credentials</p>
         <FormField
           control={form.control}
           name="platform"
           render={({ field }) => (
             <FormItem>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <Select onValueChange={field.onChange}>
                 <FormControl>
                   <SelectTrigger className="w-[180px]">
                     <SelectValue placeholder="Pick a platform" />

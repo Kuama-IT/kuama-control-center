@@ -8,6 +8,7 @@ import { KClientGetOneResult } from "@/modules/k-clients/actions/k-client-get-on
 import { BackButton } from "@/modules/ui/components/back-button";
 import { KProject } from "@/modules/k-projects/components/k-project";
 import KPlatformCredentialsList from "@/modules/k-platform-credentials/components/k-platform-credentials-list";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default async function KClientDetail({ id }: { id: string }) {
   const client = await kClientsServer.getOne(id, new Date());
@@ -16,18 +17,20 @@ export default async function KClientDetail({ id }: { id: string }) {
   }
   return (
     <div className="">
-      <div className="sticky top-0 w-full h-96 opacity-50">
-        <Suspense>
+      <div className="sticky top-0 w-full h-96 from-accent-foreground/20 to-accent overflow-hidden rounded-b-3xl bg-gradient-to-tr">
+        <InnerHeader client={client} />
+        <Suspense fallback={<Skeleton className="absolute inset-0" />}>
           <KClientReportedSpentTimeGraph clientId={client.id!} />
         </Suspense>
       </div>
 
       <div className="bg-background relative z-10 flex flex-col gap-16">
-        <InnerHeader client={client} />
-
         <div>
           {/*  TODO how on earth can id be undefined? */}
-          <KPlatformCredentialsList clientId={client.id!} />
+          <KPlatformCredentialsList
+            showAddCredentials={true}
+            clientId={client.id!}
+          />
         </div>
         <div className="flex flex-col gap-8">
           {client.kProjects?.map((project) => (
@@ -41,7 +44,7 @@ export default async function KClientDetail({ id }: { id: string }) {
 
 const InnerHeader = ({ client }: { client: KClientGetOneResult }) => {
   return (
-    <div className="flex gap-4 items-center sticky p-8 top-0 bg-background z-10">
+    <div className="flex gap-4 items-center p-8 top-0 relative z-10">
       <BackButton />
       <Image
         src={client.avatarUrl!}

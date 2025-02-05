@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const KSupportedPlatforms = z.enum(["gitlab", "jira"]);
+export const KSupportedPlatforms = z.enum(["gitlab", "jira", "easyredmine"]);
 
 export const kPlatformCredentialsFormSchema = z.object({
   platform: KSupportedPlatforms,
