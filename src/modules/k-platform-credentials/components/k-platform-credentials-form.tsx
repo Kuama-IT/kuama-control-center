@@ -55,6 +55,7 @@ export const KPlatformCredentialsForm = ({ clientId }: Props) => {
     startTransition(async () => {
       await createKPlatformCredentials({ ...credentials, clientId });
       router.refresh();
+      form.reset();
     });
   };
 

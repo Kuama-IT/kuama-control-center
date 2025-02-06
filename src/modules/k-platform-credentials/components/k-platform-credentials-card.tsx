@@ -21,6 +21,7 @@ import { useTransition } from "react";
 import { deleteKPlatformCredentials } from "@/modules/k-platform-credentials/actions/k-platform-credentials-delete";
 import { useRouter } from "next/navigation";
 import syncTimeSpentForClient from "@/modules/sync-data/actions/sync-time-spent-by-credentials-for-client";
+import Link from "next/link";
 
 export const KPlatformCredentialsCard = ({
   credentials,
@@ -122,6 +123,10 @@ export const KPlatformCredentialsCard = ({
         <Button disabled={isPending} onClick={syncData}>
           <FaSync /> Sync data
         </Button>
+
+        <Link href={`/reports/easyredmine/${credentials.id}`}>
+          <Button>See report</Button>
+        </Link>
       </div>
     </div>
   );
