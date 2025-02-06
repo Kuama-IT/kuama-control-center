@@ -5,6 +5,7 @@ import { EasyRedmineApiClient } from "@/modules/easyredmine/easyredmine-api-clie
 const action = async (credentialId: number) => {
   // do not make user to wait until import is done
 
+  // TODO complete
   const credentials = await kPlatformCredentialsServer.byId(credentialId);
 
   if (!credentials) {
@@ -18,7 +19,7 @@ const action = async (credentialId: number) => {
       credentials.persistentToken,
     );
 
-    const spentTimes = await client.getSpentTimes();
+    const spentTimes = await client.getSpentTimes(new Date());
   }
 
   await new Promise((resolve) => setTimeout(resolve, 6000));

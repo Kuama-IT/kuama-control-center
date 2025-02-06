@@ -5,8 +5,11 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
+    "build:ci": "next build --experimental-build-mode compile",
     "start": "next start",
     "lint": "next lint",
+    "format:check": "prettier --check .",
+    "format:fix": "prettier --write .",
     "test": "vitest",
     "dev:drizzle:push": "drizzle-kit push",
     "dev:drizzle:pull": "drizzle-kit pull"
