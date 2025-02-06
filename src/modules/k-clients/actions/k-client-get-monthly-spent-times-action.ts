@@ -48,11 +48,8 @@ export const kClientGetMonthlySpentTimesAction = async (
     return acc;
   }, new Map());
 
-  return reduced
-    .entries()
-    .map(([date, duration]) => ({
-      date,
-      duration,
-    }))
-    .toArray();
+  return Array.from(reduced.entries()).map(([date, duration]) => ({
+    date,
+    duration,
+  }));
 };
