@@ -10,6 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import Link from "next/link";
+import { format } from "date-fns";
 
 export default async function EasyredmineReport({
   credentialsId,
@@ -30,10 +31,14 @@ export default async function EasyredmineReport({
   const { timesSpent: spentTimes, monthTotalHours } =
     await easyRedmineGetSpentTimes(credentials, new Date());
 
+  const monthName = format(spentTimes[0].date, "MMMM");
+  const userFullName = spentTimes[0].userFullName;
+  const agency = spentTimes[0].agency;
+
   return (
     <Table>
       <TableCaption className="caption-top">
-        {spentTimes[0].userFullName} Spent time for current month
+        {agency} - {userFullName} - Spent time for {monthName}
       </TableCaption>
       <TableHeader>
         <TableRow>
@@ -43,7 +48,6 @@ export default async function EasyredmineReport({
           <TableHead>User</TableHead>
           <TableHead>Activity</TableHead>
           <TableHead>Spent time</TableHead>
-          <TableHead>Azienda</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -74,14 +78,15 @@ export default async function EasyredmineReport({
               </Link>
             </TableCell>
             <TableCell>
-              <div className="whitespace-nowrap">{spentTime.date}</div>
+              <div className="whitespace-nowrap">
+                {format(spentTime.date, "dd/MM/yyyy")}
+              </div>
             </TableCell>
             <TableCell>
               <div className="whitespace-nowrap">{spentTime.userFullName}</div>
             </TableCell>
             <TableCell>{spentTime.activity}</TableCell>
             <TableCell>{parseFloat(spentTime.spentTime).toFixed(2)}</TableCell>
-            <TableCell>{spentTime.agency}</TableCell>
           </TableRow>
         ))}
       </TableBody>
