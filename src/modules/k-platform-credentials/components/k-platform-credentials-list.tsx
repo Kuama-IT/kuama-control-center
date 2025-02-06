@@ -5,18 +5,13 @@ import { KPlatformCredentialsCard } from "@/modules/k-platform-credentials/compo
 
 type Props = {
   clientId: number;
-  projectId?: number;
   showAddCredentials?: boolean;
 };
 export default async function KPlatformCredentialsList({
   clientId,
-  projectId,
   showAddCredentials,
 }: Props) {
-  const credentials = await kPlatformCredentialsServer.byClient(
-    clientId,
-    projectId,
-  );
+  const credentials = await kPlatformCredentialsServer.byClient(clientId);
 
   return (
     <div className="p-8 flex flex-col gap-8">

@@ -1,0 +1,52 @@
+name: PR Integration
+on:
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: PR Integration (tests & build)
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: "postgresql://fake.endpoint/"
+      DIPENDENTI_IN_CLOUD_API_ENDPOINT: "https://fake.endpoint/"
+      DIPENDENTI_IN_CLOUD_PERSISTENT_TOKEN: "__CI__"
+      GITHUB_ORGANIZATION: "__CI__"
+      GITHUB_PERSISTENT_TOKEN: "__CI__"
+      YOUTRACK_API_ENDPOINT: "https://fake.endpoint/"
+      YOUTRACK_PERSISTENT_TOKEN: "__CI__"
+      CURRANT_GITLAB_ENDPOINT: "https://fake.endpoint/"
+      CURRANT_GITLAB_PERSISTENT_TOKEN: "__CI__"
+      UPLOADTHING_TOKEN: "__CI__"
+      JIRA_TOKEN: "__CI__"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache .next/cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}/.next/cache
+          key: ${{ runner.os }}-nextjs
+          restore-keys: ${{ runner.os }}-nextjs
+
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 10.0.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Format check
+        run: pnpm run format:check
+
+      - name: Build
+        run: pnpm run build:ci

@@ -35,14 +35,14 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 
-
 ## TODOs
+
 - [x] YouTrack client integration (projects, issues, time reports)
 - [ ] Project tables (k-clients, k-employees, k-projects)
 - [ ] Sync data
 - [ ] Authentication: Login with YouTrack
 - [ ] Gitlab client integration (projects, issues, time reports)
-- [ ] Dashboard: who is absent today? 
+- [ ] Dashboard: who is absent today?
 - [ ] payroll ocr?
 - [ ] payroll estimates
 - [ ] estimated annual turnover
@@ -54,8 +54,10 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 - [ ] k-employee stats: earned until today? worked hours until today? reported worked hours until today? vacanze? malattie? ferie? expected worked hours from contract?
 
 ## Gotchas
+
 A project may have
+
 - a monthly amount to invoice (with invoice row description)
 - a daily rate to be multiplied by the number of days worked (with invoice row description)
-Invoices should be managed by client, and should propose a first version of the rows of the invoice, that can be edited by the user before sending the invoice.
+  Invoices should be managed by client, and should propose a first version of the rows of the invoice, that can be edited by the user before sending the invoice.
 - If invoicing for a given project is based on time spent not reported to YT, we should be able to say "hey, this is the provider, go reading the time reports from this provider and generate the invoice based on that". Current providers that need support are easyredmine and Jira. Otherwise, spent time should be read from YT

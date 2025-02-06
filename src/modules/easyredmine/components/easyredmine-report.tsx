@@ -28,7 +28,7 @@ export default async function EasyredmineReport({
   }
 
   const { timesSpent: spentTimes, monthTotalHours } =
-    await easyRedmineGetSpentTimes(credentials);
+    await easyRedmineGetSpentTimes(credentials, new Date());
 
   return (
     <Table>

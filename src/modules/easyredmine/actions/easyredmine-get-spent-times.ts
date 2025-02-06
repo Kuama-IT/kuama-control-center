@@ -3,11 +3,12 @@ import { KPlatformCredentialsRead } from "@/drizzle/drizzle-types";
 
 export default async function easyRedmineGetSpentTimes(
   credentials: KPlatformCredentialsRead,
+  date: Date,
 ) {
   const client = new EasyRedmineApiClient(
     credentials.endpoint,
     credentials.persistentToken,
   );
 
-  return await client.getSpentTimes();
+  return await client.getSpentTimes(date);
 }

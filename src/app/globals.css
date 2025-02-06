@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  --radius: .5rem;
+  --radius: 0.5rem;
 }
 
 body {
