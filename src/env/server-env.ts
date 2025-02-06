@@ -11,6 +11,7 @@ const serverEnvSchema = z
     YOUTRACK_PERSISTENT_TOKEN: z.string().nonempty(),
     CURRANT_GITLAB_ENDPOINT: z.string().nonempty().endsWith("/"),
     CURRANT_GITLAB_PERSISTENT_TOKEN: z.string().nonempty(),
+    BLESS_TOKEN: z.string().nonempty(),
   })
   .transform((data) => {
     return {
@@ -24,6 +25,7 @@ const serverEnvSchema = z
       youtrackPersistentToken: data.YOUTRACK_PERSISTENT_TOKEN,
       currantGitlabEndpoint: data.CURRANT_GITLAB_ENDPOINT,
       currantGitlabPersistentToken: data.CURRANT_GITLAB_PERSISTENT_TOKEN,
+      blessToken: data.BLESS_TOKEN,
     };
   });
 

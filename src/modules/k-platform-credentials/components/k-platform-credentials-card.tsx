@@ -3,7 +3,7 @@ import { KPlatformCredentialsRead } from "@/drizzle/drizzle-types";
 import { Badge } from "@/components/ui/badge";
 import { SiJirasoftware, SiRedmine } from "react-icons/si";
 import { Button } from "@/components/ui/button";
-import { Copy, Trash, TrashIcon } from "lucide-react";
+import { Copy, Trash } from "lucide-react";
 import { FaSync } from "react-icons/fa";
 import { useToast } from "@/hooks/use-toast";
 import { copyToClipboard } from "@/modules/ui/ui-utils";
@@ -48,6 +48,10 @@ export const KPlatformCredentialsCard = ({
       await syncTimeSpentForClient(credentials.id);
     });
   };
+
+  // TODO, we should just use location.origin, but Bless service cannot reach us in localhost...
+  const url = `https://kuama-control-center.vercel.app/reports/easyredmine/${credentials.id}`;
+  const fileName = `${credentials.name.toLowerCase().replaceAll(" ", "-")}-report.pdf`; // TODO we should use the name of the user from easyredmine
 
   return (
     <div className="rounded-lg shadow p-8 flex flex-col items-start gap-4 bg-background overflow-hidden group">
@@ -124,7 +128,7 @@ export const KPlatformCredentialsCard = ({
           <FaSync /> Sync data
         </Button>
 
-        <Link href={`/reports/easyredmine/${credentials.id}`}>
+        <Link href={`/api/pdf?url=${url}&fileName=${fileName}`} target="_blank">
           <Button>See report</Button>
         </Link>
       </div>

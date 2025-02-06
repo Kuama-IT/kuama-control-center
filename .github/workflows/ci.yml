@@ -22,6 +22,7 @@ jobs:
       CURRANT_GITLAB_PERSISTENT_TOKEN: "__CI__"
       UPLOADTHING_TOKEN: "__CI__"
       JIRA_TOKEN: "__CI__"
+      BLESS_TOKEN: "__CI__"
 
     steps:
       - uses: actions/checkout@v4
