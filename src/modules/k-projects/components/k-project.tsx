@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import KClientSpentTime from "@/modules/k-clients/components/k-client-spent-time";
 import { AddImageToProject } from "@/modules/k-projects/components/k-projects-upload-images-button";
 import { ProjectSlider } from "@/modules/k-projects/components/k-project-slider";
-import { EmployeeAvatar } from "@/modules/k-employees/components/employee-avatar";
+import { KEmployeeAvatar } from "@/modules/k-employees/components/k-employee-avatar";
 
 export const KProject = ({ project }: { project: KProjectsReadFull }) => {
   return (
@@ -31,7 +31,7 @@ export const KProject = ({ project }: { project: KProjectsReadFull }) => {
 
       <div className="flex gap-2 py-4 px-8">
         {project.kTeams.map((member) => (
-          <EmployeeAvatar key={member.id} employee={member.kEmployee} />
+          <KEmployeeAvatar key={member.id} employee={member.kEmployee} />
         ))}
       </div>
 
