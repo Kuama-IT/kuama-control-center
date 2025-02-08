@@ -42,7 +42,7 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 - [ ] Sync data
 - [ ] Authentication: Login with YouTrack
 - [ ] Gitlab client integration (projects, issues, time reports)
-- [ ] Dashboard: who is absent today?
+- [ ] Dashboard: who is absent this week?
 - [ ] payroll ocr?
 - [ ] payroll estimates
 - [ ] estimated annual turnover
@@ -61,3 +61,31 @@ A project may have
 - a daily rate to be multiplied by the number of days worked (with invoice row description)
   Invoices should be managed by client, and should propose a first version of the rows of the invoice, that can be edited by the user before sending the invoice.
 - If invoicing for a given project is based on time spent not reported to YT, we should be able to say "hey, this is the provider, go reading the time reports from this provider and generate the invoice based on that". Current providers that need support are easyredmine and Jira. Otherwise, spent time should be read from YT
+
+## ROADMAP
+- [ ] Authentication: Login with YouTrack
+- [ ] Dashboard: who is absent this week?
+- [ ] Dashboard: monthly overall commits graphs
+- [ ] Dashboard: monthly overall time reports graphs
+- [ ] Dashboard: monthly expected expenses graphs
+- [ ] Dashboard: monthly expected revenues graphs
+- [ ] Rework sync logics: each client should provide a set of credentials to be used to sync data. Logical flow should be -> get all spent time by credentials -> understand which project and which issue (we probably don't care to sync them over YT) -> import to db
+- [ ] Employee profile: reported hours until today
+- [ ] Employee profile: performed commits until today
+- [ ] Employee profile: list of payrolls
+- [ ] Employee profile: total amount earned until today
+- [ ] Employee profile: total cost for the company until today
+- [ ] Employee profile: total earnings for company until today
+- [ ] Employee profile: List of projects he's working on this month
+- [ ] Client profile: List of projects
+- [ ] Client profile: List of credentials. Do we need to associate credentials to projects?
+- [ ] Client profile: Contract settings (see gotchas)
+- [ ] Client profile: List of invoices
+- [ ] Client profile: Earned until today (by year)
+- [ ] Client profile: Spent (by employee) until today (by year)
+- [ ] Client profile: Generate invoice button
+- [ ] Client profile: Reports button
+- [x] Projects: Team
+- [x] Projects: previews slider
+- [ ] Projects: list of issues being worked on
+- [ ] Site Navigation (header, menu...)
