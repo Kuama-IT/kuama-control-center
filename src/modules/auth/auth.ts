@@ -4,12 +4,13 @@ import { serverEnv } from "@/env/server-env";
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     {
-      id: "youtrack", // signIn("my-provider") and will be part of the callback URL
-      name: "YouTrack", // optional, used on the default login page as the button text.
-      type: "oauth", //"oidc", // or "oauth" for OAuth 2 providers
-      issuer: serverEnv.youtrackAuthIssuer, // to infer the .well-known/openid-configuration URL
-      clientId: serverEnv.youtrackAuthClientId, // from the provider's dashboard
-      clientSecret: serverEnv.youtrackAuthClientSecret, // from the provider's dashboard
+      id: "youtrack",
+      name: "YouTrack",
+      type: "oauth",
+      issuer: serverEnv.youtrackAuthIssuer,
+      clientId: serverEnv.youtrackAuthClientId,
+      clientSecret: serverEnv.youtrackAuthClientSecret,
+
       authorization: {
         params: {
           scope: "openid",
@@ -49,5 +50,5 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       return !!auth;
     },
   },
-  debug: true,
+  debug: true, // TODO should be true only in dev mode
 });

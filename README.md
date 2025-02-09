@@ -63,7 +63,10 @@ A project may have
 - If invoicing for a given project is based on time spent not reported to YT, we should be able to say "hey, this is the provider, go reading the time reports from this provider and generate the invoice based on that". Current providers that need support are easyredmine and Jira. Otherwise, spent time should be read from YT
 
 ## ROADMAP
-- [ ] Authentication: Login with YouTrack
+
+- [x] Authentication: Login with YouTrack
+- [x] Authentication: User role (admin|employee)
+- [ ] Make prettier check only relevant files
 - [ ] Dashboard: who is absent this week?
 - [ ] Dashboard: monthly overall commits graphs
 - [ ] Dashboard: monthly overall time reports graphs

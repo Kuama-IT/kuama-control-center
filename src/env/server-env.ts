@@ -15,6 +15,7 @@ const serverEnvSchema = z
     YOUTRACK_AUTH_CLIENT_ID: z.string().nonempty(),
     YOUTRACK_AUTH_CLIENT_SECRET: z.string().nonempty(),
     YOUTRACK_AUTH_ISSUER: z.string().nonempty(),
+    NODE_ENV: z.string().nonempty(),
   })
   .transform((data) => {
     return {
@@ -32,6 +33,7 @@ const serverEnvSchema = z
       youtrackAuthClientId: data.YOUTRACK_AUTH_CLIENT_ID,
       youtrackAuthClientSecret: data.YOUTRACK_AUTH_CLIENT_SECRET,
       youtrackAuthIssuer: data.YOUTRACK_AUTH_ISSUER,
+      isDev: data.NODE_ENV === "development",
     };
   });
 
