@@ -23,6 +23,10 @@ jobs:
       UPLOADTHING_TOKEN: "__CI__"
       JIRA_TOKEN: "__CI__"
       BLESS_TOKEN: "__CI__"
+      AUTH_SECRET: "__CI__"
+      YOUTRACK_AUTH_CLIENT_ID: "__CI__"
+      YOUTRACK_AUTH_CLIENT_SECRET: "__CI__"
+      YOUTRACK_AUTH_ISSUER: "__CI__"
 
     steps:
       - uses: actions/checkout@v4
