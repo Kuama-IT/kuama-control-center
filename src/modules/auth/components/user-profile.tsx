@@ -16,7 +16,7 @@ export const UserProfile = async () => {
 
   const user = session.user;
   return (
-    <div className="fixed top-0 m-4 right-0">
+    <div className="fixed top-0 m-4 right-0 z-10">
       <Popover>
         <PopoverTrigger className="cursor-pointer" asChild>
           <Avatar className="h-12 w-12">
