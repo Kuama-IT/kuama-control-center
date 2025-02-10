@@ -1,13 +1,12 @@
-"use client";
-import { signOut } from "next-auth/react";
+import { signOut } from "@/modules/auth/auth";
 import { Button } from "@/components/ui/button";
 
 export const SignOutButton = () => {
   return (
     <Button
       className="w-full"
-      onClick={() => {
-        void signOut({ redirectTo: "/sign-in" });
+      onClick={async () => {
+        await signOut({ redirectTo: "/sign-in" });
       }}
     >
       Logout

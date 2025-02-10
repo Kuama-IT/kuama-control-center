@@ -65,7 +65,7 @@ A project may have
 ## ROADMAP
 
 - [x] Authentication: Login with YouTrack
-- [ ] Authentication: User role (admin|employee)
+- [x] Authentication: User role (admin|employee)
 - [x] Make prettier check only relevant files
 - [ ] Dashboard: who is absent this week?
 - [ ] Dashboard: monthly overall commits graphs
