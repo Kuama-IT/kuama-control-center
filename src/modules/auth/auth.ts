@@ -1,5 +1,24 @@
-import NextAuth from "next-auth";
+import NextAuth, { type DefaultSession } from "next-auth";
 import { serverEnv } from "@/env/server-env";
+import { youtrackApiClient } from "@/modules/you-track/youtrack-api-client";
+
+declare module "next-auth" {
+  /**
+   * Returned by `auth`, `useSession`, `getSession` and received as a prop on the `SessionProvider` React Context
+   */
+  interface Session {
+    user: {
+      /** Whether the user is admin inside YouTrack. */
+      isAdmin: boolean;
+      /**
+       * By default, TypeScript merges new interface properties and overwrites existing ones.
+       * In this case, the default session user properties will be overwritten,
+       * with the new ones defined above. To keep the default session user properties,
+       * you need to add them back into the newly declared interface.
+       */
+    } & DefaultSession["user"];
+  }
+}
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -16,15 +35,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           scope: "openid",
         },
       },
-      // profile: (profile) => {
-      //   console.log("profile", profile);
-      //   return {
-      //     id: profile.sub,
-      //     name: profile.name,
-      //     email: profile.email,
-      //     emailVerified: profile.email_verified,
-      //   };
-      // },
       wellKnown: `${serverEnv.youtrackAuthIssuer}/.well-known/openid-configuration`,
       token: `${serverEnv.youtrackAuthIssuer}/api/rest/oauth2/token`,
       userinfo: `${serverEnv.youtrackAuthIssuer}/api/rest/oauth2/userinfo`,
@@ -34,21 +44,17 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     signIn: "/sign-in",
   },
   callbacks: {
-    // async session({ session, token }) {
-    //   session.user = token.user;
-    //   console.log("callbacks.session", session, token);
-    //   return session;
-    // },
-    // async jwt({ token, user }) {
-    //   console.log("callbacks.jwt", token, user);
-    //   if (user) {
-    //     token.user = user;
-    //   }
-    //   return token;
-    // },
+    async session({ session }) {
+      session.user.isAdmin = await youtrackApiClient.checkIsAdmin(
+        session.user.email,
+      );
+      console.log("session", session.user.isAdmin);
+      return session;
+    },
+
     authorized: async ({ auth }) => {
       return !!auth;
     },
   },
-  debug: true, // TODO should be true only in dev mode
+  debug: serverEnv.isDev,
 });

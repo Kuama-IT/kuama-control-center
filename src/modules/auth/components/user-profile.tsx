@@ -24,7 +24,11 @@ export const UserProfile = async () => {
             <AvatarFallback>{user.name?.substring(0, 2)}</AvatarFallback>
           </Avatar>
         </PopoverTrigger>
-        <PopoverContent align="end" className="right-2">
+        <PopoverContent align="end" className="flex flex-col gap-2">
+          <p>
+            {user.name} ({user.isAdmin ? "Admin" : "Employee"})
+          </p>
+
           <SignOutButton />
         </PopoverContent>
       </Popover>
