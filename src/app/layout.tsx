@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import "./globals.css";
 import { UserProfile } from "@/modules/auth/components/user-profile";
 import type { ReactNode } from "react";
+import { NavBar } from "@/modules/ui/components/navbar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,7 +33,8 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <UserProfile />
-        {children}
+        <div className="p-4 pb-32">{children}</div>
+        <NavBar />
         <Toaster />
       </body>
     </html>

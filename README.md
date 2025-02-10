@@ -36,13 +36,17 @@ A project may have
 
 - [x] Authentication: Login with YouTrack
 - [x] Authentication: User role (admin|employee)
+- [x] Authentication: Allow only admin & dipendenti in cloud users to login
 - [x] Make prettier check only relevant files
+- [x] Employee list
 - [ ] Dashboard: who is absent this week?
 - [ ] Dashboard: monthly overall commits graphs
 - [ ] Dashboard: monthly overall time reports graphs
 - [ ] Dashboard: monthly expected expenses graphs
 - [ ] Dashboard: monthly expected revenues graphs
 - [ ] Rework sync logics: each client should provide a set of credentials to be used to sync data. Logical flow should be -> get all spent time by credentials -> understand which project and which issue (we probably don't care to sync them over YT) -> import to db
+- [ ] Employee profile: provide credentials
+- [ ] Employee profile: sync data button
 - [ ] Employee profile: reported hours until today
 - [ ] Employee profile: performed commits until today
 - [ ] Employee profile: list of payrolls
