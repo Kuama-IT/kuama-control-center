@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { routes } from "@/modules/ui/routes";
 
 export const KEmployeeAvatar = ({
   employee: { avatarUrl, fullName, id },
@@ -9,7 +10,7 @@ export const KEmployeeAvatar = ({
   return (
     <Link
       className="cursor-pointer relative group flex items-center justify-center hover:z-10"
-      href={`/k-employees/${id}`}
+      href={routes.employee(id)}
     >
       <div className="aspect-square h-8 w-8 rounded-lg overflow-hidden">
         {avatarUrl && (

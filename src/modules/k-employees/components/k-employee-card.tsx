@@ -1,10 +1,9 @@
 import { KEmployeesRead } from "@/drizzle/drizzle-types";
-import { CSSProperties, Suspense } from "react";
+import { CSSProperties } from "react";
 import Link from "next/link";
-import { routes } from "@/app/routes";
-import KClientReportedSpentTimeGraph from "@/modules/k-clients/components/k-client-reported-spent-time-graph";
 import Image from "next/image";
 import { HiArrowSmRight } from "react-icons/hi";
+import { routes } from "@/modules/ui/routes";
 // TODO add some nice stats
 export const KEmployeeCard = ({
   employee,

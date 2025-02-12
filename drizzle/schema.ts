@@ -1,4 +1,5 @@
 import {
+  AnyPgColumn,
   date,
   interval,
   pgEnum,
@@ -7,6 +8,7 @@ import {
   text,
   varchar,
 } from "drizzle-orm/pg-core";
+import { sql, SQL } from "drizzle-orm";
 
 export const codeRepositoryPlatform = pgEnum("code_repository_platform", [
   "github",
@@ -44,9 +46,17 @@ export const kEmployees = pgTable("k_employees", {
   birthdate: date(),
   fullName: varchar({ length: 256 }),
   avatarUrl: text(),
+  dipendentiInCloudId: varchar({ length: 256 }).unique(),
+  hiredOn: date(),
 });
 
-export const kTimesheetDays = pgTable("k_timesheet_days", {});
+export const kAbsenceDays = pgTable("k_absence_days", {
+  id: serial().primaryKey(),
+  date: date(),
+  employeeId: serial().references(() => kEmployees.id),
+  description: text(),
+  duration: interval({ fields: "minute" }),
+});
 
 export const kProjects = pgTable("k_projects", {
   id: serial().primaryKey(),
@@ -89,3 +99,7 @@ export const kTeams = pgTable("k_teams", {
 
 export const kCommits = pgTable("k_commits", {});
 export const kRepositories = pgTable("k_commits", {});
+
+export function lower(email: AnyPgColumn): SQL {
+  return sql`lower(${email})`;
+}

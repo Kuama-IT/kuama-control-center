@@ -37,14 +37,9 @@ class DipendentiInCloudApi {
     return parsed.data;
   }
 
-  async getMonthlyTimesheet(
-    date: Date,
-    employees: DipendentiInCloudEmployee[],
-  ) {
-    const endOfMonthFns = endOfMonth(date);
-    const startOfMonthFns = startOfMonth(date);
-    const formattedStartOfMonth = format(startOfMonthFns, "yyyy-LL-dd");
-    const formattedEndOfMonth = format(endOfMonthFns, "yyyy-LL-dd");
+  async getMonthlyTimesheet(from: Date, to: Date, employees: { id: string }[]) {
+    const formattedStartOfMonth = format(from, "yyyy-MM-dd");
+    const formattedEndOfMonth = format(to, "yyyy-MM-dd");
     const employeesIds = employees.map((employee) => employee.id);
     const endpoint = `${this.endpoint}timesheet?`;
     const params = new URLSearchParams({

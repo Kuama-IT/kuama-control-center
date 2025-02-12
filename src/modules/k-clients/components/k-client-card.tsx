@@ -2,9 +2,9 @@ import { HiArrowSmRight } from "react-icons/hi";
 import Image from "next/image";
 import { KClientListItem } from "@/modules/k-clients/k-clients-server";
 import Link from "next/link";
-import { routes } from "@/app/routes";
 import { CSSProperties, Suspense } from "react";
 import KClientReportedSpentTimeGraph from "@/modules/k-clients/components/k-client-reported-spent-time-graph";
+import { routes } from "@/modules/ui/routes";
 
 type Props = {
   client: KClientListItem;
