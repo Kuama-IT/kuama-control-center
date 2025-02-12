@@ -14,7 +14,7 @@ const createDb = () => {
   const db = drizzle({
     casing: "snake_case",
     client,
-    logger: false,
+    logger: true,
     schema: { ...schema, ...relations },
   });
 

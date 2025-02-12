@@ -3,6 +3,8 @@ import Link from "next/link";
 import { FaUserGroup } from "react-icons/fa6";
 import { AiFillHome } from "react-icons/ai";
 import { MdOutlineWork, MdWork } from "react-icons/md";
+import { routes } from "@/modules/ui/routes";
+import { IoMdSettings } from "react-icons/io";
 
 export const NavBar = async () => {
   const session = await auth();
@@ -12,19 +14,25 @@ export const NavBar = async () => {
 
   return (
     <div className="bg-foreground text-background flex gap-4 rounded-full fixed bottom-2 right-8 md:right-1/3 left-8 md:left-1/3 p-4 uppercase items-center justify-center">
-      <Link href="/k-dashboard">
+      <Link href={routes.dashboard()}>
         <AiFillHome aria-label="Dashboard" />
       </Link>
 
       {session.user.isAdmin && (
-        <Link href="/k-clients">
+        <Link href={routes.clients()}>
           <MdOutlineWork aria-label="Clients" />
         </Link>
       )}
 
       {session.user.isAdmin && (
-        <Link href="/k-employees">
+        <Link href={routes.employees()}>
           <FaUserGroup aria-label="Employees" />
+        </Link>
+      )}
+
+      {session.user.isAdmin && (
+        <Link href={routes.settings()}>
+          <IoMdSettings aria-label="Settings" />
         </Link>
       )}
     </div>

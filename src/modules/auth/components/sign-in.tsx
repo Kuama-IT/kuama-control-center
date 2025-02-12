@@ -2,10 +2,11 @@ import { auth, signIn } from "@/modules/auth/auth";
 import { Button } from "@/components/ui/button";
 import { redirect } from "next/navigation";
 import Image from "next/image";
+import { routes } from "@/modules/ui/routes";
 export default async function SignIn() {
   const session = await auth();
   if (session?.user) {
-    redirect("/k-dashboard");
+    redirect(routes.dashboard());
   }
   return (
     <div className="h-svh w-svw flex flex-col items-center justify-center">
@@ -17,7 +18,7 @@ export default async function SignIn() {
         <form
           action={async () => {
             "use server";
-            await signIn("youtrack", { redirectTo: "/k-dashboard" });
+            await signIn("youtrack", { redirectTo: routes.dashboard() });
           }}
         >
           <Button size="lg" type="submit" className="flex gap-4 p-8">

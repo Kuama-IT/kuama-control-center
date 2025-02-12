@@ -15,7 +15,7 @@ const serverEnvSchema = z
     YOUTRACK_AUTH_CLIENT_ID: z.string().nonempty(),
     YOUTRACK_AUTH_CLIENT_SECRET: z.string().nonempty(),
     YOUTRACK_AUTH_ISSUER: z.string().nonempty(),
-    NODE_ENV: z.string().nonempty(),
+    NODE_ENV: z.string().nonempty().optional(),
   })
   .transform((data) => {
     return {
