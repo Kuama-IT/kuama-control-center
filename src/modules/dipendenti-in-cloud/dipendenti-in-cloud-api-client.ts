@@ -1,13 +1,13 @@
 import { serverEnv } from "@/env/server-env";
 import {
-  DipendentiInCloudEmployee,
   dipendentiInCloudEmployeesSchema,
   dipendentiInCloudPayrollsSchema,
   dipendentiInCloudTimesheetResponseSchema,
+  EmployeeSalaryHistory,
 } from "@/modules/dipendenti-in-cloud/schemas/dipendenti-in-cloud-schemas";
-import { endOfMonth, startOfMonth, format } from "date-fns";
+import { format } from "date-fns";
 
-class DipendentiInCloudApi {
+export class DipendentiInCloudApi {
   constructor(
     public readonly apiToken: string,
     public readonly endpoint: string,
@@ -77,6 +77,36 @@ class DipendentiInCloudApi {
     const parsed = dipendentiInCloudPayrollsSchema.parse(jsonResponse);
 
     return parsed.data;
+  }
+
+  async getPayrollsHistory(years: number[]) {
+    const employees = await this.getEmployees();
+    const payrolls: EmployeeSalaryHistory[] = [];
+
+    for (const employee of employees) {
+      const employeePayrolls: EmployeeSalaryHistory = {
+        name: employee.full_name,
+        salaries: {},
+      };
+      for (const year of years) {
+        employeePayrolls.salaries[year] = [];
+
+        const payrolls = await this.getPayrolls(employee.id, year);
+        for (const payroll of payrolls) {
+          for (const attachment of payroll.attachments) {
+            employeePayrolls.salaries[year].push({
+              net: payroll.net,
+              url: attachment.url,
+              date: payroll.date,
+            });
+          }
+        }
+      }
+
+      payrolls.push(employeePayrolls);
+    }
+
+    return payrolls;
   }
 }
 

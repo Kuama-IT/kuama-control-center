@@ -1,5 +1,9 @@
-import { expect, test, describe } from "vitest";
+import { describe, expect, test } from "vitest";
 import { dipendentiInCloudApiClient } from "@/modules/dipendenti-in-cloud/dipendenti-in-cloud-api-client";
+import {
+  getSalaryHistoryWithGrossAmounts,
+  readGrossSalary,
+} from "@/modules/dipendenti-in-cloud/dipendenti-in-cloud-utils";
 
 // N.B. This was written just to build the client, it is performing real calls and presumes a working env is present
 describe("dipendenti-in-cloud-api", () => {
@@ -32,5 +36,22 @@ describe("dipendenti-in-cloud-api", () => {
   //     2024,
   //   );
   //   expect(payrolls.length).greaterThan(1);
+  // });
+
+  // test("get salaries history", async () => {
+  //   const salariesHistory = await getSalaryHistoryWithGrossAmounts(
+  //     dipendentiInCloudApiClient,
+  //     [2025],
+  //   );
+  //   for (const salaryHistory of salariesHistory) {
+  //     for (const [_, salaries] of Object.entries(salaryHistory.salaries)) {
+  //       for (const salary of salaries) {
+  //         expect(salary.gross).not.toBeUndefined();
+  //         expect(salary.gross).not.toBeNaN();
+  //         expect(salary.gross).gt(1000);
+  //         expect(salary.gross).lt(2500);
+  //       }
+  //     }
+  //   }
   // });
 });
