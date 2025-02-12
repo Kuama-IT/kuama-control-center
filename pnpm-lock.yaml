@@ -83,6 +83,9 @@ importers:
       octokit:
         specifier: ^4.1.0
         version: 4.1.0
+      pdf2json:
+        specifier: ^3.1.5
+        version: 3.1.5
       postgres:
         specifier: ^3.4.5
         version: 3.4.5
@@ -2898,6 +2901,13 @@ packages:
   pathval@2.0.0:
     resolution: {integrity: sha512-vE7JKRyES09KiunauX7nd2Q9/L7lhok4smP9RZTDeD4MVs72Dp2qNFVz39Nz5a0FVEW0BJR6C0DYrq6unoziZA==}
     engines: {node: '>= 14.16'}
+
+  pdf2json@3.1.5:
+    resolution: {integrity: sha512-djZPInDLNuJU+o6GaJNvcoUh6MtUAx3IYTQCTxywHzeg1jC5YWgz/XzlgmduxxBblpMTqY2fjcWwvyRdGPTyrQ==}
+    engines: {node: '>=20.18.0', npm: '>=10.8.2'}
+    hasBin: true
+    bundledDependencies:
+      - '@xmldom/xmldom'
 
   pend@1.2.0:
     resolution: {integrity: sha512-F3asv42UuXchdzt+xXqfW1OGlVBe+mxa2mqI0pg5yAHZPvFmY3Y6drSf/GQ1A86WgWEN9Kzh/WrgKa6iGcHXLg==}
@@ -6049,6 +6059,8 @@ snapshots:
   pathe@2.0.2: {}
 
   pathval@2.0.0: {}
+
+  pdf2json@3.1.5: {}
 
   pend@1.2.0: {}
 

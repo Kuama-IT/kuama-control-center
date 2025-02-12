@@ -7,9 +7,5 @@ export default async function Page({
 }) {
   const id = (await params).id;
 
-  return (
-    <div>
-      <KEmployeeDetail id={id} />
-    </div>
-  );
+  return <KEmployeeDetail id={id} />;
 }

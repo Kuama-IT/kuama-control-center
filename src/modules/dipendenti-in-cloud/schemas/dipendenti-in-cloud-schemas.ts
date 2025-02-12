@@ -125,3 +125,25 @@ const payrollSchema = z.object({
 
 export const dipendentiInCloudPayrollsSchema =
   makePagedResponseSchema(payrollSchema);
+
+// these types are not used to parse other endpoint responses, just to build our internal stuff
+export type Salary = {
+  date: string;
+  net: number;
+  url: string;
+};
+export type SalaryWithGross = Salary & { gross: number };
+export type SalaryByYear = {
+  [key in number]: Salary[];
+};
+export type SalaryWithGrossByYear = {
+  [key in number]: SalaryWithGross[];
+};
+export type EmployeeSalaryHistory = {
+  name: string;
+  salaries: SalaryByYear;
+};
+export type EmployeeSalaryWithGrossHistory = {
+  name: string;
+  salaries: SalaryWithGrossByYear;
+};
