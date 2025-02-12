@@ -12,9 +12,9 @@ export const metadata: Metadata = {
 
 export default async function Page() {
   return (
-    <div className="max-w-screen-lg mx-auto">
+    <div className="max-w-screen-lg mx-auto flex flex-col gap-8">
       <Title icon={<IoMdSettings />}>Settings</Title>
-      <div className="grid grid-cols-2 gap/4">
+      <div className="grid grid-cols-2 gap-4">
         <SyncPresenceSettings />
         <SyncEmployees />
         <SyncButton />

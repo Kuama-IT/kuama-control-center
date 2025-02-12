@@ -19,12 +19,14 @@ export default async function syncDipendentiInCloudTimesheet({
     .where(isNotNull(kEmployees.dipendentiInCloudId));
 
   // remove kAbsenceDays for the given range
-  db.delete(kAbsenceDays).where(
-    and(
-      gte(kAbsenceDays.date, format(from, "yyyy-MM-dd")),
-      lte(kAbsenceDays.date, format(to, "yyyy-MM-dd")),
-    ),
-  );
+  await db
+    .delete(kAbsenceDays)
+    .where(
+      and(
+        gte(kAbsenceDays.date, format(from, "yyyy-MM-dd")),
+        lte(kAbsenceDays.date, format(to, "yyyy-MM-dd")),
+      ),
+    );
 
   const timesheet = await dipendentiInCloudApiClient.getMonthlyTimesheet(
     from,
@@ -48,12 +50,33 @@ export default async function syncDipendentiInCloudTimesheet({
         .where(eq(kEmployees.dipendentiInCloudId, dipendentiInCloudId));
 
       await db.insert(kAbsenceDays).values(
-        timesheetEntry.reasons.map((reason) => ({
-          date,
-          employeeId: res[0].id,
-          description: reason.reason.name,
-          duration: `${reason.duration} minute`,
-        })),
+        timesheetEntry.reasons
+          .map(({ reason, shifts, duration, duration_pending }) => {
+            return (
+              shifts?.map((shift) => {
+                return {
+                  date,
+                  employeeId: res[0].id,
+                  description: reason.name,
+                  duration: `${shift.duration ?? shift.duration_pending} minute`,
+                  pending: shift.duration_pending !== null,
+                  timeStart: shift.time_start,
+                  timeEnd: shift.time_end,
+                };
+              }) ?? [
+                {
+                  date,
+                  employeeId: res[0].id,
+                  description: reason.name,
+                  duration: `${duration ?? duration_pending} minute`,
+                  pending: duration_pending !== null,
+                  timeStart: "08:00:00",
+                  timeEnd: "18:00:00",
+                },
+              ]
+            );
+          })
+          .flat(),
       );
     }
   }
