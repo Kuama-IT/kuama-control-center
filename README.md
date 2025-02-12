@@ -39,11 +39,13 @@ A project may have
 - [x] Authentication: Allow only admin & dipendenti in cloud users to login
 - [x] Make prettier check only relevant files
 - [x] Employee list
-- [ ] Dashboard: who is absent this week?
+- [x] Dashboard: who is absent this week?
 - [ ] Dashboard: monthly overall commits graphs
 - [ ] Dashboard: monthly overall time reports graphs
 - [ ] Dashboard: monthly expected expenses graphs
 - [ ] Dashboard: monthly expected revenues graphs
+- [ ] Dashboard: yearly expected revenues (compare v/s previous years)
+- [ ] Dashboard: yearly expected turnover (compare v/s previous years)
 - [ ] Rework sync logics: each client should provide a set of credentials to be used to sync data. Logical flow should be -> get all spent time by credentials -> understand which project and which issue (we probably don't care to sync them over YT) -> import to db
 - [ ] Employee profile: provide credentials
 - [ ] Employee profile: sync data button
@@ -64,5 +66,4 @@ A project may have
 - [ ] Client profile: Reports button
 - [x] Projects: Team
 - [x] Projects: previews slider
-- [ ] Projects: list of issues being worked on
 - [ ] Site Navigation (header, menu...)

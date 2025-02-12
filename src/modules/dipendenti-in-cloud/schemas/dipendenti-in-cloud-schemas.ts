@@ -60,6 +60,16 @@ export const dipendentiInCloudTimesheetDaySchema = z.object({
       }),
       duration: z.number().nullable(),
       duration_pending: z.number().nullable(),
+      shifts: z
+        .array(
+          z.object({
+            duration: z.number().nullable(),
+            duration_pending: z.number().nullable(),
+            time_start: z.string(),
+            time_end: z.string(),
+          }),
+        )
+        .nullable(),
     }),
   ),
 });

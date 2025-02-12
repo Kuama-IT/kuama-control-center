@@ -1,5 +1,6 @@
 import {
   AnyPgColumn,
+  boolean,
   date,
   interval,
   pgEnum,
@@ -56,6 +57,9 @@ export const kAbsenceDays = pgTable("k_absence_days", {
   employeeId: serial().references(() => kEmployees.id),
   description: text(),
   duration: interval({ fields: "minute" }),
+  pending: boolean(),
+  timeStart: varchar(),
+  timeEnd: varchar(),
 });
 
 export const kProjects = pgTable("k_projects", {
