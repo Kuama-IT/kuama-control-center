@@ -4,7 +4,7 @@ import { Suspense } from "react";
 
 export default function Dashboard() {
   return (
-    <div>
+    <div className="pt-4 px-4">
       <Suspense fallback={<Skeleton />}>
         <WeeklyAbsence />
       </Suspense>
