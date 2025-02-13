@@ -18,6 +18,10 @@ export default withUt({
       "900": "900ms",
     },
     extend: {
+      fontFamily: {
+        sans: ["var(--app-font)", "ui-sans-serif", "system-ui"],
+        serif: ["var(--app-font)", "ui-sans-serif", "system-ui"],
+      },
       colors: {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",

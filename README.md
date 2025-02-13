@@ -47,7 +47,8 @@ A project may have
 - [ ] Dashboard: yearly expected revenues (compare v/s previous years)
 - [ ] Dashboard: yearly expected turnover (compare v/s previous years)
 - [ ] Rework sync logics: each client should provide a set of credentials to be used to sync data. Logical flow should be -> get all spent time by credentials -> understand which project and which issue (we probably don't care to sync them over YT) -> import to db
-- [ ] Employee profile: provide credentials
+- [ ] Client profile: List of credentials. Do we need to associate credentials to projects/employee/client? hmmmm
+- [ ] Employee profile: provide credentials? hmmm
 - [ ] Employee profile: sync data button
 - [ ] Employee profile: reported hours until today
 - [ ] Employee profile: performed commits until today
@@ -57,7 +58,6 @@ A project may have
 - [ ] Employee profile: total earnings for company until today
 - [ ] Employee profile: List of projects he's working on this month
 - [ ] Client profile: List of projects
-- [ ] Client profile: List of credentials. Do we need to associate credentials to projects?
 - [ ] Client profile: Contract settings (see gotchas)
 - [ ] Client profile: List of invoices
 - [ ] Client profile: Earned until today (by year)

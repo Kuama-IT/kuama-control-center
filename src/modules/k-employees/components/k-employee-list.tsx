@@ -6,7 +6,7 @@ export default async function KEmployees() {
   const employees = await kEmployeesServer.listAll();
   return (
     <>
-      <Title>Employees</Title>
+      <Title>Employees ({employees.length})</Title>
       <div className="grid gap-12 sm:grid-cols-1 md:grid-cols-3 py-8 items-center">
         {employees.map((employee, index) => (
           <KEmployeeCard
