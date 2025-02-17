@@ -20,6 +20,11 @@ export const syncData = async () => {
   const users = await syncYoutrackUsers();
 
   for (const user of users) {
+    if (!user.email) {
+      console.log("skipping user", user);
+      continue;
+    }
+
     await syncYouTrackUser(user, projects);
   }
 

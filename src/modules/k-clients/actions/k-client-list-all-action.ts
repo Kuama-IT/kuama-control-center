@@ -1,11 +1,17 @@
 import { db } from "@/drizzle/drizzle-db";
 import { kClients, kProjects, kTeams } from "@/drizzle/schema";
-import { eq } from "drizzle-orm";
+import { asc, eq } from "drizzle-orm";
 import { inArray } from "drizzle-orm/sql/expressions/conditions";
 import { KClientListItem } from "@/modules/k-clients/k-clients-server";
+import { handleServerErrors } from "@/utils/server-action-utils";
 
-export const kClientsListAllAction = async (): Promise<KClientListItem[]> => {
-  const clients = await db.select().from(kClients);
+const kClientsListAllAction = async (): Promise<KClientListItem[]> => {
+  const clients = await db.query.kClients.findMany({
+    with: {
+      kVats: true,
+    },
+    orderBy: [asc(kClients.name)],
+  });
   // remove last trailing slash from the base url
 
   const enhancedClients = await Promise.all(
@@ -38,3 +44,9 @@ export const kClientsListAllAction = async (): Promise<KClientListItem[]> => {
     (client) => client.projectsCount > 0 || client.name === "Kuama",
   );
 };
+
+export default handleServerErrors(kClientsListAllAction);
+
+export type KClientListAllAction = Awaited<
+  ReturnType<typeof kClientsListAllAction>
+>;

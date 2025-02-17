@@ -18,10 +18,11 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useTransition } from "react";
-import { deleteKPlatformCredentials } from "@/modules/k-platform-credentials/actions/k-platform-credentials-delete";
+import deleteKPlatformCredentials from "@/modules/k-platform-credentials/actions/k-platform-credentials-delete-action";
 import { useRouter } from "next/navigation";
 import syncTimeSpentForClient from "@/modules/sync-data/actions/sync-time-spent-by-credentials-for-client";
 import Link from "next/link";
+import { isFailure } from "@/utils/server-action-utils";
 
 export const KPlatformCredentialsCard = ({
   credentials,
@@ -34,7 +35,13 @@ export const KPlatformCredentialsCard = ({
 
   const deleteCredentials = () => {
     startTransition(async () => {
-      await deleteKPlatformCredentials(credentials.id);
+      const res = await deleteKPlatformCredentials(credentials.id);
+      if (isFailure(res)) {
+        toast({
+          title: "Error during credentials deletion, check server logs",
+        });
+        return;
+      }
       router.refresh();
     });
   };

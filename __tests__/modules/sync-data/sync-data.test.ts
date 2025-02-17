@@ -1,4 +1,4 @@
-import { expect, test, describe } from "vitest";
+import { describe, expect, test } from "vitest";
 import { syncData } from "@/modules/sync-data/sync-data";
 
 describe("sync-data", () => {

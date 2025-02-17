@@ -1,17 +1,25 @@
 import { kClientsServer } from "@/modules/k-clients/k-clients-server";
+import { isFailure } from "@/utils/server-action-utils";
+import { ErrorMessage } from "@/modules/ui/components/error-message";
 
 export default async function KClientSpentTime({
   date,
-  projects,
+  projectIds,
   className,
 }: {
   date: Date;
-  projects: number[];
+  projectIds: number[];
   className?: string;
 }) {
   try {
-    const { humanReadableDuration } =
-      await kClientsServer.getTasksAndSpentTimes(projects, date);
+    const res = await kClientsServer.getTasksAndSpentTimes({
+      projectIds,
+      date,
+    });
+    if (isFailure(res)) {
+      return <ErrorMessage failure={res} />;
+    }
+    const { humanReadableDuration } = res;
 
     return <div className={className}>{humanReadableDuration}</div>;
   } catch (e) {

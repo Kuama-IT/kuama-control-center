@@ -2,7 +2,7 @@ import { auth } from "@/modules/auth/auth";
 import Link from "next/link";
 import { FaUserGroup } from "react-icons/fa6";
 import { AiFillHome } from "react-icons/ai";
-import { MdOutlineWork, MdWork } from "react-icons/md";
+import { MdOutlineWork } from "react-icons/md";
 import { routes } from "@/modules/ui/routes";
 import { IoMdSettings } from "react-icons/io";
 

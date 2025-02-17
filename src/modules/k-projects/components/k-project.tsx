@@ -19,7 +19,7 @@ export const KProject = ({ project }: { project: KProjectsReadFull }) => {
         <div className="flex divide-x items-center">
           <div className="px-4">
             <Suspense fallback={"loading project month spent time total"}>
-              <KClientSpentTime date={new Date()} projects={[project.id]} />
+              <KClientSpentTime date={new Date()} projectIds={[project.id]} />
             </Suspense>
           </div>
 

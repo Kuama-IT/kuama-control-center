@@ -5,6 +5,8 @@ const serverEnvSchema = z
     DATABASE_URL: z.string().nonempty(),
     DIPENDENTI_IN_CLOUD_API_ENDPOINT: z.string().nonempty().endsWith("/"),
     DIPENDENTI_IN_CLOUD_PERSISTENT_TOKEN: z.string().nonempty(),
+    FATTURE_IN_CLOUD_PERSISTENT_TOKEN: z.string().nonempty(),
+    FATTURE_IN_CLOUD_COMPANY_ID: z.string().nonempty(),
     GITHUB_ORGANIZATION: z.string().nonempty(),
     GITHUB_PERSISTENT_TOKEN: z.string().nonempty(),
     YOUTRACK_API_ENDPOINT: z.string().nonempty().endsWith("/"),
@@ -23,6 +25,8 @@ const serverEnvSchema = z
       dipendentiInCloudApiEndpoint: data.DIPENDENTI_IN_CLOUD_API_ENDPOINT,
       dipendentiInCloudApiPersistentToken:
         data.DIPENDENTI_IN_CLOUD_PERSISTENT_TOKEN,
+      fattureInCloudApiPersistentToken: data.FATTURE_IN_CLOUD_PERSISTENT_TOKEN,
+      fattureInCloudCompanyId: data.FATTURE_IN_CLOUD_COMPANY_ID,
       githubOrganization: data.GITHUB_ORGANIZATION,
       githubPersistentToken: data.GITHUB_PERSISTENT_TOKEN,
       youtrackApiEndpoint: data.YOUTRACK_API_ENDPOINT,

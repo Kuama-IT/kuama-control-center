@@ -1,11 +1,10 @@
 import { ReducedUser } from "@/modules/you-track/schemas/youtrack-schemas";
 import { db } from "@/drizzle/drizzle-db";
-import { kEmployees, kSpentTimes, kTasks } from "@/drizzle/schema";
+import { kSpentTimes } from "@/drizzle/schema";
 import { youtrackApiClient } from "@/modules/you-track/youtrack-api-client";
 import { format } from "date-fns";
 import { KProjectsRead } from "@/drizzle/drizzle-types";
 import { syncYouTrackIssuesFromWorkItems } from "@/modules/sync-data/sync-youtrack-issues";
-import { eq } from "drizzle-orm";
 
 /**
  * This functions assumes that all YT projects are already in the database
@@ -23,7 +22,7 @@ export const syncYouTrackUser = async (
   console.log(`fetching work items for ${user.email}`);
   console.time(`fetching work items for ${user.email}`);
 
-  const workItems = (await youtrackApiClient.getWorkItems(user.email)) ?? [];
+  const workItems = (await youtrackApiClient.getWorkItems(user.email!)) ?? [];
 
   for (const relatedEmail in user.relatedUserEmails) {
     console.log(`fetching work items for ${relatedEmail}`);

@@ -1,5 +1,4 @@
-import { expect, test, describe } from "vitest";
-import { githubApiClient } from "@/modules/github/github-api-client";
+import { describe, expect, test } from "vitest";
 
 // N.B. This was written just to build the client, it is performing real calls and presumes a working env is present
 describe("github api client", () => {

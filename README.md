@@ -49,14 +49,14 @@ A project may have
 - [ ] Rework sync logics: each client should provide a set of credentials to be used to sync data. Logical flow should be -> get all spent time by credentials -> understand which project and which issue (we probably don't care to sync them over YT) -> import to db
 - [ ] Client profile: List of credentials. Do we need to associate credentials to projects/employee/client? hmmmm
 - [ ] Employee profile: provide credentials? hmmm
-- [ ] Employee profile: sync data button
+- [x] Employee profile: sync data button
 - [ ] Employee profile: reported hours until today
 - [ ] Employee profile: performed commits until today
 - [ ] Employee profile: list of payrolls
 - [ ] Employee profile: total amount earned until today
 - [ ] Employee profile: total cost for the company until today
 - [ ] Employee profile: total earnings for company until today
-- [ ] Employee profile: List of projects he's working on this month
+- [ ] Employee profile: List of projects he's been working on
 - [ ] Client profile: List of projects
 - [ ] Client profile: Contract settings (see gotchas)
 - [ ] Client profile: List of invoices
@@ -67,3 +67,10 @@ A project may have
 - [x] Projects: Team
 - [x] Projects: previews slider
 - [ ] Site Navigation (header, menu...)
+
+Iniziamo dal valore della RAL: 2.000 x 12 = 24.000 €
+Aggiungiamo ora la tredicesima: RAL = 24.000 + 2.000 = 26.000 €
+Calcoliamo ora i contributi a carico dell’azienda, applicando la percentuale media del 30%: 26.000 x 30%= 7.800 €
+A questo punto, calcoliamo la quota di TFR da accantonare: 26.000 : 13,5 = 1.926 € (arrotondato)
+Per finire, sommiamo i dati ricavati per capire quanto costa un dipendente a tempo indeterminato full-time: 26.000 + 7.800 + 1.926 = 35.726 euro
+A questo importo dovremo poi aggiungere i vari costi diretti e indiretti che abbiamo analizzato nel corso dell’articolo.

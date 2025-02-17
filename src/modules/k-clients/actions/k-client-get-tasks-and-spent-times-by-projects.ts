@@ -1,31 +1,16 @@
-import { db } from "@/drizzle/drizzle-db";
-import { and, gte, lte } from "drizzle-orm";
-import { kSpentTimes, kTasks } from "@/drizzle/schema";
-import { endOfMonth, format, formatDuration, startOfMonth } from "date-fns";
-import { inArray } from "drizzle-orm/sql/expressions/conditions";
+"use server";
+import { formatDuration } from "date-fns";
 import parsePostgresInterval from "postgres-interval";
+import { handleServerErrors } from "@/utils/server-action-utils";
+import { getAllClientSpentTimesByProjectAndDateQuery } from "@/modules/k-clients/utils/get-all-client-spent-times-by-project-and-date";
 
-export const getAllClientSpentTimesByProjectAndDateQuery = (
-  projectIds: number[],
-  date: Date,
-) => {
-  return db.query.kTasks.findMany({
-    with: {
-      kSpentTimes: {
-        where: and(
-          gte(kSpentTimes.date, format(startOfMonth(date), "yyyy-MM-dd")),
-          lte(kSpentTimes.date, format(endOfMonth(date), "yyyy-MM-dd")),
-        ),
-      },
-    },
-    where: and(inArray(kTasks.projectId, projectIds)),
-  });
-};
-
-export const kClientGetTasksAndSpentTimesByProjects = async (
-  projectIds: number[],
-  date: Date,
-) => {
+const kClientGetTasksAndSpentTimesByProjects = async ({
+  projectIds,
+  date,
+}: {
+  projectIds: number[];
+  date: Date;
+}) => {
   const queryResult = await getAllClientSpentTimesByProjectAndDateQuery(
     projectIds,
     date,
@@ -37,8 +22,6 @@ export const kClientGetTasksAndSpentTimesByProjects = async (
       spentTimes: [],
     };
   }
-
-  const tasksCount = queryResult.length;
 
   // TODO: group by project?
   const initialDuration = {
@@ -114,3 +97,5 @@ export const kClientGetTasksAndSpentTimesByProjects = async (
     spentTimes: queryResult,
   };
 };
+
+export default handleServerErrors(kClientGetTasksAndSpentTimesByProjects);

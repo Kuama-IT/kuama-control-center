@@ -2,11 +2,14 @@ import {
   AnyPgColumn,
   boolean,
   date,
+  integer,
   interval,
   pgEnum,
   pgTable,
+  real,
   serial,
   text,
+  timestamp,
   varchar,
 } from "drizzle-orm/pg-core";
 import { sql, SQL } from "drizzle-orm";
@@ -30,10 +33,34 @@ export const kPlatformCredentials = pgTable("k_platform_credentials", {
     .notNull(),
 });
 
+export const kInvoices = pgTable("k_invoices", {
+  id: serial().primaryKey(),
+  clientVat: serial()
+    .references(() => kClientVats.id)
+    .notNull(),
+  subject: varchar({ length: 256 }).notNull(),
+  amountNet: real().notNull().default(0),
+  amountGross: real().notNull().default(0),
+  amountVat: real().notNull().default(0),
+  date: date().notNull(),
+  number: integer().notNull(),
+  createdAt: timestamp().notNull().defaultNow(),
+  updatedAt: timestamp().notNull().defaultNow(),
+});
+
+export const kClientVats = pgTable("k_client_vats", {
+  id: serial().primaryKey(),
+  vat: varchar({ length: 256 }).notNull(),
+  companyName: varchar({ length: 256 }).notNull(),
+  fattureInCloudId: varchar({ length: 256 }).unique(),
+  clientId: serial()
+    .references(() => kClients.id)
+    .notNull(),
+});
+
 export const kClients = pgTable("k_clients", {
   id: serial().primaryKey(),
   name: varchar({ length: 256 }).notNull(),
-  vat: varchar({ length: 256 }),
   avatarUrl: text(),
   youTrackRingId: varchar({ length: 256 }).unique(),
 });
