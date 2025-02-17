@@ -1,9 +1,4 @@
 import { describe, expect, test } from "vitest";
-import { dipendentiInCloudApiClient } from "@/modules/dipendenti-in-cloud/dipendenti-in-cloud-api-client";
-import {
-  getSalaryHistoryWithGrossAmounts,
-  readGrossSalary,
-} from "@/modules/dipendenti-in-cloud/dipendenti-in-cloud-utils";
 
 // N.B. This was written just to build the client, it is performing real calls and presumes a working env is present
 describe("dipendenti-in-cloud-api", () => {

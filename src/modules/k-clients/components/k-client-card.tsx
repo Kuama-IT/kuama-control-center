@@ -5,15 +5,18 @@ import Link from "next/link";
 import { CSSProperties, Suspense } from "react";
 import KClientReportedSpentTimeGraph from "@/modules/k-clients/components/k-client-reported-spent-time-graph";
 import { routes } from "@/modules/ui/routes";
+import KClientInvoicedAmount from "@/modules/k-clients/components/k-client-invoiced-amount";
+import { auth } from "@/modules/auth/auth";
 
 type Props = {
   client: KClientListItem;
-  index: number;
+  index?: number;
 };
-export const KClientCard = ({ client, index }: Props) => {
+export const KClientCard = async ({ client, index = 0 }: Props) => {
   const style = {
     "--animation-duration": `${0.3 + index}s`,
   } as CSSProperties;
+  const session = await auth();
   return (
     <Link href={routes.client(client.id)} className="cursor-pointer">
       <div className="flex items-center relative group">
@@ -39,6 +42,11 @@ export const KClientCard = ({ client, index }: Props) => {
           </div>
           <p>{client.projectsCount} projects</p>
           <p>{client.employeesWorkingForClientCount} employees involved</p>
+          {session?.user?.isAdmin && (
+            <Suspense>
+              <KClientInvoicedAmount clientId={client.id} />
+            </Suspense>
+          )}
         </div>
         <HiArrowSmRight className="pointer-events-none absolute right-0 opacity-0 text-2xl text-gray-300 group-hover:opacity-100 group-hover:right-4 transition-all" />
       </div>

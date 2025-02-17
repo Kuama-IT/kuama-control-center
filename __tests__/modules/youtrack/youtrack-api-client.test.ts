@@ -1,5 +1,4 @@
 import { describe, expect, test } from "vitest";
-import { youtrackApiClient } from "@/modules/you-track/youtrack-api-client";
 
 // N.B. This was written just to build the client, it is performing real calls and presumes a working env is present
 describe("youtrack api client", () => {
@@ -13,11 +12,10 @@ describe("youtrack api client", () => {
   //   expect(workItems?.length).greaterThan(10);
   // });
   //
-  test("get all youtrack users", async () => {
-    const users = await youtrackApiClient.getUsers();
-    console.log(users);
-    expect(users.length).greaterThan(10);
-  });
+  // test("get all youtrack users", async () => {
+  //   const users = await youtrackApiClient.getUsers();
+  //   expect(users.length).greaterThan(10);
+  // });
   //
   // test("get all youtrack projects", async () => {
   //   const projects = await youtrackApiClient.getProjects();

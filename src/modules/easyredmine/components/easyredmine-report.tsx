@@ -11,6 +11,8 @@ import {
 } from "@/components/ui/table";
 import Link from "next/link";
 import { format } from "date-fns";
+import { isFailure } from "@/utils/server-action-utils";
+import { ErrorMessage } from "@/modules/ui/components/error-message";
 
 export default async function EasyredmineReport({
   credentialsId,
@@ -20,6 +22,10 @@ export default async function EasyredmineReport({
   const credentials = await kPlatformCredentialsServer.byId(
     Number(credentialsId),
   );
+  if (isFailure(credentials)) {
+    return <ErrorMessage failure={credentials} />;
+  }
+
   if (!credentials) {
     return <pre>Credentials not found</pre>;
   }
@@ -31,9 +37,14 @@ export default async function EasyredmineReport({
   const date = new Date();
   const previousMonth = new Date(date.getTime());
   previousMonth.setDate(0);
-  const { timesSpent: spentTimes, monthTotalHours } =
-    await easyRedmineGetSpentTimes(credentials, previousMonth); // TODO: get date from query params
-
+  const res = await easyRedmineGetSpentTimes({
+    credentials,
+    date: previousMonth,
+  }); // TODO: get date from query params
+  if (isFailure(res)) {
+    return <ErrorMessage failure={res} />;
+  }
+  const { timesSpent: spentTimes, monthTotalHours } = res;
   const monthName = format(spentTimes[0].date, "MMMM");
   const userFullName = spentTimes[0].userFullName;
   const agency = spentTimes[0].agency;

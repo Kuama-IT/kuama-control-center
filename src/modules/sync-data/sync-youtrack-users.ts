@@ -9,6 +9,7 @@ export const syncYoutrackUsers = async () => {
 
   const youTrackUsers = await youtrackApiClient.getUsers();
   const users: Array<ReducedUser & { employeeId: number }> = [];
+  // TODO we should discern if user is employee or not
   await db.transaction(async (tx) => {
     for (const user of youTrackUsers) {
       console.log(`syncYouTrackUser -> ${user.email}`);

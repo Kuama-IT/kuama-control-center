@@ -2,7 +2,6 @@ import {
   createUploadthing,
   type FileRouter as UploadthingFileRouter,
 } from "uploadthing/next";
-import { UploadThingError } from "uploadthing/server";
 import { z } from "zod";
 import { kProjectsServer } from "@/modules/k-projects/k-projects-server";
 
@@ -43,7 +42,10 @@ export const fileRouter = {
       };
     })
     .onUploadComplete(async ({ metadata, file }) => {
-      await kProjectsServer.addImages(metadata.projectId, [file.url]);
+      await kProjectsServer.addImages({
+        projectId: metadata.projectId,
+        images: [file.ufsUrl],
+      });
     }),
 } satisfies UploadthingFileRouter;
 

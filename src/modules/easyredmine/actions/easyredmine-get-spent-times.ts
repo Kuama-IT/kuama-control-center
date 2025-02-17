@@ -1,10 +1,14 @@
 import { EasyRedmineApiClient } from "@/modules/easyredmine/easyredmine-api-client";
 import { KPlatformCredentialsRead } from "@/drizzle/drizzle-types";
+import { handleServerErrors } from "@/utils/server-action-utils";
 
-export default async function easyRedmineGetSpentTimes(
-  credentials: KPlatformCredentialsRead,
-  date: Date,
-) {
+async function easyRedmineGetSpentTimes({
+  credentials,
+  date,
+}: {
+  credentials: KPlatformCredentialsRead;
+  date: Date;
+}) {
   const client = new EasyRedmineApiClient(
     credentials.endpoint,
     credentials.persistentToken,
@@ -12,3 +16,5 @@ export default async function easyRedmineGetSpentTimes(
 
   return await client.getSpentTimes(date);
 }
+
+export default handleServerErrors(easyRedmineGetSpentTimes);

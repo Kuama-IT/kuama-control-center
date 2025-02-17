@@ -26,10 +26,12 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
-import { kPlatformCredentialsServer } from "@/modules/k-platform-credentials/k-platform-credentials-server";
-import { createKPlatformCredentials } from "@/modules/k-platform-credentials/actions/k-platform-credentials-create";
+
+import createKPlatformCredentials from "@/modules/k-platform-credentials/actions/k-platform-credentials-create-action";
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { isFailure } from "@/utils/server-action-utils";
+import { useToast } from "@/hooks/use-toast";
 
 type Props = {
   clientId: number;
@@ -45,6 +47,7 @@ export const KPlatformCredentialsForm = ({ clientId }: Props) => {
       endpoint: "",
     },
   });
+  const { toast } = useToast();
   const router = useRouter();
 
   const [isPending, startTransition] = useTransition();
@@ -53,7 +56,16 @@ export const KPlatformCredentialsForm = ({ clientId }: Props) => {
     credentials: KPlatformCredentialsValidForm,
   ) => {
     startTransition(async () => {
-      await createKPlatformCredentials({ ...credentials, clientId });
+      const res = await createKPlatformCredentials({
+        ...credentials,
+        clientId,
+      });
+      if (isFailure(res)) {
+        toast({
+          title: "Error during credentials creation, check server logs",
+        });
+        return;
+      }
       router.refresh();
       form.reset();
     });

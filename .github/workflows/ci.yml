@@ -14,6 +14,8 @@ jobs:
       DATABASE_URL: "postgresql://fake.endpoint/"
       DIPENDENTI_IN_CLOUD_API_ENDPOINT: "https://fake.endpoint/"
       DIPENDENTI_IN_CLOUD_PERSISTENT_TOKEN: "__CI__"
+      FATTURE_IN_CLOUD_PERSISTENT_TOKEN: "__CI__"
+      FATTURE_IN_CLOUD_COMPANY_ID: "__CI__"
       GITHUB_ORGANIZATION: "__CI__"
       GITHUB_PERSISTENT_TOKEN: "__CI__"
       YOUTRACK_API_ENDPOINT: "https://fake.endpoint/"

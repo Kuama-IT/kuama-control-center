@@ -9,9 +9,14 @@ import { BackButton } from "@/modules/ui/components/back-button";
 import { KProject } from "@/modules/k-projects/components/k-project";
 import KPlatformCredentialsList from "@/modules/k-platform-credentials/components/k-platform-credentials-list";
 import { Skeleton } from "@/components/ui/skeleton";
+import { isFailure } from "@/utils/server-action-utils";
+import { ErrorMessage } from "@/modules/ui/components/error-message";
 
 export default async function KClientDetail({ id }: { id: string }) {
-  const client = await kClientsServer.getOne(id, new Date());
+  const client = await kClientsServer.getOne({ id });
+  if (isFailure(client)) {
+    return <ErrorMessage failure={client} />;
+  }
   if (!client) {
     return <p>Client not found TODO manage error</p>;
   }
@@ -70,7 +75,7 @@ const InnerHeader = ({ client }: { client: KClientGetOneResult }) => {
           <KClientSpentTime
             className="text-3xl mono"
             date={new Date()}
-            projects={client.kProjects?.map((it) => it.id) ?? []}
+            projectIds={client.kProjects?.map((it) => it.id) ?? []}
           />
         </Suspense>
         <p className="text-xs italic">Monthly reported spent time</p>

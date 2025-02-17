@@ -1,9 +1,17 @@
+"use server";
 import { db } from "@/drizzle/drizzle-db";
 import { and, eq, gte, lte } from "drizzle-orm";
 import { kClients, kSpentTimes } from "@/drizzle/schema";
 import { endOfMonth, format, startOfMonth } from "date-fns";
+import { handleServerErrors } from "@/utils/server-action-utils";
 
-export const kClientGetOneAction = async (id: string, date: Date) => {
+const kClientGetOneAction = async ({
+  id,
+  date = new Date(),
+}: {
+  id: string;
+  date?: Date;
+}) => {
   const queryResult = await db.query.kClients.findFirst({
     where: eq(kClients.id, parseInt(id)),
     with: {
@@ -54,6 +62,8 @@ export const kClientGetOneAction = async (id: string, date: Date) => {
     allTimeTasksCount,
   };
 };
+
+export default handleServerErrors(kClientGetOneAction);
 
 export type KClientGetOneResult = Awaited<
   ReturnType<typeof kClientGetOneAction>

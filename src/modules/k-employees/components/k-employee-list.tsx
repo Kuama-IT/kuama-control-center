@@ -1,9 +1,14 @@
 import { Title } from "@/modules/ui/components/title";
 import { kEmployeesServer } from "@/modules/k-employees/k-employee-server";
 import { KEmployeeCard } from "@/modules/k-employees/components/k-employee-card";
+import { isFailure } from "@/utils/server-action-utils";
+import { ErrorMessage } from "@/modules/ui/components/error-message";
 
 export default async function KEmployees() {
   const employees = await kEmployeesServer.listAll();
+  if (isFailure(employees)) {
+    return <ErrorMessage failure={employees} />;
+  }
   return (
     <>
       <Title>Employees ({employees.length})</Title>

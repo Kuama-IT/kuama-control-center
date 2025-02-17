@@ -145,7 +145,7 @@ export const rawReducedUserSchema = z.object({
 });
 
 export const reducedUserSchema = rawReducedUserSchema.extend({
-  email: z.string().email(),
+  email: z.string().email().nullable(),
   relatedUserEmails: z.array(z.string()), // a user may be linked to multiple (usually banned) other users, due to the sync of our YT with external issue trackers
 });
 

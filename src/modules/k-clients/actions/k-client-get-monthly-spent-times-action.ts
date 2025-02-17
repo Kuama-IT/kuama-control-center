@@ -1,11 +1,14 @@
+"use server";
 import { db } from "@/drizzle/drizzle-db";
 import { kProjects } from "@/drizzle/schema";
 import { eq } from "drizzle-orm";
-import { getAllClientSpentTimesByProjectAndDateQuery } from "@/modules/k-clients/actions/k-client-get-tasks-and-spent-times-by-projects";
+
 import parsePostgresInterval from "postgres-interval";
+import { handleServerErrors } from "@/utils/server-action-utils";
+import { getAllClientSpentTimesByProjectAndDateQuery } from "@/modules/k-clients/utils/get-all-client-spent-times-by-project-and-date";
 
 // Returns a list of spent times for a client, grouped by date
-export const kClientGetMonthlySpentTimesAction = async (
+const kClientGetMonthlySpentTimesAction = async (
   clientId: number,
   date: Date = new Date(),
 ) => {
@@ -53,3 +56,5 @@ export const kClientGetMonthlySpentTimesAction = async (
     duration,
   }));
 };
+
+export default handleServerErrors(kClientGetMonthlySpentTimesAction);

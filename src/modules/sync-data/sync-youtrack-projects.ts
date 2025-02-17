@@ -2,7 +2,6 @@ import { youtrackApiClient } from "@/modules/you-track/youtrack-api-client";
 import { db } from "@/drizzle/drizzle-db";
 import { kProjects } from "@/drizzle/schema";
 import { KProjectsRead } from "@/drizzle/drizzle-types";
-import { OrganizationListResponse } from "@/modules/you-track/schemas/youtrack-schemas";
 
 export const syncYouTrackProjects = async (
   projectOrganizationMap: Map<string, number>,

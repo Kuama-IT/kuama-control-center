@@ -116,7 +116,8 @@ class YoutrackApiClient {
         banned ||
         YoutrackApiClient.loginsToIgnore.includes(login) ||
         loginsToAssociate.includes(login) ||
-        loginsToAssociate.includes(email ?? ""),
+        loginsToAssociate.includes(email ?? "") ||
+        email === undefined,
     );
 
     const activeUsersWithRelatedUsers = activeUsers.map((user) => {

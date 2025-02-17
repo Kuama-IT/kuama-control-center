@@ -1,13 +1,15 @@
 "use server";
 import { kPlatformCredentialsServer } from "@/modules/k-platform-credentials/k-platform-credentials-server";
 import { EasyRedmineApiClient } from "@/modules/easyredmine/easyredmine-api-client";
+import { handleServerErrors, isFailure } from "@/utils/server-action-utils";
 
 const action = async (credentialId: number) => {
-  // do not make user to wait until import is done
-
   // TODO complete
   const credentials = await kPlatformCredentialsServer.byId(credentialId);
 
+  if (isFailure(credentials)) {
+    throw new Error(JSON.parse(credentials.message));
+  }
   if (!credentials) {
     throw new Error("Credentials not found");
   }
@@ -26,7 +28,8 @@ const action = async (credentialId: number) => {
   console.log("done internal action");
 };
 
-export default async function syncTimeSpentForClient(credentialId: number) {
-  action(credentialId);
-  console.log("done");
-}
+export default handleServerErrors(async (credentialId: number) => {
+  // do not make user to wait until import is done
+  void action(credentialId);
+  console.log("request completed");
+});

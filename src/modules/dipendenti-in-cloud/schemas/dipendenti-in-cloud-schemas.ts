@@ -37,41 +37,45 @@ export const dipendentiInCloudEmployeesSchema = makePagedResponseSchema(
 );
 
 export const dipendentiInCloudTimesheetDaySchema = z.object({
-  closed: z.boolean(),
+  closed: z.boolean().optional(),
   disabled: z.boolean(),
-  error: z.unknown().nullable(),
-  hours_type: z.string(), // looks like an enum, one of the values is "fixed"
+  error: z.unknown().optional(),
+  hours_type: z.string().optional(), // looks like an enum, one of the values is "fixed"
   locked: z.boolean(),
-  note: z.boolean(),
-  presence: z.object({
-    by_contract: z.number(),
-    calculated: z.number(),
-    duration: z.number(),
-    duration_pending: z.number().nullable(),
-  }),
-  reasons: z.array(
-    z.object({
-      reason: z.object({
-        id: z.number(),
-        code: z.string(), // TODO seems like an enum, one of the values is F
-        name: z.string(),
-        color: z.string(),
-        category: z.string(), // TODO seems like an enum, one of the values is absence
-      }),
-      duration: z.number().nullable(),
+  note: z.boolean().optional(),
+  presence: z
+    .object({
+      by_contract: z.number(),
+      calculated: z.number(),
+      duration: z.number(),
       duration_pending: z.number().nullable(),
-      shifts: z
-        .array(
-          z.object({
-            duration: z.number().nullable(),
-            duration_pending: z.number().nullable(),
-            time_start: z.string(),
-            time_end: z.string(),
-          }),
-        )
-        .nullable(),
-    }),
-  ),
+    })
+    .optional(),
+  reasons: z
+    .array(
+      z.object({
+        reason: z.object({
+          id: z.number(),
+          code: z.string(), // TODO seems like an enum, one of the values is F
+          name: z.string(),
+          color: z.string(),
+          category: z.string(), // TODO seems like an enum, one of the values is absence
+        }),
+        duration: z.number().nullable(),
+        duration_pending: z.number().nullable(),
+        shifts: z
+          .array(
+            z.object({
+              duration: z.number().nullable(),
+              duration_pending: z.number().nullable(),
+              time_start: z.string(),
+              time_end: z.string(),
+            }),
+          )
+          .nullable(),
+      }),
+    )
+    .optional(),
 });
 
 const dipendentiInCloudEmployeeTimesheetSchema = z.record(
