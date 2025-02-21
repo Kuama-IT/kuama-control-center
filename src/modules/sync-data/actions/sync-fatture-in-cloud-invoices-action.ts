@@ -4,6 +4,7 @@ import { db } from "@/drizzle/drizzle-db";
 import { kClientVats, kInvoices } from "@/drizzle/schema";
 import { eq } from "drizzle-orm";
 import { handleServerErrors } from "@/utils/server-action-utils";
+import { firstOrThrow } from "@/utils/array-utils";
 
 const BATCH_SIZE = 100;
 type KInvoiceInsert = typeof kInvoices.$inferInsert;
@@ -23,14 +24,30 @@ export default handleServerErrors(async () => {
             .select()
             .from(kClientVats)
             .where(eq(kClientVats.vat, vat));
-          if (clientVat.length === 0) {
-            console.warn(
-              `TODO missing client (probably not synced from YouTrack: Client VAT ${vat} not found`,
-            );
-            return null;
+
+          let clientVatId = clientVat[0]?.id;
+          if (!clientVatId) {
+            // create client vat
+            const fattureInCloudClientId = fattureInCloudInvoice.entity?.id;
+            if (!fattureInCloudClientId) {
+              throw new Error("Fatture in Cloud Client has nullish id");
+            }
+
+            const clientVatRecord: typeof kClientVats.$inferInsert = {
+              vat,
+              companyName: fattureInCloudInvoice.entity?.name ?? "UNKNOWN",
+              fattureInCloudId: fattureInCloudClientId.toString(),
+            };
+            const res = await tx
+              .insert(kClientVats)
+              .values(clientVatRecord)
+              .returning({ insertedId: kClientVats.id });
+            const { insertedId } = firstOrThrow(res);
+            clientVatId = insertedId;
           }
+
           const record: KInvoiceInsert = {
-            clientVat: clientVat[0].id,
+            clientVat: clientVatId,
             subject: fattureInCloudInvoice.subject ?? "UNKNOWN",
             amountNet: fattureInCloudInvoice.amount_net ?? 0,
             amountGross: fattureInCloudInvoice.amount_gross ?? 0,

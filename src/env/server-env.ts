@@ -18,6 +18,8 @@ const serverEnvSchema = z
     YOUTRACK_AUTH_CLIENT_SECRET: z.string().nonempty(),
     YOUTRACK_AUTH_ISSUER: z.string().nonempty(),
     NODE_ENV: z.string().nonempty().optional(),
+    PUBBLICA_WEB_USERNAME: z.string().nonempty(),
+    PUBBLICA_WEB_PASSWORD: z.string().nonempty(),
   })
   .transform((data) => {
     return {
@@ -37,6 +39,8 @@ const serverEnvSchema = z
       youtrackAuthClientId: data.YOUTRACK_AUTH_CLIENT_ID,
       youtrackAuthClientSecret: data.YOUTRACK_AUTH_CLIENT_SECRET,
       youtrackAuthIssuer: data.YOUTRACK_AUTH_ISSUER,
+      pubblicaWebUsername: data.PUBBLICA_WEB_USERNAME,
+      pubblicaWebPassword: data.PUBBLICA_WEB_PASSWORD,
       isDev: data.NODE_ENV === "development",
     };
   });
