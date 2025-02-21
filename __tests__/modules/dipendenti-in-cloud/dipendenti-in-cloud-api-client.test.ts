@@ -1,4 +1,8 @@
 import { describe, expect, test } from "vitest";
+import { PubblicaWebApi } from "@/modules/pubblica-web/pubblica-web-api-client";
+import { serverEnv } from "@/env/server-env";
+import { dipendentiInCloudApiClient } from "@/modules/dipendenti-in-cloud/dipendenti-in-cloud-api-client";
+import { readGrossSalary } from "@/modules/dipendenti-in-cloud/dipendenti-in-cloud-utils";
 
 // N.B. This was written just to build the client, it is performing real calls and presumes a working env is present
 describe("dipendenti-in-cloud-api", () => {
@@ -28,7 +32,7 @@ describe("dipendenti-in-cloud-api", () => {
   //   const firstEmployee = employees[0];
   //   const payrolls = await dipendentiInCloudApiClient.getPayrolls(
   //     firstEmployee.id,
-  //     2024,
+  //     2025,
   //   );
   //   expect(payrolls.length).greaterThan(1);
   // });
@@ -48,5 +52,24 @@ describe("dipendenti-in-cloud-api", () => {
   //       }
   //     }
   //   }
+  // });
+
+  // test("it can send payslip from PubblicaWeb to DipendentiInCloud", async () => {
+  //   const pubblicaWebClient = new PubblicaWebApi(
+  //     serverEnv.pubblicaWebUsername,
+  //     serverEnv.pubblicaWebPassword,
+  //   );
+  //
+  //   await pubblicaWebClient.authenticate();
+  //
+  //   const date = new Date();
+  //   date.setFullYear(2021);
+  //   date.setMonth(7);
+  //   const payslips = await pubblicaWebClient.fetchPayslips(date);
+  //   const res = await dipendentiInCloudApiClient.sendPayrolls({
+  //     content: payslips.bytes,
+  //     fileName: payslips.name,
+  //   });
+  //   expect(res).toBe(true);
   // });
 });

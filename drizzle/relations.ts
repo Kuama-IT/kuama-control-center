@@ -3,6 +3,7 @@ import {
   kClients,
   kClientVats,
   kEmployees,
+  kPayrolls,
   kProjectMedias,
   kProjects,
   kSpentTimes,
@@ -24,6 +25,14 @@ export const kTeamsRelations = relations(kTeams, ({ one }) => ({
 export const kEmployeesRelations = relations(kEmployees, ({ many }) => ({
   kTeams: many(kTeams),
   kTasks: many(kTasks),
+  kPayrolls: many(kPayrolls),
+}));
+
+export const kPayrollsRelations = relations(kPayrolls, ({ one }) => ({
+  kEmployee: one(kEmployees, {
+    fields: [kPayrolls.employeeId],
+    references: [kEmployees.id],
+  }),
 }));
 
 export const kProjectsRelations = relations(kProjects, ({ one, many }) => ({

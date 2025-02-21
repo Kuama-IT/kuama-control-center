@@ -8,7 +8,7 @@ const makePagedResponseSchema = <T>(schema: z.ZodType<T>) =>
     path: z.string(),
     per_page: z.number(),
     prev_page_url: z.string().nullable(),
-    to: z.number(),
+    to: z.number().nullable(),
     total: z.number(),
   });
 
@@ -135,6 +135,7 @@ export type Salary = {
   date: string;
   net: number;
   url: string;
+  dipendentiInCloudPayrollId: number;
 };
 export type SalaryWithGross = Salary & { gross: number };
 export type SalaryByYear = {
@@ -144,10 +145,12 @@ export type SalaryWithGrossByYear = {
   [key in number]: SalaryWithGross[];
 };
 export type EmployeeSalaryHistory = {
-  name: string;
+  employeeName: string;
+  employeeId: number;
   salaries: SalaryByYear;
 };
 export type EmployeeSalaryWithGrossHistory = {
-  name: string;
+  employeeName: string;
+  employeeId: number;
   salaries: SalaryWithGrossByYear;
 };
