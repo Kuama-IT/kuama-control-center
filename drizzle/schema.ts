@@ -63,7 +63,15 @@ export const kClients = pgTable("k_clients", {
   youTrackRingId: varchar({ length: 256 }).unique(),
 });
 
-export const kPayrolls = pgTable("k_payrolls", {});
+export const kPayrolls = pgTable("k_payrolls", {
+  id: serial().primaryKey(),
+  employeeId: serial().references(() => kEmployees.id),
+  net: real().notNull(),
+  gross: real().notNull(),
+  date: date().notNull(),
+  url: varchar({ length: 1500 }).notNull(),
+  dipendentiInCloudPayrollId: varchar({ length: 256 }).unique(),
+});
 export const kEmployees = pgTable("k_employees", {
   id: serial().primaryKey(),
   email: varchar({ length: 256 }).unique(), // key for external services like dipendenti in cloud, gitlab, github..

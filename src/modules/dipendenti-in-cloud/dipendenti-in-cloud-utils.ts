@@ -28,8 +28,8 @@ const calculatePointDistance = (
   return Math.sqrt(dx * dx + dy * dy);
 };
 
-const GROSS_AMOUNT_LABEL = encodeURI("RETRIBUZIONE TOTALE");
-const MAX_DISTANCE_THRESHOLD = 32; // this number only works for the combo "pdf contents" + "pdf2json", I just printed the distances to find a good threshold
+const GROSS_AMOUNT_LABEL = encodeURI("LORDO");
+const MAX_DISTANCE_THRESHOLD = 5; // this number only works for the combo "pdf contents" + "pdf2json", I just printed the distances to find a good threshold
 
 const parseItalianNumber = (value: string): number => {
   const normalized = value
@@ -94,7 +94,7 @@ export const readGrossSalary = async (attachment: { url: string }) => {
   }
 
   if (possibleGrossAmount.length === 0) {
-    throw new Error("Could not find gross amount in pdf");
+    throw new Error(`Could not find gross amount in pdf ${attachment.url}`);
   }
 
   return Math.max(...possibleGrossAmount);
@@ -111,7 +111,8 @@ export const getSalaryHistoryWithGrossAmounts = async (
   const payrollsWithGrossAmount = [];
   for (const payroll of payrolls) {
     const payrollWithGross: EmployeeSalaryWithGrossHistory = {
-      name: payroll.name,
+      employeeId: payroll.employeeId,
+      employeeName: payroll.employeeName,
       salaries: {},
     };
 

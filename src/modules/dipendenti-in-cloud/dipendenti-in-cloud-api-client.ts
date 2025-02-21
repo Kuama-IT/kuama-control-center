@@ -85,7 +85,8 @@ export class DipendentiInCloudApi {
 
     for (const employee of employees) {
       const employeePayrolls: EmployeeSalaryHistory = {
-        name: employee.full_name,
+        employeeName: employee.full_name,
+        employeeId: employee.id,
         salaries: {},
       };
       for (const year of years) {
@@ -98,6 +99,7 @@ export class DipendentiInCloudApi {
               net: payroll.net,
               url: attachment.url,
               date: payroll.date,
+              dipendentiInCloudPayrollId: payroll.id,
             });
           }
         }
@@ -107,6 +109,40 @@ export class DipendentiInCloudApi {
     }
 
     return payrolls;
+  }
+
+  /**
+   * Sends payrolls to DipendentiInCloud. Be aware that this will still require manual confirmation from the user.
+   * @param fileName
+   * @param fileContentBase64
+   */
+  async sendPayrolls({
+    fileName,
+    content,
+  }: {
+    fileName: string;
+    content: Uint8Array<ArrayBufferLike>;
+  }) {
+    const fileContentBase64 = Buffer.from(content).toString("base64");
+    const res = await fetch(`${this.endpoint}payrolls/pending`, {
+      ...this.authenticationHeaders,
+      body: JSON.stringify({
+        data: {
+          files: [
+            {
+              filename: fileName,
+              content: fileContentBase64,
+              extension: "pdf", // because "we know"
+              mimeType: "application/pdf", // because "we know"
+              rawFile: {},
+            },
+          ],
+        },
+      }),
+      method: "POST",
+    });
+
+    return res.ok;
   }
 }
 
