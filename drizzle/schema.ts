@@ -53,9 +53,7 @@ export const kClientVats = pgTable("k_client_vats", {
   vat: varchar({ length: 256 }).notNull(),
   companyName: varchar({ length: 256 }).notNull(),
   fattureInCloudId: varchar({ length: 256 }).unique(),
-  clientId: serial()
-    .references(() => kClients.id)
-    .notNull(),
+  clientId: serial().references(() => kClients.id),
 });
 
 export const kClients = pgTable("k_clients", {

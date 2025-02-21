@@ -10,10 +10,10 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 - [x] YouTrack client integration (projects, issues, time reports)
 - [ ] Project tables (k-clients, k-employees, k-projects)
 - [ ] Sync data
-- [ ] Authentication: Login with YouTrack
+- [x] Authentication: Login with YouTrack
 - [ ] Gitlab client integration (projects, issues, time reports)
-- [ ] Dashboard: who is absent this week?
-- [ ] payroll ocr?
+- [x] Dashboard: who is absent this week?
+- [x] payroll ocr?
 - [ ] payroll estimates
 - [ ] estimated annual turnover
 - [ ] estimated annual profit
@@ -40,6 +40,7 @@ A project may have
 - [x] Make prettier check only relevant files
 - [x] Employee list
 - [x] Dashboard: who is absent this week?
+- [ ] Overall Year selector?
 - [ ] Dashboard: monthly overall commits graphs
 - [ ] Dashboard: monthly overall time reports graphs
 - [ ] Dashboard: monthly expected expenses graphs
@@ -57,7 +58,7 @@ A project may have
 - [ ] Employee profile: total cost for the company until today
 - [ ] Employee profile: total earnings for company until today
 - [ ] Employee profile: List of projects he's been working on
-- [ ] Client profile: List of projects
+- [x] Client profile: List of projects
 - [ ] Client profile: Contract settings (see gotchas)
 - [ ] Client profile: List of invoices
 - [ ] Client profile: Earned until today (by year)
@@ -67,6 +68,9 @@ A project may have
 - [x] Projects: Team
 - [x] Projects: previews slider
 - [ ] Site Navigation (header, menu...)
+- [ ] Fix missing clients / projects (archived on YouTrack are not imported and we get mismatch in invoices history)
+- [x] Pubblicaweb integration
+- [ ] Sync pubblicaweb and dipendentincloud
 
 Iniziamo dal valore della RAL: 2.000 x 12 = 24.000 €
 Aggiungiamo ora la tredicesima: RAL = 24.000 + 2.000 = 26.000 €

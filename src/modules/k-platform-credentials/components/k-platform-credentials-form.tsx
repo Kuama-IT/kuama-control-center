@@ -116,7 +116,11 @@ export const KPlatformCredentialsForm = ({ clientId }: Props) => {
             <FormItem>
               <FormLabel>Name</FormLabel>
               <FormControl>
-                <Input placeholder="A talking name" {...field} />
+                <Input
+                  placeholder="A talking name"
+                  {...field}
+                  autoComplete="one-time-code"
+                />
               </FormControl>
               <FormDescription>
                 A human readable name for this credentials.
@@ -132,7 +136,12 @@ export const KPlatformCredentialsForm = ({ clientId }: Props) => {
             <FormItem>
               <FormLabel>Persistent token</FormLabel>
               <FormControl>
-                <Input placeholder="******" type="password" {...field} />
+                <Input
+                  placeholder="******"
+                  type="password"
+                  {...field}
+                  autoComplete="one-time-code"
+                />
               </FormControl>
               <FormDescription>The api secret token.</FormDescription>
               <FormMessage />
@@ -147,7 +156,11 @@ export const KPlatformCredentialsForm = ({ clientId }: Props) => {
             <FormItem>
               <FormLabel>Endpoint</FormLabel>
               <FormControl>
-                <Input placeholder="http://a.domain" {...field} />
+                <Input
+                  placeholder="http://a.domain"
+                  {...field}
+                  autoComplete="one-time-code"
+                />
               </FormControl>
               <FormDescription>
                 The api endpoint to be used in order to read spent time.
