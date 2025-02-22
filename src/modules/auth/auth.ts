@@ -85,5 +85,5 @@ export const { handlers, signIn, auth } = NextAuth({
       return !!auth;
     },
   },
-  debug: serverEnv.isDev,
+  debug: false,
 });

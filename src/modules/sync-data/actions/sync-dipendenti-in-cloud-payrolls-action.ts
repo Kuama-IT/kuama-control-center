@@ -3,7 +3,7 @@ import { getSalaryHistoryWithGrossAmounts } from "@/modules/dipendenti-in-cloud/
 import { dipendentiInCloudApiClient } from "@/modules/dipendenti-in-cloud/dipendenti-in-cloud-api-client";
 import { handleServerErrors } from "@/utils/server-action-utils";
 import { db } from "@/drizzle/drizzle-db";
-import { kClientVats, kEmployees, kPayrolls } from "@/drizzle/schema";
+import { kEmployees, kPayrolls } from "@/drizzle/schema";
 import { eq } from "drizzle-orm";
 import { firstOrThrow } from "@/utils/array-utils";
 

@@ -46,7 +46,7 @@ export class FattureInCloudApi {
     let hasNextPage = true;
     while (hasNextPage) {
       const res = await fetch(
-        `${this.baseEndpoint}${this.companyId}/entities/clients`,
+        `${this.baseEndpoint}${this.companyId}/entities/clients?per_page=100`,
         {
           method: "GET",
           headers: this.baseHeaders,

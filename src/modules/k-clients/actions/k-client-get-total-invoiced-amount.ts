@@ -1,5 +1,5 @@
 import { db } from "@/drizzle/drizzle-db";
-import { kClientVats, kInvoices } from "@/drizzle/schema";
+import { kClients, kInvoices } from "@/drizzle/schema";
 import { eq, sum } from "drizzle-orm";
 import { inArray } from "drizzle-orm/sql/expressions/conditions";
 import { firstOrThrow } from "@/utils/array-utils";
@@ -10,20 +10,23 @@ async function kClientGetTotalInvoicedAmount({
 }: {
   clientId: number;
 }) {
-  const vats = await db
-    .select()
-    .from(kClientVats)
-    .where(eq(kClientVats.clientId, clientId));
+  const clientWithVatsRecords = await db.query.kClients.findMany({
+    with: {
+      kVatsToClient: {
+        with: {
+          kVat: true,
+        },
+      },
+    },
+    where: eq(kClients.id, clientId),
+  });
 
+  const clientWithVats = firstOrThrow(clientWithVatsRecords);
+  const vats = clientWithVats.kVatsToClient.map(({ kVat }) => kVat.id);
   const amounts = await db
     .select({ value: sum(kInvoices.amountGross) })
     .from(kInvoices)
-    .where(
-      inArray(
-        kInvoices.clientVat,
-        vats.map((it) => it.id),
-      ),
-    );
+    .where(inArray(kInvoices.vat, vats));
   const amount = firstOrThrow(amounts);
   if (!amount.value) {
     return 0;

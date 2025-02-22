@@ -23,8 +23,8 @@ export const ClientsSelector = ({ kClients, fattureInCloudClients }: Props) => {
   const { toast } = useToast();
   return (
     <div className="flex gap-8">
-      <div>
-        <h1>K-Clients</h1>
+      <div className="flex flex-col gap-4">
+        <h1 className="uppercase text-sm">K-Clients</h1>
         <ul className="flex flex-col gap-4">
           {kClients.map((client) => (
             <li
@@ -45,8 +45,8 @@ export const ClientsSelector = ({ kClients, fattureInCloudClients }: Props) => {
           ))}
         </ul>
       </div>
-      <div>
-        <h1>Fatture in Cloud Clients</h1>
+      <div className="flex flex-col gap-4">
+        <h1 className="uppercase text-sm">Fatture in Cloud Clients</h1>
         <ul className="flex flex-col gap-4">
           {fattureInCloudClients.map((client) => (
             <li
@@ -66,6 +66,7 @@ export const ClientsSelector = ({ kClients, fattureInCloudClients }: Props) => {
       <Button
         disabled={!fattureInCloudClient || !kClientId || isPending}
         size="lg"
+        className="sticky top-4"
         onClick={() =>
           startTransition(async () => {
             if (!kClientId || !fattureInCloudClient) {

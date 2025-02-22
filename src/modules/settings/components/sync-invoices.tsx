@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import syncFattureInCloudInvoicesAction from "@/modules/sync-data/actions/sync-fatture-in-cloud-invoices-action";
 import { useToast } from "@/hooks/use-toast";
 import { isFailure } from "@/utils/server-action-utils";
+import { cn } from "@/lib/utils";
+import { FaSync } from "react-icons/fa";
 
 export const SyncInvoices = () => {
   const router = useRouter();
@@ -32,6 +34,7 @@ export const SyncInvoices = () => {
         })
       }
     >
+      <FaSync className={cn({ "animate-spin": isPending })} />
       Sync invoices
     </Button>
   );

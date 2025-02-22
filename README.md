@@ -8,7 +8,7 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 ## TODOs
 
 - [x] YouTrack client integration (projects, issues, time reports)
-- [ ] Project tables (k-clients, k-employees, k-projects)
+- [x] Project tables (k-clients, k-employees, k-projects)
 - [ ] Sync data
 - [x] Authentication: Login with YouTrack
 - [ ] Gitlab client integration (projects, issues, time reports)

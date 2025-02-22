@@ -1,7 +1,7 @@
 import { relations } from "drizzle-orm/relations";
 import {
   kClients,
-  kClientVats,
+  kClientsVats,
   kEmployees,
   kPayrolls,
   kProjectMedias,
@@ -9,6 +9,7 @@ import {
   kSpentTimes,
   kTasks,
   kTeams,
+  kVats,
 } from "./schema";
 
 export const kTeamsRelations = relations(kTeams, ({ one }) => ({
@@ -66,13 +67,21 @@ export const kTasksRelations = relations(kTasks, ({ one, many }) => ({
 
 export const kClientsRelations = relations(kClients, ({ many }) => ({
   kProjects: many(kProjects),
-  kVats: many(kClientVats),
+  kVatsToClient: many(kClientsVats),
 }));
 
-export const kClientsVatsRelations = relations(kClientVats, ({ one }) => ({
+export const kVatsRelations = relations(kVats, ({ many }) => ({
+  kVatsToClient: many(kClientsVats),
+}));
+
+export const kClientsVatsRelations = relations(kClientsVats, ({ one }) => ({
   kClient: one(kClients, {
-    fields: [kClientVats.clientId],
+    fields: [kClientsVats.clientId],
     references: [kClients.id],
+  }),
+  kVat: one(kVats, {
+    fields: [kClientsVats.vatId],
+    references: [kVats.id],
   }),
 }));
 

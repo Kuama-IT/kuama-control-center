@@ -1,7 +1,7 @@
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import {
   kClients,
-  kClientVats,
+  kVats,
   kEmployees,
   kPlatformCredentials,
   kProjectMedias,
@@ -41,5 +41,5 @@ export type KPlatformCredentialsRead = z.infer<
   typeof kPlatformCredentialsReadSchema
 >;
 
-export const kClientVatsSchema = createSelectSchema(kClientVats);
-export type KClientVatRead = z.infer<typeof kClientVatsSchema>;
+export const kVatsSchema = createSelectSchema(kVats);
+export type KVatRead = z.infer<typeof kVatsSchema>;
