@@ -6,6 +6,7 @@ import {
   interval,
   pgEnum,
   pgTable,
+  primaryKey,
   real,
   serial,
   text,
@@ -35,8 +36,8 @@ export const kPlatformCredentials = pgTable("k_platform_credentials", {
 
 export const kInvoices = pgTable("k_invoices", {
   id: serial().primaryKey(),
-  clientVat: serial()
-    .references(() => kClientVats.id)
+  vat: serial()
+    .references(() => kVats.id)
     .notNull(),
   subject: varchar({ length: 256 }).notNull(),
   amountNet: real().notNull().default(0),
@@ -48,13 +49,21 @@ export const kInvoices = pgTable("k_invoices", {
   updatedAt: timestamp().notNull().defaultNow(),
 });
 
-export const kClientVats = pgTable("k_client_vats", {
+export const kVats = pgTable("k_vats", {
   id: serial().primaryKey(),
-  vat: varchar({ length: 256 }).notNull(),
+  vat: varchar({ length: 256 }).notNull().unique(),
   companyName: varchar({ length: 256 }).notNull(),
-  fattureInCloudId: varchar({ length: 256 }).unique(),
-  clientId: serial().references(() => kClients.id),
+  fattureInCloudId: varchar({ length: 256 }),
 });
+
+export const kClientsVats = pgTable(
+  "k_clients_vats",
+  {
+    vatId: serial().references(() => kVats.id),
+    clientId: serial().references(() => kClients.id),
+  },
+  (t) => [primaryKey({ columns: [t.vatId, t.clientId] })],
+);
 
 export const kClients = pgTable("k_clients", {
   id: serial().primaryKey(),
