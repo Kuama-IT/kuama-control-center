@@ -8,7 +8,7 @@ import { handleServerErrors } from "@/utils/server-action-utils";
 const kClientsListAllAction = async (): Promise<KClientListItem[]> => {
   const clients = await db.query.kClients.findMany({
     with: {
-      kVatsToClient: {
+      kClientsVats: {
         with: {
           kVat: true,
         },
@@ -19,7 +19,7 @@ const kClientsListAllAction = async (): Promise<KClientListItem[]> => {
   // remove last trailing slash from the base url
 
   const enhancedClients = await Promise.all(
-    clients.map(async ({ kVatsToClient, ...client }) => {
+    clients.map(async ({ kClientsVats, ...client }) => {
       const projects = await db
         .select({ id: kProjects.id })
         .from(kProjects)
@@ -37,7 +37,7 @@ const kClientsListAllAction = async (): Promise<KClientListItem[]> => {
 
       return {
         ...client,
-        kVats: kVatsToClient.map((it) => it.kVat),
+        kVats: kClientsVats.map((it) => it.kVat),
         avatarUrl: client.avatarUrl,
         projectsCount: projects.length,
         employeesWorkingForClientCount: employeesWorkingForClient.length,

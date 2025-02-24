@@ -59,7 +59,9 @@ export default handleServerErrors(async () => {
       values.push(value);
     }
 
-    await db.insert(kVats).values(values);
+    await db.transaction(async (tx) => {
+      await tx.insert(kVats).values(values);
+    });
   }
 
   // store invoices

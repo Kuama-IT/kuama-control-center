@@ -1,11 +1,26 @@
 "use server";
-import { kPlatformCredentials } from "@/drizzle/schema";
+import {
+  kPlatformCredentials,
+  kPlatformCredentialsToEmployeesAndProjects,
+} from "@/drizzle/schema";
 import { KPlatformCredentialsInsert } from "@/drizzle/drizzle-types";
 import { db } from "@/drizzle/drizzle-db";
 import { handleServerErrors } from "@/utils/server-action-utils";
+import { firstOrThrow } from "@/utils/array-utils";
 
 export default handleServerErrors(
-  async (credentials: KPlatformCredentialsInsert) => {
-    await db.insert(kPlatformCredentials).values(credentials);
+  async (credentials: KPlatformCredentialsInsert & { clientId: number }) => {
+    await db.transaction(async (tx) => {
+      const results = await tx
+        .insert(kPlatformCredentials)
+        .values(credentials)
+        .returning({ id: kPlatformCredentials.id });
+      const result = firstOrThrow(results);
+      await tx.insert(kPlatformCredentialsToEmployeesAndProjects).values({
+        platformCredentialsId: result.id,
+        //      employeeId: auth.userId, TODO PASS EMPLOYEE ID
+        projectId: credentials.clientId,
+      });
+    });
   },
 );
