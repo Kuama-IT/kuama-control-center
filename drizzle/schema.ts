@@ -22,17 +22,24 @@ export const codeRepositoryPlatform = pgEnum("code_repository_platform", [
   "easyredmine",
 ]);
 
-// Currently represent either a set of organization/token to fetch data from GitHub, or a set of  endpoint/token to fetch data from GitLab
+// Currently represent either a set of organization/token to fetch data from GitHub, or a set of endpoint/token to fetch data from GitLab
+// Used to generate reports, and to fetch data from the code repository to feed employee's statistics
 export const kPlatformCredentials = pgTable("k_platform_credentials", {
   id: serial().primaryKey(),
   platform: codeRepositoryPlatform().notNull(),
   name: varchar({ length: 256 }).notNull(),
   persistentToken: text().notNull(),
   endpoint: varchar({ length: 500 }).notNull(),
-  clientId: serial()
-    .references(() => kClients.id)
-    .notNull(),
 });
+
+export const kPlatformCredentialsToEmployeesAndProjects = pgTable(
+  "k_platform_credentials_to_employees_and_projects",
+  {
+    platformCredentialsId: serial().references(() => kPlatformCredentials.id),
+    employeeId: serial().references(() => kEmployees.id),
+    projectId: serial().references(() => kProjects.id),
+  },
+);
 
 export const kInvoices = pgTable("k_invoices", {
   id: serial().primaryKey(),
@@ -49,6 +56,12 @@ export const kInvoices = pgTable("k_invoices", {
   updatedAt: timestamp().notNull().defaultNow(),
 });
 
+export const kInvoicesToProjects = pgTable("k_invoices_to_projects", {
+  invoiceId: serial().references(() => kInvoices.id),
+  projectId: serial().references(() => kProjects.id),
+});
+
+// Our clients can have more than one VAT number
 export const kVats = pgTable("k_vats", {
   id: serial().primaryKey(),
   vat: varchar({ length: 256 }).notNull().unique(),
@@ -72,6 +85,22 @@ export const kClients = pgTable("k_clients", {
   youTrackRingId: varchar({ length: 256 }).unique(),
 });
 
+// We can agree with the client to have a fixed daily rate for a project...
+export const kProjectDailyRates = pgTable("k_project_daily_rates", {
+  id: serial().primaryKey(),
+  employee: serial().references(() => kEmployees.id),
+  project: serial().references(() => kProjects.id),
+  rate: real().notNull(),
+});
+
+// ... or a fixed monthly rate
+export const kProjectsMonthlyRates = pgTable("k_projects_monthly_rates", {
+  id: serial().primaryKey(),
+  project: serial().references(() => kProjects.id),
+  rate: real().notNull(),
+});
+
+// Used to keep an eye if company is loosing money on a project
 export const kPayrolls = pgTable("k_payrolls", {
   id: serial().primaryKey(),
   employeeId: serial().references(() => kEmployees.id),
@@ -81,6 +110,7 @@ export const kPayrolls = pgTable("k_payrolls", {
   url: varchar({ length: 1500 }).notNull(),
   dipendentiInCloudPayrollId: varchar({ length: 256 }).unique(),
 });
+
 export const kEmployees = pgTable("k_employees", {
   id: serial().primaryKey(),
   email: varchar({ length: 256 }).unique(), // key for external services like dipendenti in cloud, gitlab, github..
@@ -93,6 +123,16 @@ export const kEmployees = pgTable("k_employees", {
   hiredOn: date(),
 });
 
+// Each month our employment consultant sends us a pdf file with the estimated costs for each employee
+export const kEmployeeEstimatedCosts = pgTable("k_employee_estimated_costs", {
+  id: serial().primaryKey(),
+  employeeId: serial().references(() => kEmployees.id),
+  estimatedYearCost: real(),
+  estimatedMonthCost: real(),
+  date: date().notNull(),
+});
+
+// Help to understand who is working this week
 export const kAbsenceDays = pgTable("k_absence_days", {
   id: serial().primaryKey(),
   date: date(),
@@ -104,20 +144,34 @@ export const kAbsenceDays = pgTable("k_absence_days", {
   timeEnd: varchar(),
 });
 
+// Help to understand who is working this week and forecast monthly employee costs / project costs
+export const kPresenceDays = pgTable("k_presence_days", {
+  id: serial().primaryKey(),
+  date: date(),
+  employeeId: serial().references(() => kEmployees.id),
+  duration: interval({ fields: "minute" }),
+  timeStart: varchar(),
+  timeEnd: varchar(),
+});
+
 export const kProjects = pgTable("k_projects", {
   id: serial().primaryKey(),
   name: varchar({ length: 256 }),
   description: text(),
   youTrackRingId: varchar({ length: 256 }).unique(),
   clientId: serial().references(() => kClients.id),
+  endDate: date(),
+  startDate: date(),
 });
 
+// A nice gallery of what we did for the client
 export const kProjectMedias = pgTable("k_project_medias", {
   id: serial().primaryKey(),
   url: text(),
   projectId: serial().references(() => kProjects.id),
 });
 
+// Mainly used to generate reports
 export const kTasks = pgTable("k_tasks", {
   id: serial().primaryKey(),
   name: varchar({ length: 256 }),
@@ -128,6 +182,7 @@ export const kTasks = pgTable("k_tasks", {
   creationDate: date(),
 });
 
+// Used to generate reports and employee statistics
 export const kSpentTimes = pgTable("k_spent_times", {
   id: serial().primaryKey(),
   duration: interval({ fields: "minute" }),
@@ -143,6 +198,7 @@ export const kTeams = pgTable("k_teams", {
   projectId: serial().references(() => kProjects.id),
 });
 
+// TODO
 export const kCommits = pgTable("k_commits", {});
 export const kRepositories = pgTable("k_commits", {});
 

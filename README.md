@@ -27,10 +27,10 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 A project may have
 
-- a monthly amount to invoice (with invoice row description)
-- a daily rate to be multiplied by the number of days worked (with invoice row description)
+- [x] a monthly amount to invoice (with invoice row description)
+- [x] a daily rate to be multiplied by the number of days worked (with invoice row description)
   Invoices should be managed by client, and should propose a first version of the rows of the invoice, that can be edited by the user before sending the invoice.
-- If invoicing for a given project is based on time spent not reported to YT, we should be able to say "hey, this is the provider, go reading the time reports from this provider and generate the invoice based on that". Current providers that need support are easyredmine and Jira. Otherwise, spent time should be read from YT
+- [x] If invoicing for a given project is based on time spent not reported to YT, we should be able to say "hey, this is the provider, go reading the time reports from this provider and generate the invoice based on that". Current providers that need support are easyredmine and Jira. Otherwise, spent time should be read from YT
 
 ## ROADMAP
 
@@ -68,9 +68,11 @@ A project may have
 - [x] Projects: Team
 - [x] Projects: previews slider
 - [ ] Site Navigation (header, menu...)
-- [ ] Fix missing clients / projects (archived on YouTrack are not imported and we get mismatch in invoices history)
+- [ ] Fix missing clients / projects (archived on YouTrack are not imported hence we get mismatch in invoices history)
 - [x] Pubblicaweb integration
 - [ ] Sync pubblicaweb and dipendentincloud
+- [ ] Sync also presence (not only absence) to verify monthly timesheets
+- [x] Should invoices be linked to projects? yes
 
 Iniziamo dal valore della RAL: 2.000 x 12 = 24.000 €
 Aggiungiamo ora la tredicesima: RAL = 24.000 + 2.000 = 26.000 €

@@ -12,7 +12,7 @@ async function kClientGetTotalInvoicedAmount({
 }) {
   const clientWithVatsRecords = await db.query.kClients.findMany({
     with: {
-      kVatsToClient: {
+      kClientsVats: {
         with: {
           kVat: true,
         },
@@ -22,7 +22,7 @@ async function kClientGetTotalInvoicedAmount({
   });
 
   const clientWithVats = firstOrThrow(clientWithVatsRecords);
-  const vats = clientWithVats.kVatsToClient.map(({ kVat }) => kVat.id);
+  const vats = clientWithVats.kClientsVats.map(({ kVat }) => kVat.id);
   const amounts = await db
     .select({ value: sum(kInvoices.amountGross) })
     .from(kInvoices)
