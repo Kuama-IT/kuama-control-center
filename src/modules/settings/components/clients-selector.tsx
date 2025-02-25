@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import associateFattureInCloudClientAction from "@/modules/sync-data/actions/associate-fatture-in-cloud-client-action";
 import { useRouter } from "next/navigation";
 import { isFailure } from "@/utils/server-action-utils";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
 type Props = {
   kClients: KClientListAllAction;
@@ -20,7 +20,7 @@ export const ClientsSelector = ({ kClients, fattureInCloudClients }: Props) => {
   >(undefined);
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
-  const { toast } = useToast();
+
   return (
     <div className="flex gap-8">
       <div className="flex flex-col gap-4">
@@ -78,8 +78,8 @@ export const ClientsSelector = ({ kClients, fattureInCloudClients }: Props) => {
             });
 
             if (isFailure(res)) {
-              toast({
-                title: "Error while associating clients",
+              toast("Error while associating clients", {
+                className: "bg-error text-foreground",
               });
               return;
             }

@@ -5,7 +5,6 @@ import { SiJirasoftware, SiRedmine } from "react-icons/si";
 import { Button } from "@/components/ui/button";
 import { Copy, Trash } from "lucide-react";
 import { FaSync } from "react-icons/fa";
-import { useToast } from "@/hooks/use-toast";
 import { copyToClipboard } from "@/modules/ui/ui-utils";
 import {
   Dialog,
@@ -23,13 +22,13 @@ import { useRouter } from "next/navigation";
 import syncTimeSpentForClient from "@/modules/sync-data/actions/sync-time-spent-by-credentials-for-client";
 import Link from "next/link";
 import { isFailure } from "@/utils/server-action-utils";
+import { toast } from "sonner";
 
 export const KPlatformCredentialsCard = ({
   credentials,
 }: {
   credentials: KPlatformCredentialsRead;
 }) => {
-  const { toast } = useToast();
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
@@ -37,8 +36,8 @@ export const KPlatformCredentialsCard = ({
     startTransition(async () => {
       const res = await deleteKPlatformCredentials(credentials.id);
       if (isFailure(res)) {
-        toast({
-          title: "Error during credentials deletion, check server logs",
+        toast("Error during credentials deletion, check server logs", {
+          className: "bg-error text-foreground",
         });
         return;
       }
@@ -47,9 +46,8 @@ export const KPlatformCredentialsCard = ({
   };
 
   const syncData = () => {
-    toast({
+    toast("K1", {
       description: "Data sync will continue in background",
-      title: "K1",
     });
     startTransition(async () => {
       await syncTimeSpentForClient(credentials.id);
@@ -61,7 +59,7 @@ export const KPlatformCredentialsCard = ({
   const fileName = `${credentials.name.toLowerCase().replaceAll(" ", "-")}-report.pdf`; // TODO we should use the name of the user from easyredmine
 
   return (
-    <div className="rounded-lg shadow p-8 flex flex-col items-start gap-4 bg-background overflow-hidden group">
+    <div className="rounded-lg shadow-sm p-8 flex flex-col items-start gap-4 bg-background overflow-hidden group">
       <Badge className="py-2 px-4 rounded-full min-w-14 uppercase flex gap-2">
         {credentials.platform === "jira" && (
           <SiJirasoftware className="h-6 w-6" />
@@ -82,7 +80,7 @@ export const KPlatformCredentialsCard = ({
           className="absolute right-0 translate-x-16 group-hover:translate-x-0 transition-all cursor-pointer"
           onClick={() => {
             copyToClipboard(credentials.endpoint);
-            toast({ description: "Endpoint copied to clipboard", title: "K1" });
+            toast("K1", { description: "Endpoint copied to clipboard" });
           }}
         />
       </div>
@@ -95,7 +93,7 @@ export const KPlatformCredentialsCard = ({
           className="absolute right-0 translate-x-16 group-hover:translate-x-0 transition-all cursor-pointer"
           onClick={() => {
             copyToClipboard(credentials.persistentToken);
-            toast({ description: "Token copied to clipboard", title: "K1" });
+            toast("K1", { description: "Token copied to clipboard" });
           }}
         />
       </div>

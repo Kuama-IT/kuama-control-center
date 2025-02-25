@@ -22,7 +22,7 @@ export default async function KClientDetail({ id }: { id: string }) {
   }
   return (
     <div className="">
-      <div className="sticky top-0 w-full h-96 from-accent-foreground/20 to-accent overflow-hidden rounded-b-3xl bg-gradient-to-tr">
+      <div className="sticky top-0 w-full h-96 from-accent-foreground/20 to-accent overflow-hidden rounded-b-3xl bg-linear-to-tr">
         <InnerHeader client={client} />
         <Suspense fallback={<Skeleton className="absolute inset-0" />}>
           <KClientReportedSpentTimeGraph clientId={client.id!} />
