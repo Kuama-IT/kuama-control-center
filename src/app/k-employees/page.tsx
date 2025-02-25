@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 
 export default async function Page() {
   return (
-    <div className="max-w-screen-lg mx-auto pt-4">
+    <div className="max-w-(--breakpoint-lg) mx-auto pt-4">
       <KEmployees />
     </div>
   );

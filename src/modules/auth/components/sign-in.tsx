@@ -10,7 +10,7 @@ export default async function SignIn() {
     redirect(routes.dashboard());
   }
   return (
-    <div className="min-h-[calc(100svh-theme(spacing.32))] flex flex-col items-center justify-center">
+    <div className="min-h-[calc(100svh-(--spacing(32)))] flex flex-col items-center justify-center">
       <div className="p-12 rounded-lg shadow-2xl flex flex-col items-center gap-8">
         <h1 className="text-2xl font-bold uppercase">
           Welcome, you are. <br />

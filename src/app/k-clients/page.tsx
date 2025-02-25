@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 export default async function Page() {
   // TODO only admin
   return (
-    <div className="max-w-screen-lg mx-auto">
+    <div className="max-w-(--breakpoint-lg) mx-auto">
       <KClientsList />
     </div>
   );
