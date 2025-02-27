@@ -107,6 +107,7 @@ export const kPayrolls = pgTable("k_payrolls", {
   net: real().notNull(),
   gross: real().notNull(),
   date: date().notNull(),
+  payrollNumber: integer().notNull().default(0), // 1, 2, 3...13 (or 14 if we move to commercial sector)
   url: varchar({ length: 1500 }).notNull(),
   dipendentiInCloudPayrollId: varchar({ length: 256 }).unique(),
 });

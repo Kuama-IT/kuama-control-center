@@ -3,8 +3,13 @@ import { kInvoices } from "@/drizzle/schema";
 import { sum } from "drizzle-orm";
 import { firstOrThrow } from "@/utils/array-utils";
 import { handleServerErrors } from "@/utils/server-action-utils";
+import { auth } from "@/modules/auth/auth";
 
 async function kClientGetOverallInvoicedAmount() {
+  const session = await auth();
+  if (!session || !session.user?.isAdmin) {
+    throw new Error("Only admin is allowed to invoke this action");
+  }
   const amounts = await db
     .select({ value: sum(kInvoices.amountGross) })
     .from(kInvoices);
