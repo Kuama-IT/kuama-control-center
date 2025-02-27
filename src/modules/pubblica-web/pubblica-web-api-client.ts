@@ -60,6 +60,56 @@ export class PubblicaWebApi {
   }
 
   /**
+   * Fetches all payslips for a given employee. Months count from 01 to 13 (december has 2 payslips).
+   * .
+   * ├── EMPLOYEE FULL NAME/
+   * │   ├── Cedolino-YYYY-MM-0000.pdf
+   * │   └── ...
+   * └── ..../
+   *     └── ...
+   * @param fullName Employee full name uppercased
+   */
+  async fetchPayslipsForEmployee(fullName: string) {
+    const repository = await this.getDefaultRepository();
+
+    const folderTree = await this.readFolderTreeAtPath(repository.Id);
+    // Our consultant has created (idk why) multiple folders for some of us...
+    const employeeFolderItems = folderTree.filter(
+      (item) => item.text === fullName,
+    );
+
+    if (!employeeFolderItems.length) {
+      throw new Error(`Employee ${fullName} not found in folder tree`);
+    }
+
+    const allPayslips: { bytes: any; mimeType: string; name: string }[] = [];
+    for (const employeeFolderItem of employeeFolderItems) {
+      const documents = await this.readDocumentsAtPath(
+        repository.Id,
+        employeeFolderItem.data.path,
+      );
+
+      const payslips = documents.filter((document) =>
+        document.Name.toLowerCase().startsWith("cedolino-"),
+      );
+
+      const payslipsBuffer = await Promise.all(
+        payslips.map((payslip) => this.downloadDocument(payslip.Id)),
+      );
+
+      allPayslips.push(
+        ...payslips.map((payslip, index) => ({
+          bytes: payslipsBuffer[index],
+          mimeType: payslip.MimeType,
+          name: payslip.Name,
+        })),
+      );
+    }
+
+    return allPayslips;
+  }
+
+  /**
    * Fetches a single document that contains all employees payslips for a given yearAndMonth.
    * Documents inside PubblicaWeb are organized this way:
    * .

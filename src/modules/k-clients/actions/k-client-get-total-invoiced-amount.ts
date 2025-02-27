@@ -4,12 +4,18 @@ import { eq, sum } from "drizzle-orm";
 import { inArray } from "drizzle-orm/sql/expressions/conditions";
 import { firstOrThrow } from "@/utils/array-utils";
 import { handleServerErrors } from "@/utils/server-action-utils";
+import { auth } from "@/modules/auth/auth";
 
 async function kClientGetTotalInvoicedAmount({
   clientId,
 }: {
   clientId: number;
 }) {
+  const session = await auth();
+  if (!session || !session.user?.isAdmin) {
+    throw new Error("Only admin is allowed to invoke this action");
+  }
+
   const clientWithVatsRecords = await db.query.kClients.findMany({
     with: {
       kClientsVats: {

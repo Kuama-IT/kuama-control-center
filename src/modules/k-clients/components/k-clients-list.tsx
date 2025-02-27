@@ -16,9 +16,9 @@ export default async function KClientsList() {
   return (
     <div className="pt-16">
       <Title>Clients</Title>
-      <p className="font-bold">
-        &euro; {new Intl.NumberFormat().format(totalInvoicedAmount)}
-      </p>
+      {/*<p className="font-bold">*/}
+      {/*  &euro; {new Intl.NumberFormat().format(totalInvoicedAmount)}*/}
+      {/*</p>*/}
 
       <div className="grid gap-12 sm:grid-cols-1 md:grid-cols-3 py-8 items-center">
         {clients.map((client, index) => (
