@@ -8,7 +8,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { FaArrowRight, FaCalendar, FaSync } from "react-icons/fa";
 import { Separator } from "@/components/ui/separator";
-import syncDipendentiInCloudEmployees from "@/modules/sync-data/actions/sync-dipendenti-in-cloud-employees-action";
+import syncDipendentiInCloudEmployees from "@/modules/dipendenti-in-cloud/actions/dic-import-action";
 import { isFailure } from "@/utils/server-action-utils";
 import { toast } from "sonner";
 
@@ -88,7 +88,12 @@ export default function SyncDipendentiInCloud() {
                 toast("Error while syncing dipendenti in cloud general info", {
                   className: "bg-error text-foreground",
                 });
+                return;
               }
+
+              toast(res.message, {
+                className: "bg-success text-foreground",
+              });
             });
           }}
         >

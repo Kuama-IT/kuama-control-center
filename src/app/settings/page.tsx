@@ -4,6 +4,7 @@ import { SyncButton } from "@/modules/settings/components/sync-button";
 import type { Metadata } from "next";
 import SyncDipendentiInCloud from "@/modules/settings/components/sync-dipendenti-in-cloud";
 import SyncFattureInCloud from "@/modules/settings/components/sync-fatture-in-cloud";
+import { SyncYoutrack } from "@/modules/settings/components/sync-youtrack";
 
 export const metadata: Metadata = {
   title: "Settings | K1 App",
@@ -16,7 +17,9 @@ export default async function Page() {
       <Title icon={<IoMdSettings />}>Settings</Title>
       <div className="grid grid-cols-4 gap-4">
         <SyncDipendentiInCloud />
-        <SyncButton />
+        <SyncYoutrack />
+
+        <div className="col-span-4"></div>
         <div></div>
         <div></div>
         <SyncFattureInCloud />
