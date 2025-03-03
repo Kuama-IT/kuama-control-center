@@ -2,7 +2,7 @@ import { describe, expect, test } from "vitest";
 import { PubblicaWebApi } from "@/modules/pubblica-web/pubblica-web-api-client";
 import { serverEnv } from "@/env/server-env";
 import { dipendentiInCloudApiClient } from "@/modules/dipendenti-in-cloud/dipendenti-in-cloud-api-client";
-import { readGrossSalary } from "@/modules/dipendenti-in-cloud/dipendenti-in-cloud-utils";
+import { parseSalary } from "@/modules/dipendenti-in-cloud/dipendenti-in-cloud-utils";
 
 // N.B. This was written just to build the client, it is performing real calls and presumes a working env is present
 describe("dipendenti-in-cloud-api", () => {

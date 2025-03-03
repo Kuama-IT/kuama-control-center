@@ -73,7 +73,7 @@ export class PubblicaWebApi {
     const repository = await this.getDefaultRepository();
 
     const folderTree = await this.readFolderTreeAtPath(repository.Id);
-    // Our consultant has created (idk why) multiple folders for some of us...
+    // Our consultant has created (IDK why) multiple folders for some of us...
     const employeeFolderItems = folderTree.filter(
       (item) => item.text === fullName,
     );
@@ -194,7 +194,7 @@ export class PubblicaWebApi {
       `${this.baseDocumentsUrl}Documents?Id=${documentId}&SubjectId=`,
       this.authenticationHeaders,
     );
-    return await response.bytes();
+    return await response.arrayBuffer();
   }
 
   private async getDefaultRepository() {
