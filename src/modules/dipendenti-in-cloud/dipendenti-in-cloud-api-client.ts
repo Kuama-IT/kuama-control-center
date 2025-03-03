@@ -4,6 +4,7 @@ import {
   dipendentiInCloudPayrollsSchema,
   dipendentiInCloudTimesheetResponseSchema,
   EmployeeSalaryHistory,
+  Salary,
 } from "@/modules/dipendenti-in-cloud/schemas/dipendenti-in-cloud-schemas";
 import { format } from "date-fns";
 
@@ -143,6 +144,11 @@ export class DipendentiInCloudApi {
     });
 
     return res.ok;
+  }
+
+  async downloadSalary(salary: Salary) {
+    const res = await fetch(salary.url);
+    return await res.arrayBuffer();
   }
 }
 

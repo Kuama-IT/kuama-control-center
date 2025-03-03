@@ -1,6 +1,10 @@
 import { describe, expect, test } from "vitest";
 import { PubblicaWebApi } from "@/modules/pubblica-web/pubblica-web-api-client";
 import { serverEnv } from "@/env/server-env";
+import { kEmployeesServer } from "@/modules/k-employees/k-employee-server";
+import { isFailure } from "@/utils/server-action-utils";
+import * as fs from "node:fs";
+import { parseSalary } from "@/modules/dipendenti-in-cloud/dipendenti-in-cloud-utils";
 
 describe("pubblica-web-api", () => {
   const client = new PubblicaWebApi(
@@ -48,4 +52,30 @@ describe("pubblica-web-api", () => {
   //     expect(res.length).not.toBe(0);
   //   }
   // });
+
+  test("it parses all needed information from a payslip", async () => {
+    // const id = 125;
+    // const employee = await kEmployeesServer.byId(id);
+    // if (isFailure(employee)) {
+    //   return;
+    // }
+    // await client.authenticate();
+    //
+    // const res = await client.fetchPayslipsForEmployee(
+    //   employee.fullName?.toUpperCase() ?? "",
+    // );
+    //
+    // fs.writeFileSync(
+    //   res[res.length - 1].name,
+    //   Buffer.from(res[res.length - 1].bytes),
+    // );
+
+    const file = fs.readFileSync(
+      "/Users/danieledematteo/Projects/kuama-control-center/Cedolino-2023-10-0000.pdf",
+    );
+    // write bytes to file
+    const parsed = await parseSalary(file.buffer);
+
+    console.log(parsed);
+  });
 });
