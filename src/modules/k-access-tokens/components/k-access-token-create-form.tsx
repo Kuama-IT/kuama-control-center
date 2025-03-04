@@ -74,8 +74,6 @@ export const KAccessTokenCreateForm = () => {
 
   const watchInfinity = form.watch("canBeUsedForInfinity");
   const watchExpires = form.watch("expires");
-  const watchAllowedUsages = form.watch("allowedUsages");
-  const watchExpiresAt = form.watch("expiresAt");
 
   useEffect(() => {
     const { canBeUsedForInfinity, expires } = form.getValues();
