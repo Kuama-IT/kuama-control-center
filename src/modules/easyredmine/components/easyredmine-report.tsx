@@ -67,13 +67,12 @@ export default async function EasyredmineReport({
         </TableHeader>
         <TableBody>
           <TableRow>
-            <TableCell colSpan={5}>
+            <TableCell colSpan={4}>
               <b>Total</b>
             </TableCell>
-            <TableCell>
-              <b>{monthTotalHours.toFixed(2)}</b>
+            <TableCell colSpan={2} className="text-right">
+              <b>{monthTotalHours.toFixed(2)} h</b>
             </TableCell>
-            <TableCell></TableCell>
           </TableRow>
           {spentTimes.map((spentTime) => (
             <TableRow key={spentTime.id}>
@@ -104,7 +103,7 @@ export default async function EasyredmineReport({
               </TableCell>
               <TableCell>{spentTime.activity}</TableCell>
               <TableCell>
-                {parseFloat(spentTime.spentTime).toFixed(2)}
+                {parseFloat(spentTime.spentTime).toFixed(2)} h
               </TableCell>
             </TableRow>
           ))}

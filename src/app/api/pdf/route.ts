@@ -32,6 +32,14 @@ export async function GET(request: NextRequest) {
 
   const pdfBuffer = await page.pdf({
     format: "A4",
+    displayHeaderFooter: true,
+    margin: { top: 20, bottom: 20 },
+    headerTemplate: "",
+    footerTemplate: `
+      <div style="font-size: 10px; width: 100%; text-align: right; padding-right: 10mm;">
+        Pagina <span class="pageNumber"></span> di <span class="totalPages"></span>
+      </div>
+    `,
   });
 
   await browser.close();

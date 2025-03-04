@@ -241,3 +241,13 @@
     @apply bg-background text-foreground;
   }
 }
+
+@media print {
+  tr {
+    page-break-inside: avoid;
+  }
+
+  body {
+    margin-top: 0mm;
+  }
+}
