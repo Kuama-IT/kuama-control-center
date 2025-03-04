@@ -10,14 +10,18 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import Link from "next/link";
-import { endOfMonth, format, startOfMonth } from "date-fns";
+import { format } from "date-fns";
 import { isFailure } from "@/utils/server-action-utils";
 import { ErrorMessage } from "@/modules/ui/components/error-message";
 
 export default async function EasyredmineReport({
   credentialsId,
+  from,
+  to,
 }: {
   credentialsId: string;
+  from: Date;
+  to: Date;
 }) {
   const credentials = await kPlatformCredentialsServer.byId(
     Number(credentialsId),
@@ -26,26 +30,25 @@ export default async function EasyredmineReport({
     return <ErrorMessage failure={credentials} />;
   }
 
-  if (!credentials) {
-    return <pre>Credentials not found</pre>;
-  }
-
   if (credentials.platform !== "easyredmine") {
-    return <pre>Invalid platform</pre>;
+    return (
+      <ErrorMessage
+        failure={{
+          type: "__failure__",
+          code: "__invalid_params__",
+          message: "Invalid platform provided",
+        }}
+      />
+    );
   }
 
-  const date = new Date();
-  const previousMonth = new Date(date.getTime());
-  previousMonth.setDate(0);
-  const endOfMonthFns = endOfMonth(date);
-  const startOfMonthFns = startOfMonth(date);
   const res = await easyRedmineGetSpentTimes({
     credentials,
     range: {
-      from: startOfMonthFns,
-      to: endOfMonthFns,
+      from,
+      to,
     },
-  }); // TODO: get date from query params
+  });
   if (isFailure(res)) {
     return <ErrorMessage failure={res} />;
   }
@@ -72,13 +75,12 @@ export default async function EasyredmineReport({
         </TableHeader>
         <TableBody>
           <TableRow>
-            <TableCell colSpan={5}>
+            <TableCell colSpan={4}>
               <b>Total</b>
             </TableCell>
-            <TableCell>
-              <b>{monthTotalHours.toFixed(2)}</b>
+            <TableCell colSpan={2} className="text-right">
+              <b>{monthTotalHours.toFixed(2)} h</b>
             </TableCell>
-            <TableCell></TableCell>
           </TableRow>
           {spentTimes.map((spentTime) => (
             <TableRow key={spentTime.id}>
@@ -109,7 +111,7 @@ export default async function EasyredmineReport({
               </TableCell>
               <TableCell>{spentTime.activity}</TableCell>
               <TableCell>
-                {parseFloat(spentTime.spentTime).toFixed(2)}
+                {parseFloat(spentTime.spentTime).toFixed(2)} h
               </TableCell>
             </TableRow>
           ))}

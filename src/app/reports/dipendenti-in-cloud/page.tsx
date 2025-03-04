@@ -2,17 +2,16 @@ import DipendentiInCloudReport from "@/modules/dipendenti-in-cloud/components/di
 import { kEmployeesServer } from "@/modules/k-employees/k-employee-server";
 import { isFailure } from "@/utils/server-action-utils";
 import { kAbsenceDaysServer } from "@/modules/k-absence-days/k-absence-days-server";
-import { endOfMonth, parse, startOfMonth } from "date-fns";
-import { z } from "zod";
+import { parse } from "date-fns";
 import { kAccessTokensServer } from "@/modules/k-access-tokens/k-access-tokens-server";
+import {
+  accessTokenParamsSchema,
+  datePeriodParamsSchema,
+  SearchParams,
+} from "@/modules/routing/schemas/routing-schemas";
+import { ErrorMessage } from "@/modules/ui/components/error-message";
 
-const paramsSchema = z.object({
-  from: z.string(),
-  to: z.string(),
-  accessToken: z.string(),
-});
-
-type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
+const paramsSchema = datePeriodParamsSchema.and(accessTokenParamsSchema);
 
 export default async function Page({
   searchParams,
@@ -23,10 +22,13 @@ export default async function Page({
 
   if (!parsedParams.success) {
     return (
-      <>
-        <pre>{JSON.stringify(searchParams, null, 2)}</pre>
-        <pre>{JSON.stringify(parsedParams.error, null, 2)}</pre>
-      </>
+      <ErrorMessage
+        failure={{
+          type: "__failure__",
+          code: "__invalid_params__",
+          message: JSON.stringify(parsedParams.error, null, 2),
+        }}
+      />
     );
   }
 
@@ -34,18 +36,17 @@ export default async function Page({
     parsedParams.data.accessToken,
   );
   if (isFailure(result)) {
-    return <pre>Invalid or expired token</pre>;
+    return <ErrorMessage failure={result} />;
   }
+
   const employees = await kEmployeesServer.listAll();
 
   if (isFailure(employees)) {
-    return <pre>Could not load employees</pre>;
+    return <ErrorMessage failure={employees} />;
   }
 
-  // TODO date it's fixed to march until we get acceptance from the payroll office
-  const date = parse("10-03-2025", "dd-MM-yyyy", new Date());
-  const from = startOfMonth(date);
-  const to = endOfMonth(date);
+  const from = parse(parsedParams.data.from, "dd-MM-yyyy", new Date());
+  const to = parse(parsedParams.data.to, "dd-MM-yyyy", new Date());
 
   const absences = await kAbsenceDaysServer.list({
     from,
@@ -53,17 +54,17 @@ export default async function Page({
   });
 
   if (isFailure(absences)) {
-    return <pre>Could not load absences</pre>;
+    return <ErrorMessage failure={absences} />;
   }
 
   const absenceReasons = await kAbsenceDaysServer.listReasons();
   if (isFailure(absenceReasons)) {
-    return <pre>Could not load absence reasons</pre>;
+    return <ErrorMessage failure={absenceReasons} />;
   }
 
   const closures = await kAbsenceDaysServer.closures();
   if (isFailure(closures)) {
-    return <pre>Could not load closures</pre>;
+    return <ErrorMessage failure={closures} />;
   }
 
   const uniqueReasons: string[] = [];

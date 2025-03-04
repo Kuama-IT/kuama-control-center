@@ -2,11 +2,12 @@ import { kAccessTokensServer } from "@/modules/k-access-tokens/k-access-tokens-s
 import { isFailure } from "@/utils/server-action-utils";
 import { CopyButton } from "next/dist/client/components/react-dev-overlay/ui/components/copy-button";
 import { KAccessTokenListItem } from "@/modules/k-access-tokens/components/k-access-token-list-item";
+import { ErrorMessage } from "@/modules/ui/components/error-message";
 
 export default async function KAccessTokenList() {
   const kAccessTokens = await kAccessTokensServer.list();
   if (isFailure(kAccessTokens)) {
-    return <pre>Could not load access tokens</pre>;
+    return <ErrorMessage failure={kAccessTokens} />;
   }
 
   if (kAccessTokens.length === 0) {
