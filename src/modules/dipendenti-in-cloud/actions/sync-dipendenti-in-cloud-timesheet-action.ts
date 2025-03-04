@@ -50,19 +50,20 @@ const syncTimesheet = async ({ from, to }: { from: Date; to: Date }) => {
       }
 
       const res = await db
-        .select({ id: kEmployees.id })
+        .select({ id: kEmployees.id, name: kEmployees.name })
         .from(kEmployees)
         .where(eq(kEmployees.dipendentiInCloudId, dipendentiInCloudId));
       if (res.length === 0) {
         // an ex employee, we can skip...
         continue;
       }
-      const { id: employeeId } = firstOrThrow(res);
+      const { id: employeeId, name: employeeName } = firstOrThrow(res);
 
       if (timesheetEntry.reasons && timesheetEntry.reasons.length > 0) {
         await db.insert(kAbsenceDays).values(
           timesheetEntry.reasons
             .map(({ reason, shifts, duration, duration_pending }) => {
+              console.log(employeeName, reason.name);
               return (
                 shifts?.map((shift) => {
                   return {

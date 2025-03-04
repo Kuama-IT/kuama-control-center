@@ -5,12 +5,11 @@ import {
   isToday,
   startOfWeek,
 } from "date-fns";
-import { and, eq, gte, lte } from "drizzle-orm";
-import { kAbsenceDays, kEmployees } from "@/drizzle/schema";
-import { db } from "@/drizzle/drizzle-db";
 import { KEmployeeAvatar } from "@/modules/k-employees/components/k-employee-avatar";
 import parsePostgresInterval from "postgres-interval";
 import { Title } from "@/modules/ui/components/title";
+import { kAbsenceDaysServer } from "@/modules/k-absence-days/k-absence-days-server";
+import { isFailure } from "@/utils/server-action-utils";
 
 const getCurrentWeekDays = () => {
   const start = startOfWeek(new Date());
@@ -21,19 +20,14 @@ const getCurrentWeekDays = () => {
 
 export default async function WeeklyAbsence() {
   const weekDays = getCurrentWeekDays();
-  const absences = await db
-    .select()
-    .from(kAbsenceDays)
-    .leftJoin(kEmployees, eq(kAbsenceDays.employeeId, kEmployees.id))
-    .where(
-      and(
-        gte(kAbsenceDays.date, format(weekDays[0], "yyyy-MM-dd")),
-        lte(
-          kAbsenceDays.date,
-          format(weekDays[weekDays.length - 1], "yyyy-MM-dd"),
-        ),
-      ),
-    );
+  // TODO refactor away from here
+  const absences = await kAbsenceDaysServer.list({
+    from: weekDays[0],
+    to: weekDays[weekDays.length - 1],
+  });
+  if (isFailure(absences)) {
+    return "Could not load absences";
+  }
   if (!absences || absences.length === 0) {
     return (
       <div className="flex flex-col gap-2">
