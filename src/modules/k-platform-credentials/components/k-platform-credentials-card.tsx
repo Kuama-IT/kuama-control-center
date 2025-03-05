@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { SiJirasoftware, SiRedmine } from "react-icons/si";
 import { Button } from "@/components/ui/button";
 import { Copy, Trash } from "lucide-react";
-import { FaDownload, FaSync } from "react-icons/fa";
+import { FaArrowRight, FaDownload, FaSync } from "react-icons/fa";
 import { copyToClipboard } from "@/modules/ui/ui-utils";
 import {
   Dialog,
@@ -16,13 +16,23 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useTransition } from "react";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+
+import { useState, useTransition } from "react";
 import deleteKPlatformCredentials from "@/modules/k-platform-credentials/actions/k-platform-credentials-delete-action";
 import { useRouter } from "next/navigation";
 import syncTimeSpentForClient from "@/modules/sync-data/actions/sync-time-spent-by-credentials-for-client";
 import Link from "next/link";
 import { isFailure } from "@/utils/server-action-utils";
 import { toast } from "sonner";
+import { Calendar } from "@/components/ui/calendar";
+import { endOfMonth, format, startOfMonth } from "date-fns";
+import { DateRange } from "react-day-picker";
+import { Separator } from "@/components/ui/separator";
 
 export const KPlatformCredentialsCard = ({
   credentials,
@@ -46,18 +56,33 @@ export const KPlatformCredentialsCard = ({
   };
 
   const syncData = () => {
+    const { from, to } = range ?? {};
+    if (!from || !to) {
+      return;
+    }
     toast("K1", {
       description: "Data sync will continue in background",
     });
     startTransition(async () => {
-      await syncTimeSpentForClient(credentials.id);
+      await syncTimeSpentForClient(credentials.id, {
+        from,
+        to,
+      });
     });
   };
 
   // TODO, we should just use location.origin, but Bless service cannot reach us in localhost...
-  const url = `https://24fb-2001-b07-a3c-1571-80bb-9a04-b3da-3d1d.ngrok-free.app/reports/easyredmine/${credentials.id}`;
+  const url = `https://kuama-control-center.vercel.app/reports/easyredmine/${credentials.id}`;
   const fileName = `${credentials.name.toLowerCase().replaceAll(" ", "-")}-report.pdf`; // TODO we should use the name of the user from easyredmine
 
+  const today = new Date();
+  const firstDateRange = startOfMonth(today);
+  const lastDateRange = endOfMonth(today);
+  const initialRange = {
+    from: firstDateRange,
+    to: lastDateRange,
+  };
+  const [range, setRange] = useState<DateRange | undefined>(initialRange);
   return (
     <div className="rounded-lg shadow-sm p-8 flex flex-col items-start gap-4 bg-background overflow-hidden group">
       <Badge className="py-2 px-4 rounded-full min-w-14 uppercase flex gap-2">
@@ -99,6 +124,50 @@ export const KPlatformCredentialsCard = ({
       </div>
 
       <div className="flex flex-col gap-2 mt-auto w-full">
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button>
+              <FaSync /> Sync timesheet
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent
+            className="w-auto p-0 flex flex-col gap-4"
+            align="start"
+          >
+            <Calendar
+              initialFocus
+              defaultMonth={range?.from}
+              numberOfMonths={2}
+              today={today}
+              mode="range"
+              onSelect={setRange}
+              selected={range}
+            />
+
+            <Separator />
+            <div className="flex items-center pb-4 justify-center">
+              <Button disabled={isPending} onClick={syncData}>
+                Sync {format(range?.from ?? today, "dd-MM-yyyy")}
+                <FaArrowRight />
+                {format(range?.to ?? today, "dd-MM-yyyy")}{" "}
+              </Button>
+            </div>
+          </PopoverContent>
+        </Popover>
+
+        <Link
+          className="w-full"
+          href={`/api/pdf?url=${url}&fileName=${fileName}`}
+          target="_blank"
+        >
+          <Button className="w-full">
+            <FaDownload />
+            Download timesheet
+          </Button>
+        </Link>
+
+        <Separator />
+
         <Dialog>
           <DialogTrigger asChild>
             <Button className="bg-destructive text-destructive-foreground uppercase flex">
@@ -112,8 +181,8 @@ export const KPlatformCredentialsCard = ({
                 Are you absolutely sure?
               </DialogTitle>
               <DialogDescription className="text-destructive">
-                This action cannot be undone. This will permanently delete your
-                account and remove your data from our servers.
+                This action cannot be undone. This will permanently delete these
+                credentials.
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>
@@ -128,21 +197,6 @@ export const KPlatformCredentialsCard = ({
             </DialogFooter>
           </DialogContent>
         </Dialog>
-
-        <Button disabled={isPending} onClick={syncData}>
-          <FaSync /> Sync timesheet
-        </Button>
-
-        <Link
-          className="w-full"
-          href={`/api/pdf?url=${url}&fileName=${fileName}`}
-          target="_blank"
-        >
-          <Button className="w-full">
-            <FaDownload />
-            Download timesheet
-          </Button>
-        </Link>
       </div>
     </div>
   );
