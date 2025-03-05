@@ -5,12 +5,8 @@ import { eq } from "drizzle-orm";
 import { firstOrThrow } from "@/utils/array-utils";
 import { handleServerErrors } from "@/utils/server-action-utils";
 
-async function getById(id: number) {
-  const res = await db.select().from(kEmployees).where(eq(kEmployees.id, id));
-
-  return firstOrThrow(res);
+async function deleteKEmployee(id: number) {
+  await db.delete(kEmployees).where(eq(kEmployees.id, id));
 }
 
-export default handleServerErrors(getById);
-
-export type KEmployeeById = Awaited<ReturnType<typeof getById>>;
+export default handleServerErrors(deleteKEmployee);
