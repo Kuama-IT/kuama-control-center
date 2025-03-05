@@ -3,7 +3,10 @@ import { kPlatformCredentialsServer } from "@/modules/k-platform-credentials/k-p
 import { EasyRedmineApiClient } from "@/modules/easyredmine/easyredmine-api-client";
 import { handleServerErrors, isFailure } from "@/utils/server-action-utils";
 
-const action = async (credentialId: number) => {
+const action = async (
+  credentialId: number,
+  range: { from: Date; to: Date },
+) => {
   // TODO complete
   const credentials = await kPlatformCredentialsServer.byId(credentialId);
 
@@ -21,15 +24,18 @@ const action = async (credentialId: number) => {
       credentials.persistentToken,
     );
 
-    const spentTimes = await client.getSpentTimes(new Date());
+    const spentTimes = await client.getSpentTimes(range);
+    console.log(spentTimes);
   }
 
   await new Promise((resolve) => setTimeout(resolve, 6000));
   console.log("done internal action");
 };
 
-export default handleServerErrors(async (credentialId: number) => {
-  // do not make user to wait until import is done
-  void action(credentialId);
-  console.log("request completed");
-});
+export default handleServerErrors(
+  async (credentialId: number, range: { from: Date; to: Date }) => {
+    // do not make user to wait until import is done
+    void action(credentialId, range);
+    console.log("request completed");
+  },
+);
