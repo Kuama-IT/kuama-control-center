@@ -4,17 +4,17 @@ import { handleServerErrors } from "@/utils/server-action-utils";
 
 async function easyRedmineGetSpentTimes({
   credentials,
-  date,
+  range,
 }: {
   credentials: KPlatformCredentialsRead;
-  date: Date;
+  range: { from: Date; to: Date };
 }) {
   const client = new EasyRedmineApiClient(
     credentials.endpoint,
     credentials.persistentToken,
   );
 
-  return await client.getSpentTimes(date);
+  return await client.getSpentTimes(range);
 }
 
 export default handleServerErrors(easyRedmineGetSpentTimes);

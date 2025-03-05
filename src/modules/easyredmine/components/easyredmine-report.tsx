@@ -10,7 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import Link from "next/link";
-import { format } from "date-fns";
+import { endOfMonth, format, startOfMonth } from "date-fns";
 import { isFailure } from "@/utils/server-action-utils";
 import { ErrorMessage } from "@/modules/ui/components/error-message";
 
@@ -37,9 +37,14 @@ export default async function EasyredmineReport({
   const date = new Date();
   const previousMonth = new Date(date.getTime());
   previousMonth.setDate(0);
+  const endOfMonthFns = endOfMonth(date);
+  const startOfMonthFns = startOfMonth(date);
   const res = await easyRedmineGetSpentTimes({
     credentials,
-    date: previousMonth,
+    range: {
+      from: startOfMonthFns,
+      to: endOfMonthFns,
+    },
   }); // TODO: get date from query params
   if (isFailure(res)) {
     return <ErrorMessage failure={res} />;
