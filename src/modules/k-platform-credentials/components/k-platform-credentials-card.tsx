@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { SiJirasoftware, SiRedmine } from "react-icons/si";
 import { Button } from "@/components/ui/button";
 import { Copy, Trash } from "lucide-react";
-import { FaSync } from "react-icons/fa";
+import { FaDownload, FaSync } from "react-icons/fa";
 import { copyToClipboard } from "@/modules/ui/ui-utils";
 import {
   Dialog,
@@ -55,7 +55,7 @@ export const KPlatformCredentialsCard = ({
   };
 
   // TODO, we should just use location.origin, but Bless service cannot reach us in localhost...
-  const url = `https://kuama-control-center.vercel.app/reports/easyredmine/${credentials.id}`;
+  const url = `https://24fb-2001-b07-a3c-1571-80bb-9a04-b3da-3d1d.ngrok-free.app/reports/easyredmine/${credentials.id}`;
   const fileName = `${credentials.name.toLowerCase().replaceAll(" ", "-")}-report.pdf`; // TODO we should use the name of the user from easyredmine
 
   return (
@@ -98,7 +98,7 @@ export const KPlatformCredentialsCard = ({
         />
       </div>
 
-      <div className="flex justify-between items-center gap-2 mt-auto w-full">
+      <div className="flex flex-col gap-2 mt-auto w-full">
         <Dialog>
           <DialogTrigger asChild>
             <Button className="bg-destructive text-destructive-foreground uppercase flex">
@@ -130,11 +130,18 @@ export const KPlatformCredentialsCard = ({
         </Dialog>
 
         <Button disabled={isPending} onClick={syncData}>
-          <FaSync /> Sync data
+          <FaSync /> Sync timesheet
         </Button>
 
-        <Link href={`/api/pdf?url=${url}&fileName=${fileName}`} target="_blank">
-          <Button>See report</Button>
+        <Link
+          className="w-full"
+          href={`/api/pdf?url=${url}&fileName=${fileName}`}
+          target="_blank"
+        >
+          <Button className="w-full">
+            <FaDownload />
+            Download timesheet
+          </Button>
         </Link>
       </div>
     </div>

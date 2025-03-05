@@ -5,6 +5,7 @@ import Image from "next/image";
 import { KProjectCard } from "@/modules/k-projects/components/k-project-card";
 import { isFailure } from "@/utils/server-action-utils";
 import { ErrorMessage } from "@/modules/ui/components/error-message";
+import { KEmployeeDangerZone } from "@/modules/k-employees/components/k-employee-danger-zone";
 
 export default async function KEmployeeDetail({ id }: { id: number }) {
   const employee = await kEmployeesServer.byId(id);
@@ -37,6 +38,10 @@ export default async function KEmployeeDetail({ id }: { id: number }) {
         {employeeProjects.map((it, index) => (
           <KProjectCard key={it.id} project={it} index={index} />
         ))}
+      </div>
+
+      <div className="p-8">
+        <KEmployeeDangerZone employee={employee} />
       </div>
     </div>
   );
