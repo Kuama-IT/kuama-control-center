@@ -71,6 +71,12 @@ export default async function WeeklyAbsence() {
                     const { hours, minutes } = parsePostgresInterval(
                       absence?.duration ?? "",
                     );
+                    const timeStart = parsePostgresInterval(
+                      absence?.timeStart ?? "",
+                    );
+                    const timeEnd = parsePostgresInterval(
+                      absence?.timeEnd ?? "",
+                    );
                     return (
                       <div
                         key={index}
@@ -84,7 +90,10 @@ export default async function WeeklyAbsence() {
                             </span>
                           )}
                           <span className="text-xs">
-                            {absence?.timeStart} - {absence?.timeEnd}
+                            {String(timeStart.hours).padStart(2, "0")}:
+                            {String(timeStart.minutes).padStart(2, "0")} -{" "}
+                            {String(timeEnd.hours).padStart(2, "0")}:
+                            {String(timeEnd.minutes).padStart(2, "0")}
                           </span>
                           <span className="text-xs">
                             {absence?.description}
