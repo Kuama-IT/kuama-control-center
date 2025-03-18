@@ -1,4 +1,5 @@
 import { z } from "zod";
+
 export const pubblicaWebAuthenticationResponseSchema = z.object({
   Message: z.string(),
   AuthToken: z.string(),
@@ -49,7 +50,7 @@ export const documentSchema = z.object({
   CreationDate: z.string().nullable(),
   ModifyDate: z.string().nullable(),
   PublicationDate: z.string(),
-  ReadingDate: z.string(),
+  ReadingDate: z.string().nullable(),
   PasswordProtected: z.boolean(),
   MimeType: z.string(),
   Period: z.string(),

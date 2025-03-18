@@ -114,8 +114,6 @@ export class DipendentiInCloudApi {
 
   /**
    * Sends payrolls to DipendentiInCloud. Be aware that this will still require manual confirmation from the user.
-   * @param fileName
-   * @param fileContentBase64
    */
   async sendPayrolls({
     fileName,

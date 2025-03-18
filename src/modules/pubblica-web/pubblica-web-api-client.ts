@@ -135,7 +135,7 @@ export class PubblicaWebApi {
     );
 
     if (!folderTreeYearItem) {
-      throw new Error("Year not found in folder tree");
+      throw new Error(`Year ${year} not found in folder tree`);
     }
 
     const yearFolderTree = await this.readFolderTreeAtPath(
@@ -147,7 +147,7 @@ export class PubblicaWebApi {
       (item) => item.text === formattedMonth,
     );
     if (!monthFolderTreeItem) {
-      throw new Error("Month not found in folder tree");
+      throw new Error(`Month ${formattedMonth} not found in folder tree`);
     }
     const documents = await this.readDocumentsAtPath(
       repository.Id,
