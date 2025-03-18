@@ -1,6 +1,6 @@
 import { Title } from "@/modules/ui/components/title";
-import SyncClients from "@/modules/settings/components/sync-clients";
-import { SyncInvoices } from "@/modules/settings/components/sync-invoices";
+import SyncClients from "@/modules/fatture-in-cloud/components/sync-clients";
+import { SyncInvoices } from "@/modules/fatture-in-cloud/components/sync-invoices";
 
 export default async function SyncFattureInCloud() {
   return (
