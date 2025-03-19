@@ -17,9 +17,8 @@ import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { isFailure } from "@/utils/server-action-utils";
 import deleteKEmployee from "@/modules/k-employees/actions/k-employee-delete-action";
-import { toast } from "sonner";
-import { cn } from "@/lib/utils";
 import { FaSync } from "react-icons/fa";
+import { notifyError, notifySuccess } from "@/modules/ui/components/notify";
 
 export const KEmployeeDangerZone = ({
   employee,
@@ -33,11 +32,11 @@ export const KEmployeeDangerZone = ({
     startTransition(async () => {
       const res = await deleteKEmployee(employee.id);
       if (isFailure(res)) {
-        toast("Error during employee deletion, check server logs", {
-          className: "bg-error text-foreground",
-        });
+        notifyError("Error during employee deletion, check server logs");
         return;
       }
+
+      notifySuccess(`${employee.fullName} has been deleted`);
       router.push("/k-employees");
     });
   };

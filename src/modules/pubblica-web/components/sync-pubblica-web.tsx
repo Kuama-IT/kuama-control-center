@@ -6,7 +6,6 @@ import syncPayrollsToDipendentiInCloudAction from "@/modules/pubblica-web/action
 import { Button } from "@/components/ui/button";
 import { FaCalendar } from "react-icons/fa";
 import { isFailure } from "@/utils/server-action-utils";
-import { toast } from "sonner";
 import {
   Select,
   SelectContent,
@@ -24,6 +23,7 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
+import { notifyError, notifySuccess } from "@/modules/ui/components/notify";
 
 const months = Array.from({ length: 12 }, (_, i) => {
   const date = setMonth(new Date(), i);
@@ -74,18 +74,13 @@ export default function SyncPubblicaWeb() {
         date,
       });
       if (isFailure(res)) {
-        toast("K1 App", {
-          description: "Error while syncing PubblicaWeb payrolls",
-          className: "bg-error text-foreground",
-        });
+        notifyError("Error while syncing PubblicaWeb payrolls");
         return;
       }
 
-      toast("K1 App", {
-        description:
-          "Payrolls synced, be sure to approve them on Dipendenti In Cloud",
-        className: "bg-success text-foreground",
-      });
+      notifySuccess(
+        "Payrolls synced, be sure to approve them on Dipendenti In Cloud",
+      );
     });
   };
 
@@ -161,7 +156,7 @@ export default function SyncPubblicaWeb() {
             disabled={isPending || !form.formState.isValid}
           >
             <FaCalendar />
-            Sync employee payrolls
+            Send employee payrolls to Dipendenti In Cloud
           </Button>
         </form>
       </Form>

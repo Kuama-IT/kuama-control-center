@@ -7,7 +7,7 @@ import syncFattureInCloudInvoicesAction from "@/modules/sync-data/actions/sync-f
 import { isFailure } from "@/utils/server-action-utils";
 import { cn } from "@/lib/utils";
 import { FaSync } from "react-icons/fa";
-import { toast } from "sonner";
+import { notifyError, notifySuccess } from "@/modules/ui/components/notify";
 
 export const SyncInvoices = () => {
   const router = useRouter();
@@ -21,15 +21,10 @@ export const SyncInvoices = () => {
         startTransition(async () => {
           const res = await syncFattureInCloudInvoicesAction();
           if (isFailure(res)) {
-            toast("k1", {
-              description: "Error while syncing invoices",
-              className: "bg-error text-foreground",
-            });
+            notifyError("Error while syncing invoices");
             return;
           }
-          toast("K1", {
-            description: "Invoices synced",
-          });
+          notifySuccess("Invoices synced");
           router.refresh();
         })
       }

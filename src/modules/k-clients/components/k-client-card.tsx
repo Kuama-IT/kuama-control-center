@@ -42,11 +42,11 @@ export const KClientCard = async ({ client, index = 0 }: Props) => {
           </div>
           <p>{client.projectsCount} projects</p>
           <p>{client.employeesWorkingForClientCount} employees involved</p>
-          {/*{session?.user?.isAdmin && (*/}
-          {/*  <Suspense>*/}
-          {/*    <KClientInvoicedAmount clientId={client.id} />*/}
-          {/*  </Suspense>*/}
-          {/*)}*/}
+          {session?.user?.isAdmin && (
+            <Suspense>
+              <KClientInvoicedAmount clientId={client.id} />
+            </Suspense>
+          )}
         </div>
         <HiArrowSmRight className="pointer-events-none absolute right-0 opacity-0 text-2xl text-gray-300 group-hover:opacity-100 group-hover:right-4 transition-all" />
       </div>

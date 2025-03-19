@@ -13,6 +13,6 @@ const client = postgres(serverEnv.databaseUrl, {
 export const db = drizzle({
   casing: "snake_case",
   client,
-  logger: serverEnv.isDev,
+  logger: false, //serverEnv.isDev,
   schema: { ...schema, ...relations },
 });

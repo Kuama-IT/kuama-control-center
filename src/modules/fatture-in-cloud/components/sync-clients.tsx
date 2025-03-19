@@ -10,16 +10,21 @@ export default async function SyncClients() {
   if (isFailure(kClients)) {
     return <ErrorMessage failure={kClients} />;
   }
-  // remove already associated clients
-  const filtered = fattureInCloudClients.filter((fattureInCloudClient) => {
-    return !kClients.some((kClient) => {
-      return kClient.kVats.some((kVat) => {
-        return kVat.vat === fattureInCloudClient.vat_number;
+  // filter out already associated clients
+  const notAssociatedFattureInCloudClients = fattureInCloudClients.filter(
+    (fattureInCloudClient) => {
+      return !kClients.some((kClient) => {
+        return kClient.kVats.some((kVat) => {
+          return kVat.vat === fattureInCloudClient.vat_number;
+        });
       });
-    });
-  });
+    },
+  );
 
   return (
-    <ClientsSelector kClients={kClients} fattureInCloudClients={filtered} />
+    <ClientsSelector
+      kClients={kClients}
+      fattureInCloudClients={notAssociatedFattureInCloudClients}
+    />
   );
 }
