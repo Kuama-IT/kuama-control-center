@@ -28,11 +28,11 @@ import { useRouter } from "next/navigation";
 import syncTimeSpentForClient from "@/modules/sync-data/actions/sync-time-spent-by-credentials-for-client";
 import Link from "next/link";
 import { isFailure } from "@/utils/server-action-utils";
-import { toast } from "sonner";
 import { Calendar } from "@/components/ui/calendar";
 import { endOfMonth, format, startOfMonth } from "date-fns";
 import { DateRange } from "react-day-picker";
 import { Separator } from "@/components/ui/separator";
+import { notifyError, notifySuccess } from "@/modules/ui/components/notify";
 
 export const KPlatformCredentialsCard = ({
   credentials,
@@ -46,9 +46,7 @@ export const KPlatformCredentialsCard = ({
     startTransition(async () => {
       const res = await deleteKPlatformCredentials(credentials.id);
       if (isFailure(res)) {
-        toast("Error during credentials deletion, check server logs", {
-          className: "bg-error text-foreground",
-        });
+        notifyError("Error during credentials deletion, check server logs");
         return;
       }
       router.refresh();
@@ -60,9 +58,7 @@ export const KPlatformCredentialsCard = ({
     if (!from || !to) {
       return;
     }
-    toast("K1", {
-      description: "Data sync will continue in background",
-    });
+    notifySuccess("Data sync will continue in background");
     startTransition(async () => {
       await syncTimeSpentForClient(credentials.id, {
         from,
@@ -105,7 +101,7 @@ export const KPlatformCredentialsCard = ({
           className="absolute right-0 translate-x-16 group-hover:translate-x-0 transition-all cursor-pointer"
           onClick={() => {
             copyToClipboard(credentials.endpoint);
-            toast("K1", { description: "Endpoint copied to clipboard" });
+            notifySuccess("Endpoint copied to clipboard");
           }}
         />
       </div>
@@ -118,7 +114,7 @@ export const KPlatformCredentialsCard = ({
           className="absolute right-0 translate-x-16 group-hover:translate-x-0 transition-all cursor-pointer"
           onClick={() => {
             copyToClipboard(credentials.persistentToken);
-            toast("K1", { description: "Token copied to clipboard" });
+            notifySuccess("Token copied to clipboard");
           }}
         />
       </div>

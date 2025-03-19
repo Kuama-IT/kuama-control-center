@@ -5,8 +5,8 @@ import { Button } from "@/components/ui/button";
 import { FaSync } from "react-icons/fa";
 import { cn } from "@/lib/utils";
 import ytSyncUsers from "@/modules/you-track/actions/yt-sync-users-action";
-import { toast } from "sonner";
 import { isFailure } from "@/utils/server-action-utils";
+import { notifyError, notifySuccess } from "@/modules/ui/components/notify";
 
 export const YtSyncUsersButton = () => {
   const [isPending, startTransition] = useTransition();
@@ -16,16 +16,12 @@ export const YtSyncUsersButton = () => {
       const result = await ytSyncUsers();
 
       if (isFailure(result)) {
-        toast("Error while importing users", {
-          className: "bg-error text-foreground",
-        });
+        notifyError("Error while importing users");
 
         return;
       }
 
-      toast(result.message, {
-        className: "bg-success text-foreground",
-      });
+      notifySuccess(result.message);
     });
   };
 

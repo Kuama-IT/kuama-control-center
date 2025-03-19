@@ -31,7 +31,7 @@ import createKPlatformCredentials from "@/modules/k-platform-credentials/actions
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { isFailure } from "@/utils/server-action-utils";
-import { toast } from "sonner";
+import { notifyError } from "@/modules/ui/components/notify";
 
 type Props = {
   clientId: number;
@@ -61,9 +61,7 @@ export const KPlatformCredentialsForm = ({ clientId }: Props) => {
         clientId,
       });
       if (isFailure(res)) {
-        toast("Error during credentials creation, check server logs", {
-          className: "bg-error text-foreground",
-        });
+        notifyError("Error during credentials creation, check server logs");
         return;
       }
       router.refresh();

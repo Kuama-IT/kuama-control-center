@@ -10,7 +10,7 @@ import { FaArrowRight, FaCalendar, FaSync } from "react-icons/fa";
 import { Separator } from "@/components/ui/separator";
 import syncDipendentiInCloudEmployees from "@/modules/dipendenti-in-cloud/actions/dic-import-action";
 import { isFailure } from "@/utils/server-action-utils";
-import { toast } from "sonner";
+import { notifyError, notifySuccess } from "@/modules/ui/components/notify";
 
 export default function SyncDipendentiInCloud() {
   const today = new Date();
@@ -41,9 +41,9 @@ export default function SyncDipendentiInCloud() {
                 from: range.from,
               });
               if (isFailure(res)) {
-                toast("Error while syncing dipendenti in cloud timesheet", {
-                  className: "bg-error text-foreground",
-                });
+                notifyError(
+                  "Error while syncing dipendenti in cloud timesheet",
+                );
               }
             });
           }}
@@ -85,15 +85,13 @@ export default function SyncDipendentiInCloud() {
             startTransition(async () => {
               const res = await syncDipendentiInCloudEmployees();
               if (isFailure(res)) {
-                toast("Error while syncing dipendenti in cloud general info", {
-                  className: "bg-error text-foreground",
-                });
+                notifyError(
+                  "Error while syncing dipendenti in cloud general info",
+                );
                 return;
               }
 
-              toast(res.message, {
-                className: "bg-success text-foreground",
-              });
+              notifySuccess(res.message);
             });
           }}
         >
