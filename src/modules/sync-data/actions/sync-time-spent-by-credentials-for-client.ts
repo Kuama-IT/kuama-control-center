@@ -32,10 +32,12 @@ const action = async (
   console.log("done internal action");
 };
 
-export default handleServerErrors(
+const handled = handleServerErrors(
   async (credentialId: number, range: { from: Date; to: Date }) => {
     // do not make user to wait until import is done
     void action(credentialId, range);
     console.log("request completed");
   },
 );
+
+export default handled;

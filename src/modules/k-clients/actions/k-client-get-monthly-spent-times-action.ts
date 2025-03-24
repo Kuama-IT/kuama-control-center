@@ -57,4 +57,5 @@ const kClientGetMonthlySpentTimesAction = async (
   }));
 };
 
-export default handleServerErrors(kClientGetMonthlySpentTimesAction);
+const handled = handleServerErrors(kClientGetMonthlySpentTimesAction);
+export default handled;

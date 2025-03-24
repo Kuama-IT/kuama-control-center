@@ -1,7 +1,7 @@
 "use server";
 import { fattureInCloudApiClient } from "@/modules/fatture-in-cloud/fatture-in-cloud-api-client";
 import { db } from "@/drizzle/drizzle-db";
-import { kVats, kInvoices } from "@/drizzle/schema";
+import { kInvoices, kVats } from "@/drizzle/schema";
 import { eq, sql } from "drizzle-orm";
 import { handleServerErrors } from "@/utils/server-action-utils";
 import { firstOrThrow } from "@/utils/array-utils";
@@ -10,7 +10,7 @@ import type { IssuedDocument } from "@fattureincloud/fattureincloud-ts-sdk";
 const BATCH_SIZE = 100;
 type KInvoiceInsert = typeof kInvoices.$inferInsert;
 
-export default handleServerErrors(async () => {
+const handled = handleServerErrors(async () => {
   const fattureInCloudInvoices = await fattureInCloudApiClient.getInvoices();
   // group invoices by vat
   const invoicesByVat = new Map<string, IssuedDocument[]>();
@@ -108,3 +108,5 @@ export default handleServerErrors(async () => {
     message: "Invoices synced successfully",
   };
 });
+
+export default handled;

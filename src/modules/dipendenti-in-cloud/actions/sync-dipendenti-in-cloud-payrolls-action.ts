@@ -7,7 +7,7 @@ import { kEmployees, kPayrolls } from "@/drizzle/schema";
 import { eq } from "drizzle-orm";
 import { firstOrThrow } from "@/utils/array-utils";
 
-export default handleServerErrors(async (years: number[]) => {
+const handled = handleServerErrors(async (years: number[]) => {
   const history = await getSalaryHistoryWithGrossAmounts(
     dipendentiInCloudApiClient,
     years,
@@ -77,3 +77,5 @@ export default handleServerErrors(async (years: number[]) => {
     }
   });
 });
+
+export default handled;

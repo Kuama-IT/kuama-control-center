@@ -7,7 +7,7 @@ import { kEmployees, lower } from "@/drizzle/schema";
 import { firstOrThrow } from "@/utils/array-utils";
 import { prefixWithYouTrackAvatarBaseUrl } from "@/modules/you-track/youtrack-utils";
 
-export default handleServerErrors(async () => {
+const handled = handleServerErrors(async () => {
   const users = await youtrackApiClient.getUsers();
 
   const query = await db.select({ count: count() }).from(kEmployees);
@@ -47,3 +47,5 @@ export default handleServerErrors(async () => {
     message: `Now you have ${result.count} employees`,
   };
 });
+
+export default handled;

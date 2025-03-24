@@ -63,7 +63,8 @@ const kClientGetOneAction = async ({
   };
 };
 
-export default handleServerErrors(kClientGetOneAction);
+const handled = handleServerErrors(kClientGetOneAction);
+export default handled;
 
 export type KClientGetOneResult = Awaited<
   ReturnType<typeof kClientGetOneAction>

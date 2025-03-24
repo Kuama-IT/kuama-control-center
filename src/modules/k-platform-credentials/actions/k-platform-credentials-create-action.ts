@@ -8,7 +8,7 @@ import { db } from "@/drizzle/drizzle-db";
 import { handleServerErrors } from "@/utils/server-action-utils";
 import { firstOrThrow } from "@/utils/array-utils";
 
-export default handleServerErrors(
+const handled = handleServerErrors(
   async (credentials: KPlatformCredentialsInsert & { clientId: number }) => {
     await db.transaction(async (tx) => {
       const results = await tx
@@ -24,3 +24,5 @@ export default handleServerErrors(
     });
   },
 );
+
+export default handled;

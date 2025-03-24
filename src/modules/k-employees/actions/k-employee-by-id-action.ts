@@ -11,6 +11,7 @@ async function getById(id: number) {
   return firstOrThrow(res);
 }
 
-export default handleServerErrors(getById);
+const handled = handleServerErrors(getById);
+export default handled;
 
 export type KEmployeeById = Awaited<ReturnType<typeof getById>>;
