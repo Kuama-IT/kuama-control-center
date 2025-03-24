@@ -46,4 +46,5 @@ async function kClientGetTotalInvoicedAmount({
   return parsed;
 }
 
-export default handleServerErrors(kClientGetTotalInvoicedAmount);
+const handled = handleServerErrors(kClientGetTotalInvoicedAmount);
+export default handled;

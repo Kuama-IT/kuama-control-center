@@ -2,12 +2,11 @@
 import { db } from "@/drizzle/drizzle-db";
 import { handleServerErrors } from "@/utils/server-action-utils";
 import { youtrackApiClient } from "@/modules/you-track/youtrack-api-client";
-import { kClients, kPlatformCredentials, kProjects } from "@/drizzle/schema";
-import { prefixWithYouTrackAvatarBaseUrl } from "@/modules/you-track/youtrack-utils";
+import { kClients, kProjects } from "@/drizzle/schema";
 import { count } from "drizzle-orm";
 import { firstOrThrow } from "@/utils/array-utils";
 
-export default handleServerErrors(async () => {
+const handled = handleServerErrors(async () => {
   const clients = await db.select().from(kClients);
 
   const projects = await youtrackApiClient.getProjects();
@@ -55,3 +54,5 @@ export default handleServerErrors(async () => {
 
   return { message: `Now you have ${result.count} projects` };
 });
+
+export default handled;

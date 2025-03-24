@@ -17,4 +17,5 @@ async function easyRedmineGetSpentTimes({
   return await client.getSpentTimes(range);
 }
 
-export default handleServerErrors(easyRedmineGetSpentTimes);
+const handled = handleServerErrors(easyRedmineGetSpentTimes);
+export default handled;

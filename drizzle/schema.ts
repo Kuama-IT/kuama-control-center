@@ -151,8 +151,6 @@ export const kPresenceDays = pgTable("k_presence_days", {
   date: date(),
   employeeId: serial().references(() => kEmployees.id),
   duration: interval({ fields: "minute" }),
-  timeStart: varchar(),
-  timeEnd: varchar(),
 });
 
 export const kProjects = pgTable("k_projects", {

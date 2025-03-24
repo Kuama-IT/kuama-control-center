@@ -58,10 +58,6 @@ export default function SyncPubblicaWeb() {
 
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      month: date.getMonth(),
-      year: date.getFullYear(),
-    },
   });
 
   const onSubmit = (values: FormSchema) => {

@@ -5,7 +5,7 @@ import { eq } from "drizzle-orm";
 import { kProjectMedias, kProjects } from "@/drizzle/schema";
 import { handleServerErrors } from "@/utils/server-action-utils";
 
-export default handleServerErrors(
+const handled = handleServerErrors(
   async ({ projectId, images }: { projectId: number; images: string[] }) => {
     const project = await db.query.kProjects.findFirst({
       where: eq(kProjects.id, projectId),
@@ -25,3 +25,5 @@ export default handleServerErrors(
     });
   },
 );
+
+export default handled;

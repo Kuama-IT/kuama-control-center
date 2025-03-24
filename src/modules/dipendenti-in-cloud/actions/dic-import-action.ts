@@ -7,7 +7,7 @@ import { kEmployees, lower } from "@/drizzle/schema";
 import { count, eq } from "drizzle-orm";
 import { firstOrThrow } from "@/utils/array-utils";
 
-export default handleServerErrors(async () => {
+const handled = handleServerErrors(async () => {
   const dicEmployees = await dipendentiInCloudApiClient.getEmployees();
 
   await db.transaction(async (tx) => {
@@ -50,3 +50,5 @@ export default handleServerErrors(async () => {
     message: `Now you have ${result.count} employees`,
   };
 });
+
+export default handled;

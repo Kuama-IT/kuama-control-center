@@ -11,4 +11,5 @@ async function deleteKEmployee(id: number) {
   });
 }
 
-export default handleServerErrors(deleteKEmployee);
+const handled = handleServerErrors(deleteKEmployee);
+export default handled;

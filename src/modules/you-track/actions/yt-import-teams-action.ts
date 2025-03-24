@@ -2,12 +2,11 @@
 import { handleServerErrors } from "@/utils/server-action-utils";
 import { youtrackApiClient } from "@/modules/you-track/youtrack-api-client";
 import { db } from "@/drizzle/drizzle-db";
-import { count, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { kEmployees, kProjects, kTeams, lower } from "@/drizzle/schema";
 import { firstOrThrow } from "@/utils/array-utils";
-import { prefixWithYouTrackAvatarBaseUrl } from "@/modules/you-track/youtrack-utils";
 
-export default handleServerErrors(async () => {
+const handled = handleServerErrors(async () => {
   const ytProjects = await youtrackApiClient.getProjects();
   let teamsCreated = 0;
   let projectsProcessed = 0;
@@ -59,3 +58,5 @@ export default handleServerErrors(async () => {
     message: `LEGEN-DARY! Created ${teamsCreated} team associations across ${projectsProcessed} projects! (Skipped ${skippedProjects} projects)`,
   };
 });
+
+export default handled;

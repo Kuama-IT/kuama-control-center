@@ -2,12 +2,12 @@
 import { db } from "@/drizzle/drizzle-db";
 import { handleServerErrors } from "@/utils/server-action-utils";
 import { youtrackApiClient } from "@/modules/you-track/youtrack-api-client";
-import { kClients, kPlatformCredentials } from "@/drizzle/schema";
+import { kClients } from "@/drizzle/schema";
 import { prefixWithYouTrackAvatarBaseUrl } from "@/modules/you-track/youtrack-utils";
 import { count } from "drizzle-orm";
 import { firstOrThrow } from "@/utils/array-utils";
 
-export default handleServerErrors(async () => {
+const handled = handleServerErrors(async () => {
   const organizations = await youtrackApiClient.getOrganizations();
   const payload: (typeof kClients.$inferInsert)[] = organizations
     .filter((it) => !it.name.toLowerCase().includes("kuama"))
@@ -27,3 +27,5 @@ export default handleServerErrors(async () => {
 
   return { message: `Now you have ${result.count} clients` };
 });
+
+export default handled;

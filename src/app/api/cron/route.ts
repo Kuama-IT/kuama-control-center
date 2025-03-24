@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-import { dipendentiInCloudApiClient } from "@/modules/dipendenti-in-cloud/dipendenti-in-cloud-api-client";
-import syncDipendentiInCloudPayrollsAction from "@/modules/sync-data/actions/sync-dipendenti-in-cloud-payrolls-action";
+import syncDipendentiInCloudPayrollsAction from "@/modules/dipendenti-in-cloud/actions/sync-dipendenti-in-cloud-payrolls-action";
 
 // TODO THIS SHOULD ONLY SEND CURRENT MONTH PAYROLLS TO DIPENDENTI IN CLOUD
 export async function GET() {

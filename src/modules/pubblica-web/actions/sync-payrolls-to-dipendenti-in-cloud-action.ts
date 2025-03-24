@@ -5,7 +5,7 @@ import { serverEnv } from "@/env/server-env";
 import { dipendentiInCloudApiClient } from "@/modules/dipendenti-in-cloud/dipendenti-in-cloud-api-client";
 import { handleServerErrors } from "@/utils/server-action-utils";
 
-export default handleServerErrors(async function ({ date }: { date: Date }) {
+const handled = handleServerErrors(async function ({ date }: { date: Date }) {
   const pubblicaWebClient = new PubblicaWebApi(
     serverEnv.pubblicaWebUsername,
     serverEnv.pubblicaWebPassword,
@@ -19,3 +19,5 @@ export default handleServerErrors(async function ({ date }: { date: Date }) {
     fileName: payslips.name,
   });
 });
+
+export default handled;

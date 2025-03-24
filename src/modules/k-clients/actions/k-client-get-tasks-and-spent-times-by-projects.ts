@@ -98,4 +98,5 @@ const kClientGetTasksAndSpentTimesByProjects = async ({
   };
 };
 
-export default handleServerErrors(kClientGetTasksAndSpentTimesByProjects);
+const handled = handleServerErrors(kClientGetTasksAndSpentTimesByProjects);
+export default handled;

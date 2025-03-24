@@ -67,7 +67,8 @@ const kClientsListAllAction = async (): Promise<KClientListItem[]> => {
   );
 };
 
-export default handleServerErrors(kClientsListAllAction);
+const handled = handleServerErrors(kClientsListAllAction);
+export default handled;
 
 export type KClientListAllAction = Awaited<
   ReturnType<typeof kClientsListAllAction>

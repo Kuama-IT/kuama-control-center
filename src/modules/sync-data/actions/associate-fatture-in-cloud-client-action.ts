@@ -1,7 +1,7 @@
 "use server";
 import { Client } from "@fattureincloud/fattureincloud-ts-sdk/src/models/client";
 import { db } from "@/drizzle/drizzle-db";
-import { kClientsVats, kTasks, kVats } from "@/drizzle/schema";
+import { kClientsVats, kVats } from "@/drizzle/schema";
 import { handleServerErrors } from "@/utils/server-action-utils";
 import { fattureInCloudClientSchema } from "@/modules/fatture-in-cloud/schemas/fatture-in-cloud-schemas";
 import { firstOrThrow } from "@/utils/array-utils";
@@ -36,4 +36,6 @@ async function associateFattureInCloudClientAction({
   await db.insert(kClientsVats).values(relation);
 }
 
-export default handleServerErrors(associateFattureInCloudClientAction);
+const handled = handleServerErrors(associateFattureInCloudClientAction);
+
+export default handled;

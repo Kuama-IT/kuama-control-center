@@ -4,7 +4,7 @@ import { kProjects, kTeams } from "@/drizzle/schema";
 import { eq, inArray } from "drizzle-orm";
 import { handleServerErrors } from "@/utils/server-action-utils";
 
-export default handleServerErrors(async (employeeId: number) => {
+const handled = handleServerErrors(async (employeeId: number) => {
   const employeeTeams = await db
     .select({ projectId: kTeams.projectId })
     .from(kTeams)
@@ -20,3 +20,5 @@ export default handleServerErrors(async (employeeId: number) => {
     ),
   });
 });
+
+export default handled;
