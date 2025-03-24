@@ -56,7 +56,7 @@ export const KAccessTokenListItem = ({
             -
           </>
         )}
-        <span>Created at: {token.createdAt?.toLocaleDateString()}</span>
+        <span>Created at: {format(token.createdAt, "PPP")}</span>
         {token.allowedUsages === -1 && token.expiresAt && (
           <>
             -<span>Expires at {format(token.expiresAt, "PPP")}</span>

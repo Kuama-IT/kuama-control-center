@@ -2,7 +2,7 @@ import {
   Api,
   TimeEntryApiResponse,
 } from "@/modules/easyredmine/generated/easyredmine-rest-client";
-import { endOfMonth, format, startOfMonth } from "date-fns";
+import { format } from "date-fns";
 
 export class EasyRedmineApiClient {
   private readonly api: Api<{ headers: { "X-Redmine-API-Key": string } }>;
@@ -34,7 +34,13 @@ export class EasyRedmineApiClient {
       },
     );
 
-    // todo find a better way than as
+    if (!req.ok) {
+      throw new Error(
+        `Error fetching time entries: ${req.status} ${req.statusText}`,
+      );
+    }
+
+    // todo find a better way than "as"
     const json = (await req.json()) as {
       total_count?: number;
       offset?: number;
@@ -65,9 +71,10 @@ export class EasyRedmineApiClient {
         name?: string;
         code?: string;
       };
-      task?: {
-        id: number;
+      task: {
+        id: string;
         subject: string;
+        date: string;
       };
       date: string;
       userFullName: string;
@@ -100,7 +107,8 @@ export class EasyRedmineApiClient {
             },
             task: {
               subject: issueResponse.data?.issue?.subject ?? "",
-              id: timeEntry.issue.id,
+              id: timeEntry.issue.id?.toString() ?? "",
+              date: issueResponse.data?.issue?.created_on ?? "",
             },
             date: date,
             userFullName: user?.name ?? "",
@@ -109,7 +117,12 @@ export class EasyRedmineApiClient {
             agency: "Kuama",
           });
         } else {
-          console.log(timeEntry.project?.name, " - ", timeEntry.hours);
+          console.log(
+            "*** time entry without an issue ***",
+            timeEntry.project?.name,
+            " - ",
+            timeEntry.hours,
+          );
         }
       }
     }

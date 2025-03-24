@@ -2,6 +2,7 @@ import {
   AnyPgColumn,
   boolean,
   date,
+  foreignKey,
   integer,
   interval,
   pgEnum,
@@ -20,6 +21,7 @@ export const codeRepositoryPlatform = pgEnum("code_repository_platform", [
   "gitlab",
   "jira",
   "easyredmine",
+  "youtrack",
 ]);
 
 // Currently represent either a set of organization/token to fetch data from GitHub, or a set of endpoint/token to fetch data from GitLab
@@ -33,12 +35,29 @@ export const kPlatformCredentials = pgTable("k_platform_credentials", {
 });
 
 export const kPlatformCredentialsToEmployeesAndProjects = pgTable(
-  "k_platform_credentials_to_employees_and_projects",
+  "k_platform_credentials_relations",
   {
-    platformCredentialsId: serial().references(() => kPlatformCredentials.id),
-    employeeId: serial().references(() => kEmployees.id),
-    projectId: serial().references(() => kProjects.id),
+    platformCredentialsId: serial(),
+    employeeId: serial(),
+    projectId: serial(),
   },
+  (table) => [
+    foreignKey({
+      columns: [table.platformCredentialsId],
+      foreignColumns: [kPlatformCredentials.id],
+      name: "fk_platform_credential_id",
+    }),
+    foreignKey({
+      columns: [table.employeeId],
+      foreignColumns: [kEmployees.id],
+      name: "fk_employee_id",
+    }),
+    foreignKey({
+      columns: [table.projectId],
+      foreignColumns: [kProjects.id],
+      name: "fk_project_id",
+    }),
+  ],
 );
 
 export const kInvoices = pgTable("k_invoices", {
@@ -194,7 +213,8 @@ export const kTasks = pgTable("k_tasks", {
   id: serial().primaryKey(),
   name: varchar({ length: 256 }),
   description: text(),
-  youTrackId: varchar({ length: 256 }).unique(),
+  platform: codeRepositoryPlatform().notNull(),
+  externalTrackerId: varchar({ length: 256 }).unique(),
   projectId: serial().references(() => kProjects.id),
   employeeId: serial().references(() => kEmployees.id),
   creationDate: date(),
@@ -206,7 +226,8 @@ export const kSpentTimes = pgTable("k_spent_times", {
   duration: interval({ fields: "minute" }),
   date: date(),
   description: text(),
-  youTrackId: varchar({ length: 256 }).unique(),
+  platform: codeRepositoryPlatform().notNull(),
+  externalTrackerId: varchar({ length: 256 }).unique(),
   taskId: serial().references(() => kTasks.id),
 });
 

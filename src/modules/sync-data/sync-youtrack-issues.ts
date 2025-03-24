@@ -76,7 +76,8 @@ export const syncYouTrackIssuesFromWorkItems = async (
       const taskPayload: typeof kTasks.$inferInsert = {
         name: issue.idReadable,
         description: issue.summary,
-        youTrackId: issue.id,
+        externalTrackerId: issue.id,
+        platform: "youtrack",
         projectId: project.id,
         employeeId: employeeId,
         creationDate: format(new Date(issue.created), "yyyy-MM-dd"),
@@ -86,7 +87,7 @@ export const syncYouTrackIssuesFromWorkItems = async (
         .insert(kTasks)
         .values(taskPayload)
         .onConflictDoUpdate({
-          target: kTasks.youTrackId,
+          target: kTasks.externalTrackerId,
           set: taskPayload,
         })
         .returning({ taskId: kTasks.id });

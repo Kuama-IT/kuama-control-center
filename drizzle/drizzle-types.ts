@@ -42,6 +42,11 @@ export type KPlatformCredentialsRead = z.infer<
   typeof kPlatformCredentialsReadSchema
 >;
 
+export type KPlatformCredentialsFullRead = KPlatformCredentialsRead & {
+  kEmployee?: KEmployeesRead;
+  kProject?: KProjectsRead;
+};
+
 export const kVatsSchema = createSelectSchema(kVats);
 export type KVatRead = z.infer<typeof kVatsSchema>;
 
