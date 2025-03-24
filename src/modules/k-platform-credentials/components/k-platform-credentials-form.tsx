@@ -34,7 +34,8 @@ import { isFailure } from "@/utils/server-action-utils";
 import { notifyError } from "@/modules/ui/components/notify";
 
 type Props = {
-  clientId: number;
+  clientId?: number;
+  employeeId?: number;
 };
 
 export const KPlatformCredentialsForm = ({ clientId }: Props) => {
@@ -45,6 +46,7 @@ export const KPlatformCredentialsForm = ({ clientId }: Props) => {
       name: "",
       persistentToken: "",
       endpoint: "",
+      clientId,
     },
   });
 
@@ -58,7 +60,6 @@ export const KPlatformCredentialsForm = ({ clientId }: Props) => {
     startTransition(async () => {
       const res = await createKPlatformCredentials({
         ...credentials,
-        clientId,
       });
       if (isFailure(res)) {
         notifyError("Error during credentials creation, check server logs");

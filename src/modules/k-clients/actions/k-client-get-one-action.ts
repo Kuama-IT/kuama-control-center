@@ -41,6 +41,10 @@ const kClientGetOneAction = async ({
     },
   });
 
+  if (!queryResult) {
+    throw new Error("Client not found");
+  }
+
   const allTimeTasksCount = queryResult?.kProjects.reduce(
     (acc, project) => acc + project.kTasks.length,
     0,

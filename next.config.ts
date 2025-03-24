@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import path from "node:path";
 
 const nextConfig: NextConfig = {
   /* config options here */
@@ -9,6 +10,7 @@ const nextConfig: NextConfig = {
       { hostname: "utfs.io" },
     ],
   },
+  outputFileTracingRoot: path.join(__dirname, "/output"),
 };
 
 export default nextConfig;

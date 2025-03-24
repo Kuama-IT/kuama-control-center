@@ -5,6 +5,7 @@ import SyncDipendentiInCloud from "@/modules/dipendenti-in-cloud/components/sync
 import SyncFattureInCloud from "@/modules/fatture-in-cloud/components/sync-fatture-in-cloud";
 import { SyncYoutrack } from "@/modules/settings/components/sync-youtrack";
 import SyncPubblicaWeb from "@/modules/pubblica-web/components/sync-pubblica-web";
+import KPlatformCredentialsList from "@/modules/k-platform-credentials/components/k-platform-credentials-list";
 
 export const metadata: Metadata = {
   title: "Settings | K1 App",
@@ -19,11 +20,10 @@ export default async function Page() {
         <SyncDipendentiInCloud />
         <SyncYoutrack />
         <SyncPubblicaWeb />
-
-        <div className="col-span-4"></div>
-        <div></div>
-        <div></div>
         <SyncFattureInCloud />
+        <div className="col-span-4">
+          <KPlatformCredentialsList />
+        </div>
       </div>
     </div>
   );

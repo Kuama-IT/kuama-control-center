@@ -7,9 +7,8 @@ export const kPlatformCredentialsFormSchema = z.object({
   name: z.string(),
   persistentToken: z.string(),
   endpoint: z.string().url(),
-  // TODO uncomment when we want to allow to create credentials without visiting  project / client
-  // clientId: z.number(),
-  // projectId: z.number().optional(),
+  clientId: z.number(),
+  projectId: z.number().optional(),
 });
 
 export type KPlatformCredentialsValidForm = z.infer<

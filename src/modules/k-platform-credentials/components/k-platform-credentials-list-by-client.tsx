@@ -5,8 +5,15 @@ import { KPlatformCredentialsCard } from "@/modules/k-platform-credentials/compo
 import { isFailure } from "@/utils/server-action-utils";
 import { auth } from "@/modules/auth/auth";
 
-export default async function KPlatformCredentialsList() {
-  const credentials = await kPlatformCredentialsServer.all();
+type Props = {
+  clientId: number;
+  showAddCredentials?: boolean;
+};
+export default async function KPlatformCredentialsListByClient({
+  clientId,
+  showAddCredentials,
+}: Props) {
+  const credentials = await kPlatformCredentialsServer.byClient(clientId);
 
   const session = await auth();
 
@@ -25,9 +32,11 @@ export default async function KPlatformCredentialsList() {
           />
         ))}
 
-        <div className="">
-          <KPlatformCredentialsForm clientId={1} />
-        </div>
+        {showAddCredentials && session?.user?.isAdmin && (
+          <div className="">
+            <KPlatformCredentialsForm clientId={clientId} />
+          </div>
+        )}
       </div>
     </div>
   );
