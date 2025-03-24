@@ -77,11 +77,12 @@ export const syncYouTrackUser = async (
         duration: `${workItem.duration.minutes} minute`,
         date: format(new Date(workItem.date), "yyyy-MM-dd"),
         taskId: task?.id,
-        youTrackId: workItem.id,
+        externalTrackerId: workItem.id,
+        platform: "youtrack",
       };
 
       await tx.insert(kSpentTimes).values(spentTimePayload).onConflictDoUpdate({
-        target: kSpentTimes.youTrackId,
+        target: kSpentTimes.externalTrackerId,
         set: spentTimePayload,
       });
     }

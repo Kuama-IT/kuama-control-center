@@ -22,7 +22,7 @@ export const handleServerErrors = <ReturnType, ArgsType extends unknown[]>(
       console.error(error);
       return {
         type: "__failure__",
-        message: JSON.stringify(error),
+        message: JSON.stringify(error, null, 2),
       };
     }
   };

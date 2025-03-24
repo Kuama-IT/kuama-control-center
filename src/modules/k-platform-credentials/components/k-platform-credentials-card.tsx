@@ -1,10 +1,10 @@
 "use client";
-import { KPlatformCredentialsRead } from "@/drizzle/drizzle-types";
+import { KPlatformCredentialsFullRead } from "@/drizzle/drizzle-types";
 import { Badge } from "@/components/ui/badge";
 import { SiJirasoftware, SiRedmine } from "react-icons/si";
 import { Button } from "@/components/ui/button";
 import { Trash } from "lucide-react";
-import { FaArrowRight, FaDownload, FaSync } from "react-icons/fa";
+import { FaArrowRight, FaDownload, FaLink, FaSync } from "react-icons/fa";
 import {
   Dialog,
   DialogClose,
@@ -21,7 +21,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
-import { useState, useTransition } from "react";
+import { useRef, useState, useTransition } from "react";
 import deleteKPlatformCredentials from "@/modules/k-platform-credentials/actions/k-platform-credentials-delete-action";
 import { useRouter } from "next/navigation";
 import syncTimeSpentForClient from "@/modules/sync-data/actions/sync-time-spent-by-credentials-for-client";
@@ -33,11 +33,12 @@ import { DateRange } from "react-day-picker";
 import { Separator } from "@/components/ui/separator";
 import { notifyError, notifySuccess } from "@/modules/ui/components/notify";
 import { CopyButton } from "@/modules/ui/components/copy-button";
+import { MdOutlineToken } from "react-icons/md";
 
 export const KPlatformCredentialsCard = ({
   credentials,
 }: {
-  credentials: KPlatformCredentialsRead;
+  credentials: KPlatformCredentialsFullRead;
 }) => {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
@@ -49,9 +50,13 @@ export const KPlatformCredentialsCard = ({
         notifyError("Error during credentials deletion, check server logs");
         return;
       }
+
+      notifySuccess("Credentials deleted");
       router.refresh();
     });
   };
+
+  const syncButtonToggle = useRef<HTMLButtonElement>(null);
 
   const syncData = () => {
     const { from, to } = range ?? {};
@@ -65,13 +70,14 @@ export const KPlatformCredentialsCard = ({
         to,
       });
     });
+    syncButtonToggle.current?.click();
   };
 
   // TODO, we should just use location.origin, but Bless service cannot reach us in localhost...
   const url = `https://kuama-control-center.vercel.app/reports/easyredmine/${credentials.id}`;
   const fileName = `${credentials.name.toLowerCase().replaceAll(" ", "-")}-report.pdf`; // TODO we should use the name of the user from easyredmine
 
-  const today = new Date();
+  const today = new Date(); // TODO pick date range
   const firstDateRange = startOfMonth(today);
   const lastDateRange = endOfMonth(today);
   const initialRange = {
@@ -81,45 +87,53 @@ export const KPlatformCredentialsCard = ({
   const [range, setRange] = useState<DateRange | undefined>(initialRange);
   return (
     <div className="rounded-lg shadow-sm p-8 flex flex-col items-start gap-4 bg-background overflow-hidden group">
-      <Badge className="py-2 px-4 rounded-full min-w-14 uppercase flex gap-2">
-        {credentials.platform === "jira" && (
-          <SiJirasoftware className="h-6 w-6" />
-        )}
-        {credentials.platform === "easyredmine" && (
-          <SiRedmine className="h-6 w-6" />
-        )}
-        {credentials.platform}
-      </Badge>
-      <h3 className="text-xl font-bold uppercase">{credentials.name}</h3>
+      <div className="flex items-center gap-4">
+        <Badge
+          variant="secondary"
+          className="py-2 px-4 rounded-full min-w-14 uppercase flex gap-2 items-center"
+        >
+          {credentials.platform === "jira" && (
+            <SiJirasoftware className="h-6 w-6" />
+          )}
+          {credentials.platform === "easyredmine" && (
+            <SiRedmine className="h-6 w-6" />
+          )}
+          <span className="text-xs"> {credentials.platform}</span>
+        </Badge>
+        <h3 className="font-bold uppercase text-sm">{credentials.name}</h3>
 
-      <div className="relative flex flex-col justify-center w-full">
-        <span className="font-bold text-sm">Endpoint</span>
-        <p className="mono text-lg text-foreground/80 tracking-wide text-ellipsis overflow-hidden w-4/5">
-          {credentials.endpoint}
-        </p>
-        <CopyButton
-          className="absolute right-0 translate-x-16 group-hover:translate-x-0 transition-all "
-          successMessage="Endpoint copied to clipboard"
-          contentToCopy={credentials.endpoint}
-        />
-      </div>
-      <div className="relative flex flex-col justify-center w-full">
-        <span className="font-bold text-sm">Token</span>
-        <p className="mono text-lg text-foreground/80 tracking-wide">
-          ****************
-        </p>
-
-        <CopyButton
-          className="absolute right-0 translate-x-16 group-hover:translate-x-0 transition-all "
-          successMessage="Token copied to clipboard"
-          contentToCopy={credentials.persistentToken}
-        />
+        {credentials.kProject && <p>{credentials.kProject.name}</p>}
+        {credentials.kEmployee && <p>{credentials.kEmployee.fullName}</p>}
       </div>
 
-      <div className="flex flex-col gap-2 mt-auto w-full">
+      <div className="flex items-center justify-between w-full">
+        <div className="flex items-center gap-2">
+          <FaLink className="text-foreground/80" />
+          <p className="mono text-lg text-foreground/80 tracking-wide text-ellipsis overflow-hidden w-4/5">
+            {credentials.endpoint}
+          </p>
+          <CopyButton
+            successMessage="Endpoint copied to clipboard"
+            contentToCopy={credentials.endpoint}
+          />
+        </div>
+        <div className="flex items-center gap-2">
+          <MdOutlineToken className="text-foreground/80" />
+          <p className="mono text-lg text-foreground/80 tracking-wide">
+            ****************
+          </p>
+
+          <CopyButton
+            successMessage="Token copied to clipboard"
+            contentToCopy={credentials.persistentToken}
+          />
+        </div>
+      </div>
+
+      <div className="flex gap-2 items-center">
         <Popover>
           <PopoverTrigger asChild>
-            <Button>
+            <Button ref={syncButtonToggle}>
               <FaSync /> Sync timesheet
             </Button>
           </PopoverTrigger>
@@ -159,37 +173,40 @@ export const KPlatformCredentialsCard = ({
           </Button>
         </Link>
 
-        <Separator />
-
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button className="bg-destructive text-destructive-foreground uppercase flex">
-              <Trash />
-              Delete
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle className="text-destructive">
-                Are you absolutely sure?
-              </DialogTitle>
-              <DialogDescription className="text-destructive">
-                This action cannot be undone. This will permanently delete these
-                credentials.
-              </DialogDescription>
-            </DialogHeader>
-            <DialogFooter>
-              <DialogClose asChild>
-                <Button type="button" variant="secondary">
-                  Nope, undo please
-                </Button>
-              </DialogClose>
-              <Button disabled={isPending} onClick={() => deleteCredentials()}>
-                Yes
+        <div className="ml-auto">
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button className="bg-destructive text-destructive-foreground uppercase flex">
+                <Trash />
+                Delete
               </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle className="text-destructive">
+                  Are you absolutely sure?
+                </DialogTitle>
+                <DialogDescription className="text-destructive">
+                  This action cannot be undone. This will permanently delete
+                  these credentials.
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter>
+                <DialogClose asChild>
+                  <Button type="button" variant="secondary">
+                    Nope, undo please
+                  </Button>
+                </DialogClose>
+                <Button
+                  disabled={isPending}
+                  onClick={() => deleteCredentials()}
+                >
+                  Yes
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
     </div>
   );

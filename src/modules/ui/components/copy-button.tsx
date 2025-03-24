@@ -15,7 +15,7 @@ export const CopyButton = ({
   return (
     <Button
       size="icon"
-      className={className}
+      className={`cursor-pointer ${className}`}
       onClick={() => {
         copyToClipboard(contentToCopy);
         notifySuccess(successMessage);

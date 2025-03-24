@@ -4,27 +4,38 @@ import { KPlatformCredentialsForm } from "@/modules/k-platform-credentials/compo
 import { KPlatformCredentialsCard } from "@/modules/k-platform-credentials/components/k-platform-credentials-card";
 import { isFailure } from "@/utils/server-action-utils";
 import { auth } from "@/modules/auth/auth";
+import { kClientsServer } from "@/modules/k-clients/k-clients-server";
+import { ErrorMessage } from "@/modules/ui/components/error-message";
 
-type Props = {
-  clientId: number;
-  showAddCredentials?: boolean;
-};
-export default async function KPlatformCredentialsList({
-  clientId,
-  showAddCredentials,
-}: Props) {
-  const credentials = await kPlatformCredentialsServer.byClient(clientId);
+export default async function KPlatformCredentialsList() {
+  const credentials = await kPlatformCredentialsServer.all();
+  const clients = await kClientsServer.listAll();
 
   const session = await auth();
 
+  if (!session?.user || !session.user.isAdmin) {
+    return (
+      <ErrorMessage
+        failure={{
+          type: "__failure__",
+          code: "__unauthorized__",
+          message: "Unauthorized",
+        }}
+      />
+    );
+  }
+
   if (isFailure(credentials)) {
-    return <div>{credentials.message}</div>;
+    return <ErrorMessage failure={credentials} />;
+  }
+  if (isFailure(clients)) {
+    return <ErrorMessage failure={clients} />;
   }
   return (
     <div className="p-8 flex flex-col gap-8">
-      <Title>Time spent import credentials</Title>
+      <Title>Platform credentials</Title>
 
-      <div className="flex gap-4">
+      <div className="flex flex-col gap-4">
         {credentials.map((credential) => (
           <KPlatformCredentialsCard
             key={credential.id}
@@ -32,11 +43,9 @@ export default async function KPlatformCredentialsList({
           />
         ))}
 
-        {showAddCredentials && session?.user?.isAdmin && (
-          <div className="">
-            <KPlatformCredentialsForm clientId={clientId} />
-          </div>
-        )}
+        <div className="">
+          <KPlatformCredentialsForm clients={clients} />
+        </div>
       </div>
     </div>
   );
