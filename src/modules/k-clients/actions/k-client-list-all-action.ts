@@ -1,9 +1,13 @@
 import { db } from "@/drizzle/drizzle-db";
-import { kClients, kProjects, kTeams } from "@/drizzle/schema";
+import { kClients, kEmployees, kProjects, kTeams } from "@/drizzle/schema";
 import { asc, eq } from "drizzle-orm";
 import { inArray } from "drizzle-orm/sql/expressions/conditions";
-import { KClientListItem } from "@/modules/k-clients/k-clients-server";
+import {
+  KClientListItem,
+  KProjectWithTeam,
+} from "@/modules/k-clients/k-clients-server";
 import { handleServerErrors } from "@/utils/server-action-utils";
+import { KEmployeesRead } from "@/drizzle/drizzle-types";
 
 const readClientsWithVat = async () => {
   return await db.query.kClients.findMany({
@@ -21,7 +25,7 @@ type ClientWithVatList = Awaited<ReturnType<typeof readClientsWithVat>>;
 
 const clientProjectsAndTeam = async (clientId: number) => {
   const projects = await db
-    .select({ id: kProjects.id })
+    .select({ id: kProjects.id, name: kProjects.name })
     .from(kProjects)
     .where(eq(kProjects.clientId, clientId));
 
@@ -35,8 +39,29 @@ const clientProjectsAndTeam = async (clientId: number) => {
       ),
     );
 
+  const projectsWithTeam: KProjectWithTeam[] = [];
+  for (const kProject of projects) {
+    const team = await db
+      .select({ employeeId: kTeams.employeeId })
+      .from(kTeams)
+      .where(eq(kTeams.projectId, kProject.id));
+    const employees = await db
+      .select()
+      .from(kEmployees)
+      .where(
+        inArray(
+          kEmployees.id,
+          team.map((t) => t.employeeId),
+        ),
+      );
+    projectsWithTeam.push({
+      ...kProject,
+      team: employees,
+    });
+  }
+
   return {
-    projects,
+    projects: projectsWithTeam,
     employeesWorkingForClient,
   };
 };
@@ -52,6 +77,7 @@ const clientsWithProjectsAndTeam = async (baseClients: ClientWithVatList) => {
       kVats: kClientsVats.map((it) => it.kVat),
       avatarUrl: client.avatarUrl,
       projectsCount: projects.length,
+      projects,
       employeesWorkingForClientCount: employeesWorkingForClient.length,
     });
   }

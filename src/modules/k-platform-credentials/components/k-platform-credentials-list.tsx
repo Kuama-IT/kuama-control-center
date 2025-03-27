@@ -4,14 +4,19 @@ import { KPlatformCredentialsForm } from "@/modules/k-platform-credentials/compo
 import { KPlatformCredentialsCard } from "@/modules/k-platform-credentials/components/k-platform-credentials-card";
 import { isFailure } from "@/utils/server-action-utils";
 import { auth } from "@/modules/auth/auth";
+import { kClientsServer } from "@/modules/k-clients/k-clients-server";
 
 export default async function KPlatformCredentialsList() {
   const credentials = await kPlatformCredentialsServer.all();
+  const clients = await kClientsServer.listAll();
 
   const session = await auth();
 
   if (isFailure(credentials)) {
     return <div>{credentials.message}</div>;
+  }
+  if (isFailure(clients)) {
+    return <div>{clients.message}</div>;
   }
   return (
     <div className="p-8 flex flex-col gap-8">
@@ -26,7 +31,7 @@ export default async function KPlatformCredentialsList() {
         ))}
 
         <div className="">
-          <KPlatformCredentialsForm clientId={1} />
+          <KPlatformCredentialsForm clients={clients} />
         </div>
       </div>
     </div>

@@ -8,6 +8,7 @@ export const kPlatformCredentialsFormSchema = z.object({
   persistentToken: z.string(),
   endpoint: z.string().url(),
   clientId: z.number(),
+  employeeId: z.number().optional(),
   projectId: z.number().optional(),
 });
 
