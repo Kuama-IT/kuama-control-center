@@ -4,26 +4,17 @@ import { endOfMonth, format, startOfMonth } from "date-fns";
 import { FormEvent, useState, useTransition } from "react";
 import { DateRange } from "react-day-picker";
 import syncDipendentiInCloudTimesheet from "@/modules/dipendenti-in-cloud/actions/sync-dipendenti-in-cloud-timesheet-action";
+import syncDipendentiInCloudEmployees from "@/modules/dipendenti-in-cloud/actions/dipendenti-in-cloud-import-employees-action";
+import syncDipendentiInCloudAbsenceReasonsAndClosures from "@/modules/dipendenti-in-cloud/actions/dipendenti-in-cloud-import-absence-reasons-and-closures";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { FaArrowRight, FaCalendar, FaSync } from "react-icons/fa";
 import { Separator } from "@/components/ui/separator";
-import syncDipendentiInCloudEmployees from "@/modules/dipendenti-in-cloud/actions/dic-import-action";
 import { isFailure } from "@/utils/server-action-utils";
 import { notifyError, notifySuccess } from "@/modules/ui/components/notify";
 import { cn } from "@/lib/utils";
 
 export default function SyncDipendentiInCloud() {
-  const today = new Date();
-  const firstDateRange = startOfMonth(today);
-  const lastDateRange = endOfMonth(today);
-  const initialRange = {
-    from: firstDateRange,
-    to: lastDateRange,
-  };
-  const [range, setRange] = useState<DateRange | undefined>(initialRange);
-  const [isPending, startTransition] = useTransition();
-
   return (
     <div className="border rounded-lg p-4">
       <Title>Dipendenti in cloud</Title>
@@ -32,6 +23,8 @@ export default function SyncDipendentiInCloud() {
         <SyncTimesheetForm />
         <Separator />
         <SyncEmployeeData />
+        <Separator />
+        <SyncAbsenceReasonsAndClosures />
       </div>
     </div>
   );
@@ -45,7 +38,9 @@ const SyncEmployeeData = () => {
     startTransition(async () => {
       const res = await syncDipendentiInCloudEmployees();
       if (isFailure(res)) {
-        notifyError("Error while syncing dipendenti in cloud general info");
+        notifyError(
+          "Error while syncing dipendenti in cloud employees general info",
+        );
         return;
       }
 
@@ -58,6 +53,32 @@ const SyncEmployeeData = () => {
       <Button disabled={isPending} size="lg">
         <FaSync className={cn({ "animate-spin": isPending })} />
         Sync employees general information
+      </Button>
+    </form>
+  );
+};
+
+const SyncAbsenceReasonsAndClosures = () => {
+  const [isPending, startTransition] = useTransition();
+
+  const onSubmit = (ev: FormEvent) => {
+    ev.preventDefault();
+    startTransition(async () => {
+      const res = await syncDipendentiInCloudAbsenceReasonsAndClosures();
+      if (isFailure(res)) {
+        notifyError("Error while syncing dipendenti in cloud general info");
+        return;
+      }
+
+      notifySuccess(res.message);
+    });
+  };
+
+  return (
+    <form onSubmit={onSubmit}>
+      <Button disabled={isPending} size="lg">
+        <FaSync className={cn({ "animate-spin": isPending })} />
+        Sync general information
       </Button>
     </form>
   );

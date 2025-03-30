@@ -1,5 +1,9 @@
 import { serverEnv } from "@/env/server-env";
 import {
+  absenceReasonsResponseSchema,
+  closuresResponseSchema,
+  DipendentiInCloudEmployeeDetail,
+  dipendentiInCloudEmployeeDetailResponseSchema,
   dipendentiInCloudEmployeesSchema,
   dipendentiInCloudPayrollsSchema,
   dipendentiInCloudTimesheetResponseSchema,
@@ -35,7 +39,18 @@ export class DipendentiInCloudApi {
 
     const parsed = dipendentiInCloudEmployeesSchema.parse(jsonResponse);
 
-    return parsed.data;
+    const employees: DipendentiInCloudEmployeeDetail[] = [];
+    for (const employee of parsed.data) {
+      const endpoint = `${this.endpoint}employees/${employee.id}`;
+
+      const rawResponse = await fetch(endpoint, this.authenticationHeaders);
+      const jsonResponse = await rawResponse.json();
+
+      const employeeDetail =
+        dipendentiInCloudEmployeeDetailResponseSchema.parse(jsonResponse).data;
+      employees.push(employeeDetail);
+    }
+    return employees;
   }
 
   async getMonthlyTimesheet(from: Date, to: Date, employees: { id: string }[]) {
@@ -147,6 +162,33 @@ export class DipendentiInCloudApi {
   async downloadSalary(salary: Salary) {
     const res = await fetch(salary.url);
     return await res.arrayBuffer();
+  }
+
+  async getAbsenceReasons() {
+    const endpoint = `${this.endpoint}reasons`;
+    const res = await fetch(endpoint, this.authenticationHeaders);
+    const jsonResponse = await res.json();
+
+    return absenceReasonsResponseSchema
+      .parse(jsonResponse)
+      .data.list.filter((it) => it.active === 1);
+  }
+
+  async getClosures() {
+    const endpoint = `${this.endpoint}closures?`;
+    const params = new URLSearchParams({
+      per_page: "50",
+      page: "1",
+    });
+
+    const rawResponse = await fetch(
+      endpoint + params,
+      this.authenticationHeaders,
+    );
+
+    const jsonResponse = await rawResponse.json();
+
+    return closuresResponseSchema.parse(jsonResponse).data;
   }
 }
 
