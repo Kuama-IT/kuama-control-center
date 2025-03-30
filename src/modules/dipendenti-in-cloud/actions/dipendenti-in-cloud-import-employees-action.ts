@@ -26,6 +26,9 @@ const handled = handleServerErrors(async () => {
           fullName: employee.full_name,
           hiredOn: employee.current_contract?.valid_from,
           email: employee.email,
+          iban: employee.iban,
+          nationalInsuranceNumber: employee.tax_code,
+          phoneNumber: employee.phone_number,
         });
         continue;
       }
@@ -38,6 +41,9 @@ const handled = handleServerErrors(async () => {
           surname: employee.last_name,
           fullName: employee.full_name,
           hiredOn: employee.current_contract?.valid_from,
+          iban: employee.iban,
+          nationalInsuranceNumber: employee.tax_code,
+          phoneNumber: employee.phone_number,
         })
         .where(eq(lower(kEmployees.email), employee.email.toLowerCase()));
     }

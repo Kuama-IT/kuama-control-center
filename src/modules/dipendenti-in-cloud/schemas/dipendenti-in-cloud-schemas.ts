@@ -27,14 +27,24 @@ export const dipendentiInCloudEmployeeSchema = z.object({
     valid_from: z.string(),
   }),
 });
-
-export type DipendentiInCloudEmployee = z.infer<
-  typeof dipendentiInCloudEmployeeSchema
->;
-
 export const dipendentiInCloudEmployeesSchema = makePagedResponseSchema(
   dipendentiInCloudEmployeeSchema,
 );
+
+export const dipendentiInCloudEmployeeDetailSchema =
+  dipendentiInCloudEmployeeSchema.extend({
+    iban: z.string().nullable(),
+    phone_number: z.string().nullable(),
+    tax_code: z.string().nullable(),
+  });
+
+export type DipendentiInCloudEmployeeDetail = z.infer<
+  typeof dipendentiInCloudEmployeeDetailSchema
+>;
+
+export const dipendentiInCloudEmployeeDetailResponseSchema = z.object({
+  data: dipendentiInCloudEmployeeDetailSchema,
+});
 
 export const dipendentiInCloudTimesheetDaySchema = z.object({
   closed: z.boolean().optional(),
@@ -56,7 +66,7 @@ export const dipendentiInCloudTimesheetDaySchema = z.object({
       z.object({
         reason: z.object({
           id: z.number(),
-          code: z.string(), // TODO seems like an enum, one of the values is F
+          code: z.string(), // see absenceReasonSchema
           name: z.string(),
           color: z.string(),
           category: z.string(), // TODO seems like an enum, one of the values is absence
@@ -129,6 +139,28 @@ const payrollSchema = z.object({
 
 export const dipendentiInCloudPayrollsSchema =
   makePagedResponseSchema(payrollSchema);
+
+export const absenceReasonSchema = z.object({
+  category: z.string(),
+  code: z.string(),
+  name: z.string(),
+  active: z.number(),
+});
+
+export const absenceReasonsResponseSchema = z.object({
+  data: z.object({
+    list: z.array(absenceReasonSchema),
+  }),
+});
+
+export const closureSchema = z.object({
+  day: z.number(),
+  month: z.number(),
+  year: z.number().nullable(),
+  disabled_reason: z.string(),
+});
+
+export const closuresResponseSchema = makePagedResponseSchema(closureSchema);
 
 // these types are not used to parse other endpoint responses, just to build our internal stuff
 export type Salary = {

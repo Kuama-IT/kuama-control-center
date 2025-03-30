@@ -122,6 +122,9 @@ export const kEmployees = pgTable("k_employees", {
   avatarUrl: text(),
   dipendentiInCloudId: varchar({ length: 256 }).unique(),
   hiredOn: date(),
+  nationalInsuranceNumber: varchar({ length: 256 }),
+  phoneNumber: varchar({ length: 256 }),
+  iban: varchar({ length: 256 }),
 });
 
 // Each month our employment consultant sends us a pdf file with the estimated costs for each employee
@@ -133,12 +136,28 @@ export const kEmployeeEstimatedCosts = pgTable("k_employee_estimated_costs", {
   date: date().notNull(),
 });
 
+// Used to generate the legend of the report for our payrolls consultant
+export const kAbsenceReasons = pgTable("k_absence_reasons", {
+  id: serial().primaryKey(),
+  code: varchar({ length: 256 }).notNull(),
+  name: varchar({ length: 256 }).notNull(),
+});
+
+export const kClosures = pgTable("k_closures", {
+  id: serial().primaryKey(),
+  day: integer().notNull(),
+  month: integer().notNull(),
+  year: integer(),
+  description: varchar({ length: 256 }),
+});
+
 // Help to understand who is working this week
 export const kAbsenceDays = pgTable("k_absence_days", {
   id: serial().primaryKey(),
   date: date(),
   employeeId: serial().references(() => kEmployees.id),
   description: text(),
+  reasonCode: varchar({ length: 256 }),
   duration: interval({ fields: "minute" }),
   pending: boolean(),
   timeStart: varchar(),

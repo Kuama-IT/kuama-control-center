@@ -1,15 +1,13 @@
 import { describe, expect, test } from "vitest";
-import { PubblicaWebApi } from "@/modules/pubblica-web/pubblica-web-api-client";
-import { serverEnv } from "@/env/server-env";
-import { dipendentiInCloudApiClient } from "@/modules/dipendenti-in-cloud/dipendenti-in-cloud-api-client";
-import { parseSalary } from "@/modules/dipendenti-in-cloud/dipendenti-in-cloud-utils";
 
 // N.B. This was written just to build the client, it is performing real calls and presumes a working env is present
+
 describe("dipendenti-in-cloud-api", () => {
   // just to make vitest happy and keep this suite of tests for reference
   test("fake test", () => {
     expect(1).toBe(1);
   });
+
   // test("get employees", async () => {
   //   const employees = await dipendentiInCloudApiClient.getEmployees();
   //
@@ -52,6 +50,17 @@ describe("dipendenti-in-cloud-api", () => {
   //       }
   //     }
   //   }
+  // });
+
+  // test("get absence reasons", async () => {
+  //   const reasons = await dipendentiInCloudApiClient.getAbsenceReasons();
+  //   expect(reasons.length).greaterThan(1);
+  // });
+  //
+  // test("get closures", async () => {
+  //   const closures = await dipendentiInCloudApiClient.getClosures();
+  //   expect(closures.length).greaterThan(1);
+  //   expect(closures.find((it) => it.day === 1 && it.month === 1)).toBeDefined();
   // });
 
   // test("it can send payslip from PubblicaWeb to DipendentiInCloud", async () => {
