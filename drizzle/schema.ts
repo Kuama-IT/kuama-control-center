@@ -216,9 +216,20 @@ export const kTeams = pgTable("k_teams", {
   projectId: serial().references(() => kProjects.id),
 });
 
+// Used to grant access temporarily to the site to user that do not have an account
+export const kAccessTokens = pgTable("k_access_tokens", {
+  id: serial().primaryKey(),
+  token: varchar({ length: 256 }).notNull().unique(),
+  purpose: varchar({ length: 256 }).notNull(),
+  createdAt: timestamp().notNull().defaultNow(),
+  expiresAt: timestamp(),
+  allowedUsages: integer().default(-1), // no limits until expired
+  usageCount: integer().default(0),
+});
+
 // TODO
 export const kCommits = pgTable("k_commits", {});
-export const kRepositories = pgTable("k_commits", {});
+export const kRepositories = pgTable("k_repositories", {});
 
 export function lower(email: AnyPgColumn): SQL {
   return sql`lower(${email})`;
