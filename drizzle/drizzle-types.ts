@@ -1,13 +1,14 @@
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import {
+  kAccessTokens,
   kClients,
-  kVats,
   kEmployees,
   kPlatformCredentials,
   kProjectMedias,
   kProjects,
   kTasks,
   kTeams,
+  kVats,
 } from "@/drizzle/schema";
 import { z } from "zod";
 
@@ -43,3 +44,11 @@ export type KPlatformCredentialsRead = z.infer<
 
 export const kVatsSchema = createSelectSchema(kVats);
 export type KVatRead = z.infer<typeof kVatsSchema>;
+
+export const kAccessTokenSchemaRead = createSelectSchema(kAccessTokens);
+export const kAccessTokenSchemaCreate = createInsertSchema(kAccessTokens).omit({
+  token: true,
+  createdAt: true,
+});
+export type KAccessTokenRead = z.infer<typeof kAccessTokenSchemaRead>;
+export type KAccessTokenCreate = z.infer<typeof kAccessTokenSchemaCreate>;
