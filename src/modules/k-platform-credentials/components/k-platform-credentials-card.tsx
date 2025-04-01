@@ -3,9 +3,8 @@ import { KPlatformCredentialsRead } from "@/drizzle/drizzle-types";
 import { Badge } from "@/components/ui/badge";
 import { SiJirasoftware, SiRedmine } from "react-icons/si";
 import { Button } from "@/components/ui/button";
-import { Copy, Trash } from "lucide-react";
+import { Trash } from "lucide-react";
 import { FaArrowRight, FaDownload, FaSync } from "react-icons/fa";
-import { copyToClipboard } from "@/modules/ui/ui-utils";
 import {
   Dialog,
   DialogClose,
@@ -33,6 +32,7 @@ import { endOfMonth, format, startOfMonth } from "date-fns";
 import { DateRange } from "react-day-picker";
 import { Separator } from "@/components/ui/separator";
 import { notifyError, notifySuccess } from "@/modules/ui/components/notify";
+import { CopyButton } from "@/modules/ui/components/copy-button";
 
 export const KPlatformCredentialsCard = ({
   credentials,
@@ -97,12 +97,10 @@ export const KPlatformCredentialsCard = ({
         <p className="mono text-lg text-foreground/80 tracking-wide text-ellipsis overflow-hidden w-4/5">
           {credentials.endpoint}
         </p>
-        <Copy
-          className="absolute right-0 translate-x-16 group-hover:translate-x-0 transition-all cursor-pointer"
-          onClick={() => {
-            copyToClipboard(credentials.endpoint);
-            notifySuccess("Endpoint copied to clipboard");
-          }}
+        <CopyButton
+          className="absolute right-0 translate-x-16 group-hover:translate-x-0 transition-all "
+          successMessage="Endpoint copied to clipboard"
+          contentToCopy={credentials.endpoint}
         />
       </div>
       <div className="relative flex flex-col justify-center w-full">
@@ -110,12 +108,11 @@ export const KPlatformCredentialsCard = ({
         <p className="mono text-lg text-foreground/80 tracking-wide">
           ****************
         </p>
-        <Copy
-          className="absolute right-0 translate-x-16 group-hover:translate-x-0 transition-all cursor-pointer"
-          onClick={() => {
-            copyToClipboard(credentials.persistentToken);
-            notifySuccess("Token copied to clipboard");
-          }}
+
+        <CopyButton
+          className="absolute right-0 translate-x-16 group-hover:translate-x-0 transition-all "
+          successMessage="Token copied to clipboard"
+          contentToCopy={credentials.persistentToken}
         />
       </div>
 
