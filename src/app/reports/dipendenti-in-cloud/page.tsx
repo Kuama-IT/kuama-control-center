@@ -3,16 +3,45 @@ import { kEmployeesServer } from "@/modules/k-employees/k-employee-server";
 import { isFailure } from "@/utils/server-action-utils";
 import { kAbsenceDaysServer } from "@/modules/k-absence-days/k-absence-days-server";
 import { endOfMonth, parse, startOfMonth } from "date-fns";
+import { z } from "zod";
+import { kAccessTokensServer } from "@/modules/k-access-tokens/k-access-tokens-server";
 
-export default async function Page() {
+const paramsSchema = z.object({
+  from: z.string(),
+  to: z.string(),
+  accessToken: z.string(),
+});
+
+type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
+
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: SearchParams;
+}) {
+  const parsedParams = paramsSchema.safeParse(await searchParams);
+
+  if (!parsedParams.success) {
+    return (
+      <>
+        <pre>{JSON.stringify(searchParams, null, 2)}</pre>
+        <pre>{JSON.stringify(parsedParams.error, null, 2)}</pre>
+      </>
+    );
+  }
+
+  const result = await kAccessTokensServer.manage(
+    parsedParams.data.accessToken,
+  );
+  if (isFailure(result)) {
+    return <pre>Invalid or expired token</pre>;
+  }
   const employees = await kEmployeesServer.listAll();
 
   if (isFailure(employees)) {
     return <pre>Could not load employees</pre>;
   }
 
-  // TODO from and to should be parameters
-  // TODO add token to the request
   // TODO date it's fixed to march until we get acceptance from the payroll office
   const date = parse("10-03-2025", "dd-MM-yyyy", new Date());
   const from = startOfMonth(date);
