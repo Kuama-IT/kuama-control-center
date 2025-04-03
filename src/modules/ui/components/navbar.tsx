@@ -13,7 +13,7 @@ export const NavBar = async () => {
   }
 
   return (
-    <div className="bg-foreground text-background flex gap-4 rounded-full fixed bottom-2 right-8 md:right-1/3 left-8 md:left-1/3 p-4 uppercase items-center justify-center">
+    <div className="hidden-print bg-foreground text-background flex gap-4 rounded-full fixed bottom-2 right-8 md:right-1/3 left-8 md:left-1/3 p-4 uppercase items-center justify-center">
       <Link href={routes.dashboard()}>
         <AiFillHome aria-label="Dashboard" />
       </Link>

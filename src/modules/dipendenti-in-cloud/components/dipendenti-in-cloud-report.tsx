@@ -20,27 +20,35 @@ export default function DipendentiInCloudReport(
 ) {
   const { rows, month } = getDataForReport(props);
 
-  const employeeCellClass = "w-[200px] min-w-[200px]";
-  const dayCellClass = "w-[40px] max-w-[40px]";
+  const employeeCellClass =
+    "w-[200px] min-w-[200px] print:w-[100px] print:min-w-[100px]";
+  const dayCellClass =
+    "w-[40px] max-w-[40px] print:w-[30px] print:max-w-[30px]";
   return (
-    <div className="m-16 space-y-4 text-sm min-w-max">
+    <div className="m-16 print:m-0 text-sm min-w-max print:text-[10px]">
       <ReportTitle date={props.from} />
 
-      <div className="border-black border text-black flex flex-col">
-        <ReportPreHeader />
-
-        <ReportHeader
-          month={month}
-          dayCellClass={dayCellClass}
-          employeeCellClass={employeeCellClass}
-        />
-
-        <ReportBody
-          rows={rows}
-          dayCellClass={dayCellClass}
-          employeeCellClass={employeeCellClass}
-        />
-      </div>
+      <table className="text-black w-full border-collapse">
+        <thead className="table-header-group">
+          <tr>
+            <th className="border border-black">
+              <ReportPreHeader />
+              <ReportHeader
+                month={month}
+                dayCellClass={dayCellClass}
+                employeeCellClass={employeeCellClass}
+              />
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <ReportBody
+            rows={rows}
+            dayCellClass={dayCellClass}
+            employeeCellClass={employeeCellClass}
+          />
+        </tbody>
+      </table>
       <ReportLegend reasons={props.absenceReasons} />
     </div>
   );
@@ -55,7 +63,7 @@ const ReportTitle = ({ date }: { date: Date }) => {
 };
 
 const ReportPreHeader = () => (
-  <div className="uppercase font-bold py-2 border-black  flex justify-center">
+  <div className="uppercase font-bold py-2 border-black border-t border-r border-l flex justify-center">
     Ore lavorate
   </div>
 );
@@ -81,14 +89,16 @@ const ReportHeader = ({
       return (
         <div
           key={`report-header-${index}`}
-          className={`flex flex-col items-center ${dayCellClass} border-r border-black text-xs`}
+          className={`flex flex-col items-center ${dayCellClass} border-r border-black text-xs print:text-[10px]`}
         >
           <span>{getItalianDayLetter(day.date)}</span>
           <span>{format(day.date, "d")}</span>
         </div>
       );
     })}
-    <div className={"flex items-center justify-center flex-1"}>Totali</div>
+    <div className="flex items-center justify-center flex-1 border-r border-black print:text-[10px]">
+      Totali
+    </div>
   </div>
 );
 
@@ -103,55 +113,59 @@ const ReportBody = ({
 }) => {
   return rows.map((item, index) => {
     return (
-      <div className="uppercase border-t border-black flex" key={index}>
-        <div
-          className={`${employeeCellClass} py-2 border-r border-black flex items-center justify-center text-center`}
-        >
-          <div className="flex flex-col gap-1">
-            {item.employeeName}
-            <pre className="font-[10px]">
-              {item.employeeNationalInsuranceNumber}
-            </pre>
-          </div>
-        </div>
-        <div className="flex flex-col flex-1">
-          {item.reasons.map(({ code, days }, reasonIndex) => (
+      <tr className="t-body break-inside-avoid" key={index}>
+        <td className="border border-black">
+          <div className="uppercase flex print:text-[10px]">
             <div
-              className={`flex ${reasonIndex > 0 ? "border-t border-black" : ""}`}
-              key={`${index}-${reasonIndex}-${code}`}
+              className={`${employeeCellClass} py-2 border-r border-black flex items-center justify-center text-center`}
             >
-              <div
-                className={`${dayCellClass} py-2 border-r border-black flex items-center justify-center`}
-              >
-                {code}
+              <div className="flex flex-col gap-1 print:text-[10px]">
+                {item.employeeName}
+                <pre className="text-[10px]">
+                  {item.employeeNationalInsuranceNumber}
+                </pre>
               </div>
-
-              {days.map((day, dayIndex) => (
-                <ReportDayCell
-                  day={day}
-                  dayCellClass={dayCellClass}
-                  key={`r-${index}-${reasonIndex}-${dayIndex}-${day.formattedDate}`}
-                />
-              ))}
             </div>
-          ))}
+            <div className="flex flex-col flex-1">
+              {item.reasons.map(({ code, days }, reasonIndex) => (
+                <div
+                  className={`flex ${reasonIndex > 0 ? "border-t border-black" : ""}`}
+                  key={`${index}-${reasonIndex}-${code}`}
+                >
+                  <div
+                    className={`${dayCellClass} py-2 border-r border-black flex items-center justify-center`}
+                  >
+                    {code}
+                  </div>
 
-          <div className={`flex border-t border-black`}>
-            <div className={`${dayCellClass} py-2 border-r border-black`} />
-            {item.totals.map((day, itemTotalIndex) => (
-              <ReportDayCell
-                day={day}
-                dayCellClass={dayCellClass}
-                key={`t-${index}-${itemTotalIndex}-${day.formattedDate}`}
-              />
-            ))}
+                  {days.map((day, dayIndex) => (
+                    <ReportDayCell
+                      day={day}
+                      dayCellClass={dayCellClass}
+                      key={`r-${index}-${reasonIndex}-${dayIndex}-${day.formattedDate}`}
+                    />
+                  ))}
+                </div>
+              ))}
+
+              <div className={`flex border-t border-black`}>
+                <div className={`${dayCellClass} py-2 border-r border-black`} />
+                {item.totals.map((day, itemTotalIndex) => (
+                  <ReportDayCell
+                    day={day}
+                    dayCellClass={dayCellClass}
+                    key={`t-${index}-${itemTotalIndex}-${day.formattedDate}`}
+                  />
+                ))}
+              </div>
+            </div>
+
+            <div className="flex-1 text-end items-center flex justify-center border-r border-black">
+              {item.monthlyTotalLabel}
+            </div>
           </div>
-        </div>
-
-        <div className="flex-1 text-end items-center flex justify-center">
-          {item.monthlyTotalLabel}
-        </div>
-      </div>
+        </td>
+      </tr>
     );
   });
 };
@@ -169,7 +183,7 @@ const ReportDayCell = ({
 
   return (
     <div
-      className={`flex flex-col justify-center items-center ${dayCellClass} border-r border-black text-xs py-2`}
+      className={`flex flex-col justify-center items-center ${dayCellClass} border-r border-black text-xs print:text-[10px] py-2`}
     >
       {day.label}
     </div>

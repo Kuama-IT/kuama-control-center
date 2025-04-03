@@ -17,6 +17,11 @@ export default {
       "900": "900ms",
     },
     extend: {
+      screens: {
+        print: { raw: "print" },
+        screen: { raw: "screen" },
+      },
+
       fontFamily: {
         sans: ["var(--app-font)", "ui-sans-serif", "system-ui"],
         serif: ["var(--app-font)", "ui-sans-serif", "system-ui"],

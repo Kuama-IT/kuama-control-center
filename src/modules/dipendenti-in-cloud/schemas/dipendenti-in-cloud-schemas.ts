@@ -78,8 +78,8 @@ export const dipendentiInCloudTimesheetDaySchema = z.object({
             z.object({
               duration: z.number().nullable(),
               duration_pending: z.number().nullable(),
-              time_start: z.string(),
-              time_end: z.string(),
+              time_start: z.string().nullable(),
+              time_end: z.string().nullable(),
             }),
           )
           .nullable(),

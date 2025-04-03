@@ -248,6 +248,10 @@
   }
 
   body {
-    margin-top: 0mm;
+    margin-top: 0;
+  }
+
+  .hidden-print {
+    display: none;
   }
 }
