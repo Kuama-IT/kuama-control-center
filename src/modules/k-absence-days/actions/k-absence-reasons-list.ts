@@ -4,7 +4,13 @@ import { db } from "@/drizzle/drizzle-db";
 import { kAbsenceReasons } from "@/drizzle/schema";
 
 async function kAbsenceReasonsList() {
-  return db.select().from(kAbsenceReasons);
+  const res = await db.select().from(kAbsenceReasons);
+  res.push({
+    id: 0,
+    name: "Per contratto",
+    code: "--",
+  });
+  return res;
 }
 
 const managed = handleServerErrors(kAbsenceReasonsList);

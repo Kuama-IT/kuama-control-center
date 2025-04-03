@@ -4,7 +4,7 @@ import { db } from "@/drizzle/drizzle-db";
 import { kAbsenceDays, kEmployees, kPresenceDays } from "@/drizzle/schema";
 import { and, eq, gte, isNotNull, lte } from "drizzle-orm";
 import { z } from "zod";
-import { format } from "date-fns";
+import { eachDayOfInterval, format } from "date-fns";
 import { handleServerErrors } from "@/utils/server-action-utils";
 import { firstOrThrow } from "@/utils/array-utils";
 
@@ -99,6 +99,42 @@ const syncTimesheet = async ({ from, to }: { from: Date; to: Date }) => {
           date,
           employeeId,
           duration: `${timesheetEntry.presence.duration} minute`,
+        });
+      }
+    }
+  }
+
+  // ensure employee with national insurance number = GRSSRG92H26Z140H has 4 hours of absence each monday inside the from/to period
+  const daysOfPeriod = eachDayOfInterval({
+    start: from,
+    end: to,
+  });
+  const mondayDays = daysOfPeriod.filter((day) => format(day, "E") === "Mon");
+  const employeeRes = await db
+    .select()
+    .from(kEmployees)
+    .where(eq(kEmployees.nationalInsuranceNumber, "GRSSRG92H26Z140H"));
+
+  if (employeeRes.length > 0) {
+    const { id } = firstOrThrow(employeeRes);
+    for (const monday of mondayDays) {
+      const res = await db
+        .select()
+        .from(kAbsenceDays)
+        .where(
+          and(
+            eq(kAbsenceDays.employeeId, id),
+            eq(kAbsenceDays.date, format(monday, "yyyy-MM-dd")),
+          ),
+        );
+      if (res.length === 0) {
+        await db.insert(kAbsenceDays).values({
+          date: format(monday, "yyyy-MM-dd"),
+          employeeId: id,
+          reasonCode: "--",
+          duration: "240 minute",
+          timeStart: "14:00:00",
+          timeEnd: "18:00:00",
         });
       }
     }

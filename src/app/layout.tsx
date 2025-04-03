@@ -27,7 +27,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${appFont.variable} antialiased`}>
         <UserProfile />
-        <div className="pb-32">{children}</div>
+        <div className="pb-32 print:pb-0">{children}</div>
         <NavBar />
         <Toaster />
       </body>

@@ -144,6 +144,7 @@ export const kEmployees = pgTable("k_employees", {
   nationalInsuranceNumber: varchar({ length: 256 }),
   phoneNumber: varchar({ length: 256 }),
   iban: varchar({ length: 256 }),
+  payrollRegistrationNumber: integer(),
 });
 
 // Each month our employment consultant sends us a pdf file with the estimated costs for each employee
