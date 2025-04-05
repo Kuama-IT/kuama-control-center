@@ -8,13 +8,14 @@ import SyncPubblicaWeb from "@/modules/pubblica-web/components/sync-pubblica-web
 import KPlatformCredentialsList from "@/modules/k-platform-credentials/components/k-platform-credentials-list";
 import KAccessTokenManagement from "@/modules/k-access-tokens/components/k-access-token-management";
 import { BackButton } from "@/modules/ui/components/back-button";
+import { AuthenticatedPageWrapper } from "@/modules/auth/authenticated-page-wrapper";
 
 export const metadata: Metadata = {
   title: "Settings | K1 App",
   description: "Settings | Kuama Control Center",
 };
 
-export default async function Page() {
+async function Page() {
   return (
     <div className="px-8 pt-8 flex flex-col gap-8">
       <div className="flex gap-4 items-center">
@@ -37,3 +38,7 @@ export default async function Page() {
 }
 
 export const dynamic = "force-dynamic"; // opt-out of static rendering
+
+export default async function () {
+  return await AuthenticatedPageWrapper(Page);
+}

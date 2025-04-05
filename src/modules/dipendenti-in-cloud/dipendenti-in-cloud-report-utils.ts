@@ -4,7 +4,7 @@ import { KAbsenceDaysList } from "@/modules/k-absence-days/actions/k-absence-day
 import { KEmployeesListAllActionResult } from "@/modules/k-employees/actions/k-employee-list-all-action";
 import parsePostgresInterval from "postgres-interval";
 import { KAbsenceReasonList } from "@/modules/k-absence-days/actions/k-absence-reasons-list";
-import { KClosuresList } from "@/modules/k-absence-days/actions/k-closures-list";
+import type { KClosuresList } from "@/modules/k-closures/actions/k-closures-list";
 import { ChronoUnit, Duration } from "@js-joda/core";
 
 export type DipendentiInCloudReportProps = {
