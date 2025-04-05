@@ -3,6 +3,8 @@ import { handleServerErrors } from "@/utils/server-action-utils";
 import { db } from "@/drizzle/drizzle-db";
 import { kClosures } from "@/drizzle/schema";
 import { parse } from "date-fns";
+import { unstable_cache } from "next/cache";
+import { KClosuresCacheTag } from "@/modules/k-closures/k-closures-cache-tags";
 
 async function kClosuresList() {
   const closuresFromDb = await db.select().from(kClosures);
@@ -23,7 +25,12 @@ async function kClosuresList() {
   });
 }
 
-const managed = handleServerErrors(kClosuresList);
+const cached = unstable_cache(kClosuresList, [], {
+  revalidate: 60,
+  tags: [KClosuresCacheTag],
+});
+
+const managed = handleServerErrors(cached);
 export default managed;
 
 export type KClosuresList = Awaited<ReturnType<typeof kClosuresList>>;

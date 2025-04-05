@@ -2,7 +2,7 @@ import EasyredmineReport from "@/modules/easyredmine/components/easyredmine-repo
 import {
   accessTokenParamsSchema,
   datePeriodParamsSchema,
-  SearchParams,
+  PageParams,
 } from "@/modules/routing/schemas/routing-schemas";
 import { z } from "zod";
 import { kAccessTokensServer } from "@/modules/k-access-tokens/k-access-tokens-server";
@@ -16,11 +16,7 @@ const paramsSchema = datePeriodParamsSchema.and(accessTokenParamsSchema).and(
   }),
 );
 
-export default async function Page({
-  searchParams,
-}: {
-  searchParams: SearchParams;
-}) {
+export default async function Page({ searchParams }: PageParams) {
   const parsedParams = paramsSchema.safeParse(await searchParams);
 
   if (!parsedParams.success) {
@@ -53,3 +49,5 @@ export default async function Page({
     />
   );
 }
+
+export const dynamic = "force-dynamic"; // opt-out of static rendering

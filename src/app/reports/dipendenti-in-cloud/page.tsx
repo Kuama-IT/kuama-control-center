@@ -7,17 +7,15 @@ import { kAccessTokensServer } from "@/modules/k-access-tokens/k-access-tokens-s
 import {
   accessTokenParamsSchema,
   datePeriodParamsSchema,
+  PageParams,
   SearchParams,
 } from "@/modules/routing/schemas/routing-schemas";
 import { ErrorMessage } from "@/modules/ui/components/error-message";
+import { kClosuresServer } from "@/modules/k-closures/k-closures-server";
 
 const paramsSchema = datePeriodParamsSchema.and(accessTokenParamsSchema);
 
-export default async function Page({
-  searchParams,
-}: {
-  searchParams: SearchParams;
-}) {
+export default async function Page({ searchParams }: PageParams) {
   const parsedParams = paramsSchema.safeParse(await searchParams);
 
   if (!parsedParams.success) {
@@ -62,7 +60,7 @@ export default async function Page({
     return <ErrorMessage failure={absenceReasons} />;
   }
 
-  const closures = await kAbsenceDaysServer.closures();
+  const closures = await kClosuresServer.closures();
   if (isFailure(closures)) {
     return <ErrorMessage failure={closures} />;
   }
@@ -88,3 +86,5 @@ export default async function Page({
     />
   );
 }
+
+export const dynamic = "force-dynamic"; // opt-out of static rendering
