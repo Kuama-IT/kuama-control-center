@@ -7,7 +7,6 @@ import KClientReportedSpentTimeGraph from "@/modules/k-clients/components/k-clie
 import { KClientGetOneResult } from "@/modules/k-clients/actions/k-client-get-one-action";
 import { BackButton } from "@/modules/ui/components/back-button";
 import { KProject } from "@/modules/k-projects/components/k-project";
-import KPlatformCredentialsListByClient from "@/modules/k-platform-credentials/components/k-platform-credentials-list-by-client";
 import { Skeleton } from "@/components/ui/skeleton";
 import { isFailure } from "@/utils/server-action-utils";
 import { ErrorMessage } from "@/modules/ui/components/error-message";
@@ -30,12 +29,6 @@ export default async function KClientDetail({ id }: { id: string }) {
       </div>
 
       <div className="bg-background relative z-10 flex flex-col gap-16">
-        <div>
-          <KPlatformCredentialsListByClient
-            showAddCredentials={true}
-            clientId={client.id}
-          />
-        </div>
         <div className="flex flex-col gap-8">
           {client.kProjects?.map((project) => (
             <KProject project={project} key={project.id} />

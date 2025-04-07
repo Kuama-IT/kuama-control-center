@@ -7,7 +7,8 @@ import {
   KProjectWithTeam,
 } from "@/modules/k-clients/k-clients-server";
 import { handleServerErrors } from "@/utils/server-action-utils";
-import { KEmployeesRead } from "@/drizzle/drizzle-types";
+import { unstable_cache } from "next/cache";
+import { kClientsListAllCacheTag } from "../k-clients-cache-tags";
 
 const readClientsWithVat = async () => {
   return await db.query.kClients.findMany({
@@ -93,7 +94,13 @@ const kClientsListAllAction = async (): Promise<KClientListItem[]> => {
   );
 };
 
-const handled = handleServerErrors(kClientsListAllAction);
+const cached = unstable_cache(kClientsListAllAction, [], {
+  revalidate: 60,
+  tags: [kClientsListAllCacheTag], // TODO Invalidate this tag when a client is created or deleted or imported
+});
+
+// TODO pass over user to the list: the query should filter only clients the the employee is working for or show all clients if the user is admin
+const handled = handleServerErrors(cached);
 export default handled;
 
 export type KClientListAllAction = Awaited<
