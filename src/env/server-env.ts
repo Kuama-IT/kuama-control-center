@@ -20,6 +20,7 @@ const serverEnvSchema = z
     NODE_ENV: z.string().nonempty().optional(),
     PUBBLICA_WEB_USERNAME: z.string().nonempty(),
     PUBBLICA_WEB_PASSWORD: z.string().nonempty(),
+    SHOW_DATABASE_LOGS: z.string().nonempty().optional(),
   })
   .transform((data) => {
     return {
@@ -42,6 +43,7 @@ const serverEnvSchema = z
       pubblicaWebUsername: data.PUBBLICA_WEB_USERNAME,
       pubblicaWebPassword: data.PUBBLICA_WEB_PASSWORD,
       isDev: data.NODE_ENV === "development",
+      showDatabaseLogs: data.SHOW_DATABASE_LOGS === "true",
     };
   });
 

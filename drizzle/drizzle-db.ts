@@ -5,14 +5,12 @@ import * as schema from "./schema";
 import * as relations from "./relations";
 
 const client = postgres(serverEnv.databaseUrl, {
-  prepare: false,
-  connect_timeout: 3000,
-  max: 10, // Maximum number of connections
-  idle_timeout: 20, // Seconds a client must sit idle before closing
+  prepare: false, // Disable prefetch as it is not supported for "Transaction" pool mode
 });
+
 export const db = drizzle({
   casing: "snake_case",
   client,
-  logger: false, //serverEnv.isDev,
+  logger: serverEnv.showDatabaseLogs,
   schema: { ...schema, ...relations },
 });
