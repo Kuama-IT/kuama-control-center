@@ -73,11 +73,13 @@ export const KPlatformCredentialsCard = ({
     syncButtonToggle.current?.click();
   };
 
+  const canGenerateReport = credentials.platform === "easyredmine";
   // TODO, we should just use location.origin, but Bless service cannot reach us in localhost...
   const url = `https://kuama-control-center.vercel.app/reports/easyredmine/${credentials.id}`;
-  const fileName = `${credentials.name.toLowerCase().replaceAll(" ", "-")}-report.pdf`; // TODO we should use the name of the user from easyredmine
+  const reportName = credentials.kEmployee?.fullName ?? credentials.name;
+  const fileName = `${reportName.toLowerCase().replaceAll(" ", "-")}-report.pdf`;
 
-  const today = new Date(); // TODO pick date range
+  const today = new Date();
   const firstDateRange = startOfMonth(today);
   const lastDateRange = endOfMonth(today);
   const initialRange = {
@@ -131,47 +133,51 @@ export const KPlatformCredentialsCard = ({
       </div>
 
       <div className="flex gap-2 items-center">
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button ref={syncButtonToggle}>
-              <FaSync /> Sync timesheet
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent
-            className="w-auto p-0 flex flex-col gap-4"
-            align="start"
-          >
-            <Calendar
-              initialFocus
-              defaultMonth={range?.from}
-              numberOfMonths={2}
-              today={today}
-              mode="range"
-              onSelect={setRange}
-              selected={range}
-            />
-
-            <Separator />
-            <div className="flex items-center pb-4 justify-center">
-              <Button disabled={isPending} onClick={syncData}>
-                Sync {format(range?.from ?? today, "dd-MM-yyyy")}
-                <FaArrowRight />
-                {format(range?.to ?? today, "dd-MM-yyyy")}{" "}
+        {canGenerateReport && (
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button ref={syncButtonToggle}>
+                <FaSync /> Sync timesheet
               </Button>
-            </div>
-          </PopoverContent>
-        </Popover>
+            </PopoverTrigger>
+            <PopoverContent
+              className="w-auto p-0 flex flex-col gap-4"
+              align="start"
+            >
+              <Calendar
+                initialFocus
+                defaultMonth={range?.from}
+                numberOfMonths={2}
+                today={today}
+                mode="range"
+                onSelect={setRange}
+                selected={range}
+              />
 
-        <Link
-          className="w-full"
-          href={`/api/pdf?url=${url}&fileName=${fileName}`}
-          target="_blank"
-        >
-          <Button className="w-full">
-            <FaDownload />
-            Download timesheet
-          </Button>
-        </Link>
+              <Separator />
+              <div className="flex items-center pb-4 justify-center">
+                <Button disabled={isPending} onClick={syncData}>
+                  Sync {format(range?.from ?? today, "dd-MM-yyyy")}
+                  <FaArrowRight />
+                  {format(range?.to ?? today, "dd-MM-yyyy")}{" "}
+                </Button>
+              </div>
+            </PopoverContent>
+          </Popover>
+        )}
+
+        {canGenerateReport && (
+          <Link
+            className="w-full"
+            href={`/api/pdf?url=${url}&fileName=${fileName}`}
+            target="_blank"
+          >
+            <Button className="w-full">
+              <FaDownload />
+              Download timesheet
+            </Button>
+          </Link>
+        )}
 
         <div className="ml-auto">
           <Dialog>

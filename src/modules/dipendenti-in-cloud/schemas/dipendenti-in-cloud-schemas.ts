@@ -69,7 +69,7 @@ export const dipendentiInCloudTimesheetDaySchema = z.object({
           code: z.string(), // see absenceReasonSchema
           name: z.string(),
           color: z.string(),
-          category: z.string(), // TODO seems like an enum, one of the values is absence
+          category: z.string(),
         }),
         duration: z.number().nullable(),
         duration_pending: z.number().nullable(),

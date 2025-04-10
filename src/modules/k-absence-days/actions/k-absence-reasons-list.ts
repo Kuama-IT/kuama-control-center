@@ -7,7 +7,7 @@ import { kAbsenceReasonListCacheTag } from "@/modules/k-absence-days/k-absence-d
 
 async function kAbsenceReasonsList() {
   const res = await db.select().from(kAbsenceReasons);
-  // TODO maybe move to db?
+  // TODO maybe move to db/seed?
   res.push({
     id: 0,
     name: "Per contratto",

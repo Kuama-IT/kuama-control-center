@@ -121,7 +121,7 @@ export const workTimeResponseSchema = z.object({
   issue: issueResponseSchema,
   type: z
     .object({
-      name: z.string(), // TODO this can be an enum
+      name: z.string(),
     })
     .nullable(),
   date: z.number(), // UTC timestamp

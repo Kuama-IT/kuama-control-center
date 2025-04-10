@@ -34,14 +34,14 @@ export const KProjectCard = ({ project, index = 0 }: Props) => {
               <h2 className="text-xl">{project.name}</h2>
               <p>{project.kClient.name}</p>
               <Suspense>
-                {/*<div className="absolute inset-0 opacity-50 pointer-events-none">*/}
-                {/* todo KProjectReportedSpentTimeGraph */}
-                <KClientSpentTime
-                  className="text-sm"
-                  date={new Date()}
-                  projectIds={[project.id]}
-                />
-                {/*</div>*/}
+                <div className="absolute inset-0 opacity-50 pointer-events-none">
+                  {/* todo KProjectReportedSpentTimeGraph */}
+                  <KClientSpentTime
+                    className="text-sm"
+                    date={new Date()}
+                    projectIds={[project.id]}
+                  />
+                </div>
               </Suspense>
             </div>
           </div>

@@ -52,7 +52,7 @@ export class FattureInCloudApi {
           headers: this.baseHeaders,
         },
       );
-      const data: ListClientsResponse = await res.json(); // TODO create zod schemas
+      const data: ListClientsResponse = await res.json();
       clients.push(...(data.data?.filter((it) => !!it.vat_number) ?? []));
       hasNextPage = data.next_page_url !== null;
     }
@@ -69,7 +69,7 @@ export class FattureInCloudApi {
         method: "GET",
         headers: this.baseHeaders,
       });
-      const data: ListIssuedDocumentsResponse = await res.json(); // TODO create zod schemas
+      const data: ListIssuedDocumentsResponse = await res.json();
       invoices.push(...(data.data ?? []));
       url = data.next_page_url;
     }
