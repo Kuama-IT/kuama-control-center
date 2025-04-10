@@ -11,7 +11,7 @@ const action = async (
   credentialId: number,
   range: { from: Date; to: Date },
 ) => {
-  // TODO complete
+  // TODO complete (we're missing jira)
   const credentials = await kPlatformCredentialsServer.byId(credentialId);
 
   if (isFailure(credentials)) {

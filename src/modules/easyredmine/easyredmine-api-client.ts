@@ -40,7 +40,6 @@ export class EasyRedmineApiClient {
       );
     }
 
-    // todo find a better way than "as"
     const json = (await req.json()) as {
       total_count?: number;
       offset?: number;
