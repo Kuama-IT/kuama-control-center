@@ -4,6 +4,7 @@ import { auth } from "@/modules/auth/auth";
 import { db } from "@/drizzle/drizzle-db";
 import { kAccessTokens } from "@/drizzle/schema";
 import { handleServerErrors } from "@/utils/server-action-utils";
+import { unstable_cache } from "next/cache";
 
 async function listKAccessTokens() {
   const session = await auth();
@@ -14,7 +15,11 @@ async function listKAccessTokens() {
   return db.select().from(kAccessTokens);
 }
 
-const handled = handleServerErrors(listKAccessTokens);
+const cached = unstable_cache(listKAccessTokens, [], {
+  revalidate: 60,
+  tags: ["k-access-tokens"],
+});
+const handled = handleServerErrors(cached);
 
 export default handled;
 

@@ -3,8 +3,9 @@ import { db } from "@/drizzle/drizzle-db";
 import { kSpentTimes } from "@/drizzle/schema";
 import { youtrackApiClient } from "@/modules/you-track/youtrack-api-client";
 import { format } from "date-fns";
-import { KProjectsRead } from "@/drizzle/drizzle-types";
+
 import { syncYouTrackIssuesFromWorkItems } from "@/modules/sync-data/sync-youtrack-issues";
+import { KProjectsRead } from "@/modules/k-projects/schemas/k-projects-schemas";
 
 /**
  * This functions assumes that all YT projects are already in the database

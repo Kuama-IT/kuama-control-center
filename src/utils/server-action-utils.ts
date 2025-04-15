@@ -2,7 +2,7 @@ import { z } from "zod";
 
 const failureSchema = z.object({
   type: z.literal("__failure__"),
-  code: z.ostring(),
+  code: z.string().optional(),
   message: z.string(),
 });
 

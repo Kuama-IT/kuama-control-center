@@ -1,14 +1,15 @@
 "use server";
-import {
-  KAccessTokenCreate,
-  kAccessTokenSchemaCreate,
-} from "@/drizzle/drizzle-types";
 import { auth } from "@/modules/auth/auth";
 import { db } from "@/drizzle/drizzle-db";
 import { kAccessTokens } from "@/drizzle/schema";
 import { handleServerErrors } from "@/utils/server-action-utils";
 import { firstOrThrow } from "@/utils/array-utils";
 import { eq } from "drizzle-orm";
+import {
+  KAccessTokenCreate,
+  kAccessTokenSchemaCreate,
+} from "@/modules/k-access-tokens/schemas/k-access-token-schemas";
+import { revalidateTag } from "next/cache";
 
 async function createKAccessToken(dto: KAccessTokenCreate) {
   // ensure correct type
@@ -35,6 +36,9 @@ async function createKAccessToken(dto: KAccessTokenCreate) {
     .where(eq(kAccessTokens.id, insertedId))
     .limit(1);
 
+  // invalidate access token cache
+  revalidateTag("k-access-tokens");
+
   return {
     message: `Access token ${parsed.purpose} created`,
     data: firstOrThrow(record),
@@ -44,7 +48,3 @@ async function createKAccessToken(dto: KAccessTokenCreate) {
 const handled = handleServerErrors(createKAccessToken);
 
 export default handled;
-
-export type CreateKAccessTokenResult = Awaited<
-  ReturnType<typeof createKAccessToken>
->;

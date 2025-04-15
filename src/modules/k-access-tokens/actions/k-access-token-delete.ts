@@ -5,6 +5,7 @@ import { kAccessTokens } from "@/drizzle/schema";
 import { eq } from "drizzle-orm";
 import { firstOrThrow } from "@/utils/array-utils";
 import { handleServerErrors } from "@/utils/server-action-utils";
+import { revalidateTag } from "next/cache";
 
 async function deleteKAccessToken({ id }: { id: number }) {
   const session = await auth();
@@ -19,7 +20,8 @@ async function deleteKAccessToken({ id }: { id: number }) {
   const record = firstOrThrow(records);
 
   await db.delete(kAccessTokens).where(eq(kAccessTokens.id, id));
-
+  // invalidate access token cache
+  revalidateTag("k-access-tokens");
   return {
     message: `Access token ${record.purpose} deleted`,
   };

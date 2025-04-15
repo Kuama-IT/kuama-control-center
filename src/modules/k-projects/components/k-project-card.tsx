@@ -1,17 +1,14 @@
-import { KProjectsRead } from "@/drizzle/drizzle-types";
 import { CSSProperties, Suspense } from "react";
 import Link from "next/link";
 import { routes } from "@/modules/ui/routes";
 import { HiArrowSmRight } from "react-icons/hi";
 import KClientSpentTime from "@/modules/k-clients/components/k-client-spent-time";
+import { KProjectsRead } from "@/modules/k-projects/schemas/k-projects-schemas";
+import { KClientRead } from "@/modules/k-clients/schemas/k-clients-schemas";
 
 type Props = {
   project: KProjectsRead & {
-    kClient: {
-      id: number;
-      name: string;
-      youTrackRingId: string | null;
-    };
+    kClient: KClientRead;
   };
   index?: number;
 };

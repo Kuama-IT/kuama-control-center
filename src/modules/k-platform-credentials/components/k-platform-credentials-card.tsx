@@ -1,5 +1,5 @@
 "use client";
-import { KPlatformCredentialsFullRead } from "@/drizzle/drizzle-types";
+
 import { Badge } from "@/components/ui/badge";
 import { SiJirasoftware, SiRedmine } from "react-icons/si";
 import { Button } from "@/components/ui/button";
@@ -34,6 +34,7 @@ import { Separator } from "@/components/ui/separator";
 import { notifyError, notifySuccess } from "@/modules/ui/components/notify";
 import { CopyButton } from "@/modules/ui/components/copy-button";
 import { MdOutlineToken } from "react-icons/md";
+import { KPlatformCredentialsFullRead } from "@/modules/k-platform-credentials/schemas/k-platform-credentials-schemas";
 
 export const KPlatformCredentialsCard = ({
   credentials,

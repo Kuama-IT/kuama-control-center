@@ -4,8 +4,9 @@ import {
 } from "@/modules/you-track/schemas/youtrack-schemas";
 import { db } from "@/drizzle/drizzle-db";
 import { kTasks, kTeams } from "@/drizzle/schema";
-import { KProjectsRead } from "@/drizzle/drizzle-types";
+
 import { format } from "date-fns";
+import { KProjectsRead } from "@/modules/k-projects/schemas/k-projects-schemas";
 
 export type SyncYouTrackIssuesFromWorkItemsResult = {
   id: number;

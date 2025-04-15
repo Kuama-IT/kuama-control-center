@@ -1,9 +1,9 @@
-import { KEmployeesRead } from "@/drizzle/drizzle-types";
 import { CSSProperties } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { HiArrowSmRight } from "react-icons/hi";
 import { routes } from "@/modules/ui/routes";
+import { KEmployeesRead } from "@/modules/k-employees/schemas/k-employees-schemas";
 // TODO add some nice stats
 export const KEmployeeCard = ({
   employee,
@@ -37,7 +37,7 @@ export const KEmployeeCard = ({
             <h2 className="text-xl">{employee.fullName}</h2>
           </div>
           <p>{employee.email}</p>
-          <p>{employee.birthdate} </p>
+          <p>{employee.birthdate}</p>
         </div>
         <HiArrowSmRight className="pointer-events-none absolute right-0 opacity-0 text-2xl text-gray-300 group-hover:opacity-100 group-hover:right-4 transition-all" />
       </div>

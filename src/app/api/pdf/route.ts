@@ -33,6 +33,7 @@ export async function GET(request: NextRequest) {
   const accessTokenCreateResult = await kAccessTokensServer.create({
     purpose: `PDF generation for ${url}`,
     allowedUsages: 1,
+    expiresAt: null,
   });
 
   if (isFailure(accessTokenCreateResult)) {
