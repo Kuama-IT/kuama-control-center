@@ -71,7 +71,7 @@ const syncTimesheet = async ({ from, to }: { from: Date; to: Date }) => {
                     employeeId,
                     description: reason.name,
                     reasonCode: reason.code,
-                    duration: `${shift.duration ?? shift.duration_pending} minute`,
+                    duration: `${shift.duration ?? shift.duration_pending} minutes`,
                     pending: shift.duration_pending !== null,
                     timeStart: shift.time_start,
                     timeEnd: shift.time_end,
@@ -82,7 +82,7 @@ const syncTimesheet = async ({ from, to }: { from: Date; to: Date }) => {
                     employeeId,
                     description: reason.name,
                     reasonCode: reason.code,
-                    duration: `${duration ?? duration_pending} minute`,
+                    duration: `${duration ?? duration_pending} minutes`,
                     pending: duration_pending !== null,
                     timeStart: "08:00:00",
                     timeEnd: "18:00:00",
@@ -98,7 +98,7 @@ const syncTimesheet = async ({ from, to }: { from: Date; to: Date }) => {
         await db.insert(kPresenceDays).values({
           date,
           employeeId,
-          duration: `${timesheetEntry.presence.duration} minute`,
+          duration: `${timesheetEntry.presence.duration} minutes`,
         });
       }
     }
@@ -132,7 +132,7 @@ const syncTimesheet = async ({ from, to }: { from: Date; to: Date }) => {
           date: format(monday, "yyyy-MM-dd"),
           employeeId: id,
           reasonCode: "--",
-          duration: "240 minute",
+          duration: "240 minutes",
           timeStart: "14:00:00",
           timeEnd: "18:00:00",
         });

@@ -7,6 +7,9 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       { hostname: "k1.youtrack.cloud" },
       { hostname: "utfs.io" },
+      // needed for fake data
+      { hostname: "cdn.jsdelivr.net" },
+      { hostname: "avatars.githubusercontent.com" },
     ],
   },
 };

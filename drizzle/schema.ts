@@ -16,7 +16,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { sql, SQL } from "drizzle-orm";
 
-export const codeRepositoryPlatform = pgEnum("code_repository_platform", [
+export const kExternalPlatforms = pgEnum("external_platforms", [
   "github",
   "gitlab",
   "jira",
@@ -24,11 +24,10 @@ export const codeRepositoryPlatform = pgEnum("code_repository_platform", [
   "youtrack",
 ]);
 
-// Currently represent either a set of organization/token to fetch data from GitHub, or a set of endpoint/token to fetch data from GitLab
-// Used to generate reports, and to fetch data from the code repository to feed employee's statistics
+// Used to fetch spent times data from the code repository to feed employee's statistics and timesheets
 export const kPlatformCredentials = pgTable("k_platform_credentials", {
   id: serial().primaryKey(),
-  platform: codeRepositoryPlatform().notNull(),
+  platform: kExternalPlatforms().notNull(),
   name: varchar({ length: 256 }).notNull(),
   persistentToken: text().notNull(),
   endpoint: varchar({ length: 500 }).notNull(),
@@ -214,7 +213,7 @@ export const kTasks = pgTable("k_tasks", {
   id: serial().primaryKey(),
   name: varchar({ length: 256 }),
   description: text(),
-  platform: codeRepositoryPlatform().notNull(),
+  platform: kExternalPlatforms().notNull(),
   externalTrackerId: varchar({ length: 256 }).unique(),
   projectId: serial().references(() => kProjects.id),
   employeeId: serial().references(() => kEmployees.id),
@@ -227,7 +226,7 @@ export const kSpentTimes = pgTable("k_spent_times", {
   duration: interval({ fields: "minute" }),
   date: date(),
   description: text(),
-  platform: codeRepositoryPlatform().notNull(),
+  platform: kExternalPlatforms().notNull(),
   externalTrackerId: varchar({ length: 256 }).unique(),
   taskId: serial().references(() => kTasks.id),
 });
