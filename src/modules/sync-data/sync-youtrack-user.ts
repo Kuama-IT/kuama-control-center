@@ -75,7 +75,7 @@ export const syncYouTrackUser = async (
       }
 
       const spentTimePayload: typeof kSpentTimes.$inferInsert = {
-        duration: `${workItem.duration.minutes} minute`,
+        duration: `${workItem.duration.minutes} minutes`,
         date: format(new Date(workItem.date), "yyyy-MM-dd"),
         taskId: task?.id,
         externalTrackerId: workItem.id,
