@@ -1,5 +1,5 @@
 "use client";
-import { KAccessTokenRead } from "@/drizzle/drizzle-types";
+
 import { InfinityIcon, TrashIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTransition } from "react";
@@ -9,6 +9,7 @@ import { isFailure } from "@/utils/server-action-utils";
 import { notifyError, notifySuccess } from "@/modules/ui/components/notify";
 import { format } from "date-fns";
 import { CopyButton } from "@/modules/ui/components/copy-button";
+import { KAccessTokenRead } from "@/modules/k-access-tokens/schemas/k-access-token-schemas";
 
 export const KAccessTokenListItem = ({
   token,

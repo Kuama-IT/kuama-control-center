@@ -9,7 +9,7 @@ import {
 import { eq } from "drizzle-orm";
 import { handleServerErrors } from "@/utils/server-action-utils";
 import { firstOrThrow } from "@/utils/array-utils";
-import { KPlatformCredentialsFullRead } from "@/drizzle/drizzle-types";
+import { KPlatformCredentialsFullRead } from "@/modules/k-platform-credentials/schemas/k-platform-credentials-schemas";
 
 const handled = handleServerErrors(async (id: number) => {
   const records = await db

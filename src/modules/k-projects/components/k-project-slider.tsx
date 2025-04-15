@@ -1,9 +1,9 @@
 "use client";
 
-import type { KProjectMediaRead } from "@/drizzle/drizzle-types";
 import { ImageSlide } from "@/modules/ui/components/image-slide";
 import { useEffect, useRef, useState } from "react";
 import { ArrowLeftCircle, ArrowRightCircle } from "lucide-react";
+import { KProjectMediaRead } from "@/modules/k-projects/schemas/k-projects-schemas";
 
 export const ProjectSlider = ({
   images,

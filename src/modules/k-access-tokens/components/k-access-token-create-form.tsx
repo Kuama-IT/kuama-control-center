@@ -95,7 +95,7 @@ export const KAccessTokenCreateForm = () => {
     transition(async () => {
       const res = await createKAccessToken({
         purpose: values.purpose,
-        expiresAt: values.expiresAt,
+        expiresAt: values.expiresAt ?? null,
         allowedUsages: values.allowedUsages,
       });
 

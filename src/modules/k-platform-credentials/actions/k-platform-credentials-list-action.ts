@@ -4,7 +4,7 @@ import { kEmployees, kProjects } from "@/drizzle/schema";
 import { inArray } from "drizzle-orm";
 import { handleServerErrors } from "@/utils/server-action-utils";
 import { firstOrThrow } from "@/utils/array-utils";
-import { KPlatformCredentialsFullRead } from "@/drizzle/drizzle-types";
+import { KPlatformCredentialsFullRead } from "@/modules/k-platform-credentials/schemas/k-platform-credentials-schemas";
 
 const listAllKPlatformCredentials = async () => {
   const res = await db.query.kPlatformCredentials.findMany({

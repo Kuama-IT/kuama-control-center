@@ -1,9 +1,9 @@
-import type { KProjectsReadFull } from "@/drizzle/drizzle-types";
 import { Suspense } from "react";
 import KClientSpentTime from "@/modules/k-clients/components/k-client-spent-time";
 import { AddImageToProject } from "@/modules/k-projects/components/k-projects-upload-images-button";
 import { ProjectSlider } from "@/modules/k-projects/components/k-project-slider";
 import { KEmployeeAvatar } from "@/modules/k-employees/components/k-employee-avatar";
+import { KProjectsReadFull } from "@/modules/k-projects/schemas/k-projects-schemas";
 
 export const KProject = ({ project }: { project: KProjectsReadFull }) => {
   return (
