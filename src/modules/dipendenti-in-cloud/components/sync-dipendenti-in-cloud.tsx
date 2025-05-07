@@ -1,18 +1,25 @@
 "use client";
 import { Title } from "@/modules/ui/components/title";
 import { endOfMonth, format, startOfMonth } from "date-fns";
-import { FormEvent, useState, useTransition } from "react";
+import { FormEvent, useEffect, useRef, useState, useTransition } from "react";
 import { DateRange } from "react-day-picker";
 import syncDipendentiInCloudTimesheet from "@/modules/dipendenti-in-cloud/actions/sync-dipendenti-in-cloud-timesheet-action";
 import syncDipendentiInCloudEmployees from "@/modules/dipendenti-in-cloud/actions/dipendenti-in-cloud-import-employees-action";
 import syncDipendentiInCloudAbsenceReasonsAndClosures from "@/modules/dipendenti-in-cloud/actions/dipendenti-in-cloud-import-absence-reasons-and-closures";
+import getNonExpiredToken from "@/modules/k-access-tokens/actions/k-access-token-get-not-expired";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
-import { FaArrowRight, FaCalendar, FaSync } from "react-icons/fa";
+import { FaArrowRight, FaCalendar, FaEye, FaSync } from "react-icons/fa";
 import { Separator } from "@/components/ui/separator";
 import { isFailure } from "@/utils/server-action-utils";
 import { notifyError, notifySuccess } from "@/modules/ui/components/notify";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 export default function SyncDipendentiInCloud() {
   return (
@@ -25,10 +32,92 @@ export default function SyncDipendentiInCloud() {
         <SyncEmployeeData />
         <Separator />
         <SyncAbsenceReasonsAndClosures />
+        <Separator />
+        <PreviewEmployeePresenceReport />
       </div>
     </div>
   );
 }
+
+const PreviewEmployeePresenceReport = () => {
+  const syncButtonToggle = useRef<HTMLButtonElement>(null);
+
+  const [accessToken, setAccessToken] = useState<string | undefined>(undefined);
+  const [origin, setOrigin] = useState<string | undefined>(undefined);
+  const today = new Date();
+  const firstDateRange = startOfMonth(today);
+  const lastDateRange = endOfMonth(today);
+  const initialRange = {
+    from: firstDateRange,
+    to: lastDateRange,
+  };
+  const [range, setRange] = useState<DateRange>(initialRange);
+
+  const from = range?.from ? format(range.from, "dd-MM-yyyy") : "";
+  const to = range?.to ? format(range.to, "dd-MM-yyyy") : "";
+  const url = `${origin}/reports/dipendenti-in-cloud?from=${from}&to=${to}&accessToken=${accessToken}`;
+
+  const [isPending, startTransition] = useTransition();
+
+  useEffect(() => {
+    setOrigin(location?.origin);
+    startTransition(async () => {
+      const kAccessToken = await getNonExpiredToken();
+      if (!isFailure(kAccessToken)) {
+        setAccessToken(kAccessToken.token);
+      }
+    });
+  }, []);
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        {isPending ? (
+          <FaSync className="animate-spin" />
+        ) : (
+          <Button ref={syncButtonToggle}>
+            <FaEye /> Preview presence report
+          </Button>
+        )}
+      </PopoverTrigger>
+      <PopoverContent className="w-auto p-0 flex flex-col gap-4" align="start">
+        <Calendar
+          initialFocus
+          defaultMonth={range?.from}
+          numberOfMonths={2}
+          today={today}
+          mode="range"
+          onSelect={(range) => {
+            if (range) {
+              setRange(range);
+            }
+          }}
+          selected={range}
+        />
+
+        <Separator />
+        <div className="flex items-center p-4 justify-center">
+          {range?.from && range?.to && (
+            <Link
+              className="w-full"
+              href={url}
+              target="_blank"
+              onClick={() => {
+                syncButtonToggle.current?.click();
+              }}
+            >
+              <Button className="w-full">
+                <FaEye />
+                Preview presence report {format(range.from, "dd-MM-yyyy")}
+                <FaArrowRight />
+                {format(range.to, "dd-MM-yyyy")}
+              </Button>
+            </Link>
+          )}
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+};
 
 const SyncEmployeeData = () => {
   const [isPending, startTransition] = useTransition();
@@ -78,7 +167,7 @@ const SyncAbsenceReasonsAndClosures = () => {
     <form onSubmit={onSubmit}>
       <Button disabled={isPending} size="lg">
         <FaSync className={cn({ "animate-spin": isPending })} />
-        Sync general information
+        Sync closures and absence reasons
       </Button>
     </form>
   );

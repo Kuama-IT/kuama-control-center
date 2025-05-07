@@ -12,7 +12,7 @@ import {
 import { revalidateTag } from "next/cache";
 
 async function createKAccessToken(dto: KAccessTokenCreate) {
-  // ensure correct type
+  // ensure dto type is correct
   const parsed = kAccessTokenSchemaCreate.parse(dto);
 
   const session = await auth();

@@ -6,20 +6,25 @@ import { kAccessTokens } from "@/drizzle/schema";
 import { handleServerErrors } from "@/utils/server-action-utils";
 import { unstable_cache } from "next/cache";
 
+async function listKAccessTokensInternal() {
+  return db.select().from(kAccessTokens);
+}
+
+const cached = unstable_cache(listKAccessTokensInternal, [], {
+  revalidate: 60,
+  tags: ["k-access-tokens"],
+});
+
 async function listKAccessTokens() {
   const session = await auth();
   if (!session?.user?.isAdmin) {
     throw new Error("You are not allowed to list access tokens");
   }
 
-  return db.select().from(kAccessTokens);
+  return cached();
 }
 
-const cached = unstable_cache(listKAccessTokens, [], {
-  revalidate: 60,
-  tags: ["k-access-tokens"],
-});
-const handled = handleServerErrors(cached);
+const handled = handleServerErrors(listKAccessTokens);
 
 export default handled;
 
