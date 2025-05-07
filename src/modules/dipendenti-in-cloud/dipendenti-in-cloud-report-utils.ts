@@ -1,4 +1,4 @@
-import { eachDayOfInterval, format, getDay } from "date-fns";
+import { eachDayOfInterval, format, getDate, getDay, parseISO } from "date-fns";
 import { it } from "date-fns/locale";
 import { KAbsenceDaysList } from "@/modules/k-absence-days/actions/k-absence-days-list";
 import { KEmployeesListAllActionResult } from "@/modules/k-employees/actions/k-employee-list-all-action";
@@ -60,11 +60,17 @@ export type MonthDayItem = {
 };
 
 const toMonthDayItem = (date: Date, closures: KClosuresList) => {
-  const day = getDay(date);
-  const isSaturday = day === 6;
-  const isSunday = day === 0;
+  const dayWeekNumber = getDay(parseISO(date.toISOString()));
+  const dayMonthNumber = getDate(date.toISOString());
+  const isSaturday = dayWeekNumber === 6;
+  const isSunday = dayWeekNumber === 0;
+
   const isClosure = closures.some((closure) => {
-    return closure.date === date;
+    return (
+      closure.date === date ||
+      (closure.day === dayMonthNumber &&
+        closure.month === date.getUTCMonth() + 1)
+    ); // closures can be "year" independent, ex. 25th of December
   });
 
   return {
@@ -74,7 +80,9 @@ const toMonthDayItem = (date: Date, closures: KClosuresList) => {
     isWeekend: isSaturday || isSunday,
     isClosureOrWeekend: isSaturday || isSunday || isClosure,
     date,
-    formattedDate: format(date, "yyyy-MM-dd"),
+    formattedDate: format(date, "yyyy-MM-dd", {
+      locale: it,
+    }),
   };
 };
 
@@ -241,7 +249,7 @@ export const getDataForReport = ({
 
     for (const day of month) {
       const dayTotalDuration = dayMap.get(day.formattedDate);
-      if (!dayTotalDuration) {
+      if (!dayTotalDuration || day.isClosureOrWeekend) {
         item.totals.push({ ...day, label: "" });
         continue;
       }
