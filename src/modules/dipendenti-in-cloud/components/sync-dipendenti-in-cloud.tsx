@@ -20,6 +20,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { useDateRange } from "@/modules/ui/hooks/useDateRange";
 
 export default function SyncDipendentiInCloud() {
   return (
@@ -44,17 +45,8 @@ const PreviewEmployeePresenceReport = () => {
 
   const [accessToken, setAccessToken] = useState<string | undefined>(undefined);
   const [origin, setOrigin] = useState<string | undefined>(undefined);
-  const today = new Date();
-  const firstDateRange = startOfMonth(today);
-  const lastDateRange = endOfMonth(today);
-  const initialRange = {
-    from: firstDateRange,
-    to: lastDateRange,
-  };
-  const [range, setRange] = useState<DateRange>(initialRange);
 
-  const from = range?.from ? format(range.from, "dd-MM-yyyy") : "";
-  const to = range?.to ? format(range.to, "dd-MM-yyyy") : "";
+  const { to, setRange, range, from, today } = useDateRange();
   const url = `${origin}/reports/dipendenti-in-cloud?from=${from}&to=${to}&accessToken=${accessToken}`;
 
   const [isPending, startTransition] = useTransition();
