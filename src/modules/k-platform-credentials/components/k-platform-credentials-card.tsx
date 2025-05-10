@@ -41,6 +41,7 @@ import { notifyError, notifySuccess } from "@/modules/ui/components/notify";
 import { CopyButton } from "@/modules/ui/components/copy-button";
 import { MdOutlineToken } from "react-icons/md";
 import { KPlatformCredentialsFullRead } from "@/modules/k-platform-credentials/schemas/k-platform-credentials-schemas";
+import { useDateRange } from "@/modules/ui/hooks/useDateRange";
 
 export const KPlatformCredentialsCard = ({
   credentials,
@@ -123,17 +124,8 @@ const DownloadTimesheetButton = ({
 
   const syncButtonToggle = useRef<HTMLButtonElement>(null);
 
-  const today = new Date();
-  const firstDateRange = startOfMonth(today);
-  const lastDateRange = endOfMonth(today);
-  const initialRange = {
-    from: firstDateRange,
-    to: lastDateRange,
-  };
-  const [range, setRange] = useState<DateRange>(initialRange);
+  const { to, setRange, range, from, today } = useDateRange();
 
-  const from = range?.from ? format(range.from, "dd-MM-yyyy") : "";
-  const to = range?.to ? format(range.to, "dd-MM-yyyy") : "";
   const url = `https://kuama-control-center.vercel.app/reports/easyredmine?credentialsId=${credentials.id}&from=${from}&to=${to}`;
   return (
     <Popover>
