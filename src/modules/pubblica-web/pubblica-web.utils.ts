@@ -6,16 +6,16 @@ export const pubblicaWebUtils = {
 
   async parseSalaryMonthlyBalance(buffer: ArrayBufferLike) {
     const parsedPdf = await pdfUtils.loadPdfStructure(buffer);
+    let totalBusinessCost = 0;
 
-    const salaryMonthlyBalancePage = parsedPdf.Pages[0];
-    if (!salaryMonthlyBalancePage || parsedPdf.Pages.length !== 1) {
-      throw new Error(
-        `Could not find any page in the salary PDF or salary has more than one page`,
-      );
+    for (const page of parsedPdf.Pages) {
+      try {
+        totalBusinessCost += await readTotalBusinessCostFromPage(page);
+      } catch (e) {
+        console.error("Error reading total business cost from page:", e);
+        continue;
+      }
     }
-    const totalBusinessCost = await readTotalBusinessCostFromPage(
-      salaryMonthlyBalancePage,
-    );
 
     return {
       totalBusinessCost,
@@ -27,7 +27,7 @@ export const pubblicaWebUtils = {
     const salaryPage = parsedPdf.Pages[0];
     if (!salaryPage || parsedPdf.Pages.length !== 1) {
       throw new Error(
-        `Could not find any page in the salary PDF or salary has more than one page`,
+        `Could not find any page in the salary PDF or salary has more than one page`
       );
     }
     return await readPayrollInfosFromfPage(salaryPage);
@@ -41,7 +41,7 @@ export const pubblicaWebUtils = {
       const pageWithAmounts = parsedPdf.Pages[i];
       if (!pageWithAmounts) {
         throw new Error(
-          `Could not find page ${i} in the salary PDF or salary has no pages`,
+          `Could not find page ${i} in the salary PDF or salary has no pages`
         );
       }
       try {
@@ -59,7 +59,7 @@ export const pubblicaWebUtils = {
   },
   computeEmployeesMonthlyCost(
     employeePayrolls: { gross: number; fullName: string }[],
-    totalBusinessCost: number,
+    totalBusinessCost: number
   ) {
     // Step 1: Calculate total gross
     const L_tot = employeePayrolls.reduce((sum, emp) => sum + emp.gross, 0);
@@ -82,7 +82,7 @@ export const pubblicaWebUtils = {
 
 const calculatePointDistance = (
   point1: { x: number; y: number },
-  point2: { x: number; y: number },
+  point2: { x: number; y: number }
 ) => {
   const dx = point2.x - point1.x;
   const dy = point2.y - point1.y;
@@ -146,31 +146,31 @@ async function readPayrollInfosFromfPage(page: Page) {
 
   if (grossAmountLabelItem === undefined) {
     throw new Error(
-      `Could not find "${GROSS_AMOUNT_LABEL}" label in the salary PDF`,
+      `Could not find "${GROSS_AMOUNT_LABEL}" label in the salary PDF`
     );
   }
 
   if (netAmountLabelItem === undefined) {
     throw new Error(
-      `Could not find "${NET_AMOUNT_LABEL}" label in the salary PDF`,
+      `Could not find "${NET_AMOUNT_LABEL}" label in the salary PDF`
     );
   }
 
   if (birthDateLabelItem === undefined) {
     throw new Error(
-      `Could not find "${BIRTH_DATE_LABEL}" label in the salary PDF`,
+      `Could not find "${BIRTH_DATE_LABEL}" label in the salary PDF`
     );
   }
 
   if (hireDateLabelItem === undefined) {
     throw new Error(
-      `Could not find "${HIRE_DATE_LABEL}" label in the salary PDF`,
+      `Could not find "${HIRE_DATE_LABEL}" label in the salary PDF`
     );
   }
 
   if (fullNameLabelItem === undefined) {
     throw new Error(
-      `Could not find "${FULL_NAME_LABEL}" label in the salary PDF`,
+      `Could not find "${FULL_NAME_LABEL}" label in the salary PDF`
     );
   }
 
@@ -350,7 +350,7 @@ function tryParseFullNameFromOddContent(rawContent: string) {
   }
   // try to extract the full name as the longest substring after the fiscal code
   const fiscalCodeMatch = rawContent.match(
-    /[A-Z]{6}[0-9]{2}[A-Z][0-9]{2}[A-Z][0-9]{3}[A-Z]/,
+    /[A-Z]{6}[0-9]{2}[A-Z][0-9]{2}[A-Z][0-9]{3}[A-Z]/
   );
   if (!fiscalCodeMatch) {
     console.log("No fiscal code found in:", rawContent);

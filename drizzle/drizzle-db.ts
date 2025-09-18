@@ -4,6 +4,8 @@ import postgres from "postgres";
 import * as schema from "./schema";
 import * as relations from "./relations";
 
+// TODO switch over pools
+
 const client = postgres(serverEnv.databaseUrl, {
   prepare: false, // Disable prefetch as it is not supported for "Transaction" pool mode
 });

@@ -7,7 +7,7 @@ import { pubblicaWebUtils } from "@/modules/pubblica-web/pubblica-web.utils";
 describe("parse pubblica web data", () => {
   const client = new PubblicaWebApi(
     serverEnv.pubblicaWebUsername,
-    serverEnv.pubblicaWebPassword,
+    serverEnv.pubblicaWebPassword
   );
 
   test("fake test", () => {
@@ -21,16 +21,16 @@ describe("parse pubblica web data", () => {
     // write to file the first pdf
     fs.writeFileSync(
       "__tests__/modules/pubblica-web/Cedolino-2022-08-0000.pdf",
-      Buffer.from(payslips.bytes),
+      Buffer.from(payslips.bytes)
     );
   });
 
   test("it parses multiple salary pdf", async () => {
     const pdfBytes = fs.readFileSync(
-      "__tests__/modules/pubblica-web/Cedolino-2022-08-0000.pdf",
+      "__tests__/modules/pubblica-web/Cedolino-2022-08-0000.pdf"
     );
     const res = await pubblicaWebUtils.parseMultiPageSalaries(
-      new Uint8Array(pdfBytes).buffer,
+      new Uint8Array(pdfBytes).buffer
     );
     const { fullName } = res[0];
 
@@ -47,22 +47,22 @@ describe("parse pubblica web data", () => {
 
   test("it downloads monthly balance by year and month", async () => {
     await client.authenticate();
-    const balance = await client.fetchMonthlyBalance(2023, 1);
+    const balance = await client.fetchMonthlyBalance(2022, 7);
 
     // write to file the first pdf
     fs.writeFileSync(
-      "__tests__/modules/pubblica-web/Bilancino-2023-01-0000.pdf",
-      Buffer.from(balance!.bytes),
+      "__tests__/modules/pubblica-web/Bilancino-2022-07-0000.pdf",
+      Buffer.from(balance!.bytes)
     );
   });
 
   test("it parses monthly total business cost from balance pdf", async () => {
     const pdfBytes = fs.readFileSync(
-      "__tests__/modules/pubblica-web/Bilancino-2023-01-0000.pdf",
+      "__tests__/modules/pubblica-web/Bilancino-2022-07-0000.pdf"
     );
 
     const res = await pubblicaWebUtils.parseSalaryMonthlyBalance(
-      new Uint8Array(pdfBytes).buffer,
+      new Uint8Array(pdfBytes).buffer
     );
 
     expect(res.totalBusinessCost).greaterThan(0);
@@ -70,18 +70,18 @@ describe("parse pubblica web data", () => {
 
   test("it computes employee monthly cost based on gross and total business cost", async () => {
     const pdfBytes = fs.readFileSync(
-      "__tests__/modules/pubblica-web/Cedolino-2023-01-0000.pdf",
+      "__tests__/modules/pubblica-web/Cedolino-2023-01-0000.pdf"
     );
     const salaries = await pubblicaWebUtils.parseMultiPageSalaries(
-      new Uint8Array(pdfBytes).buffer,
+      new Uint8Array(pdfBytes).buffer
     );
 
     const pdfBalanceBytes = fs.readFileSync(
-      "__tests__/modules/pubblica-web/Bilancino-2023-01-0000.pdf",
+      "__tests__/modules/pubblica-web/Bilancino-2023-01-0000.pdf"
     );
 
     const balance = await pubblicaWebUtils.parseSalaryMonthlyBalance(
-      new Uint8Array(pdfBalanceBytes).buffer,
+      new Uint8Array(pdfBalanceBytes).buffer
     );
 
     const { totalBusinessCost } = balance;
@@ -92,12 +92,12 @@ describe("parse pubblica web data", () => {
         gross: s.gross,
         fullName: s.fullName,
       })),
-      totalBusinessCost,
+      totalBusinessCost
     );
 
     // 1. La somma dei costi aziendali deve tornare col totale
     expect(
-      employeeCosts.reduce((sum, e) => sum + e.businessCost, 0),
+      employeeCosts.reduce((sum, e) => sum + e.businessCost, 0)
     ).toBeCloseTo(totalBusinessCost, 2);
 
     // 2. Ogni quota deve corrispondere alla proporzione del lordo

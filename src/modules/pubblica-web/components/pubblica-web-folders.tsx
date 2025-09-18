@@ -1,13 +1,43 @@
 import { isFailure } from "@/utils/server-action-utils";
-import { handledListRootFolders } from "../actions/payrolls.actions";
-import { PubblicaFolderDownloadEmployeePayslips } from "./pubblica-web-download-employee-payslips";
+import {
+  handledGetPubblicaWebEmployeesCostOverMonthsGraphData,
+  handledGetPubblicaWebGraphData,
+  handledListRootFolders,
+} from "../actions/payrolls.actions";
+import { PubblicaFolderPayslipsActions } from "./pubblica-web-payslips-actions";
 import { PubblicaWebCollapsiblePayslips } from "./pubblica-web-collapsible-payslips";
+import { PubblicaWebPayslipsGraph } from "./pubblica-web-payslips-graph";
+import { ErrorMessage } from "@/modules/ui/components/error-message";
+import { PubblicaWebEmployeeCostBalanceGraph } from "./pubblica-web-employee-cost-balance-graph";
+import { handledGetFattureInCloudEmittedInvoicesGraphData } from "@/modules/fatture-in-cloud/fatture-in-cloud.actions";
 
 export default async function PubblicaWebFolders() {
   const folders = await handledListRootFolders();
 
+  const graphData = await handledGetPubblicaWebGraphData();
+
+  const balanceGraphData =
+    await handledGetPubblicaWebEmployeesCostOverMonthsGraphData(
+      new Date().getFullYear().toString()
+    );
+
+  const invoicesGraphData =
+    await handledGetFattureInCloudEmittedInvoicesGraphData();
+
   if (isFailure(folders)) {
-    return <div>Error: {folders.message}</div>;
+    return <ErrorMessage failure={folders} />;
+  }
+
+  if (isFailure(graphData)) {
+    return <ErrorMessage failure={graphData} />;
+  }
+
+  if (isFailure(balanceGraphData)) {
+    return <ErrorMessage failure={balanceGraphData} />;
+  }
+
+  if (isFailure(invoicesGraphData)) {
+    return <ErrorMessage failure={invoicesGraphData} />;
   }
 
   return (
@@ -18,7 +48,7 @@ export default async function PubblicaWebFolders() {
           <li key={index} className="flex-1 grid grid-cols-2 gap-2 shadow p-2">
             {folder.text}
             <div className="flex justify-end">
-              <PubblicaFolderDownloadEmployeePayslips year={folder.text} />
+              <PubblicaFolderPayslipsActions year={folder.text} />
             </div>
             <div className="col-span-2">
               {folder.payrolls.length} payslips downloaded
@@ -28,7 +58,7 @@ export default async function PubblicaWebFolders() {
                   <strong>
                     {folder.payrolls[folder.payrolls.length - 1].year}/
                     {String(
-                      folder.payrolls[folder.payrolls.length - 1].month,
+                      folder.payrolls[folder.payrolls.length - 1].month
                     ).padStart(2, "0")}
                   </strong>{" "}
                   to{" "}
@@ -54,6 +84,15 @@ export default async function PubblicaWebFolders() {
           </li>
         ))}
       </ul>
+      <div className="p-4">
+        <PubblicaWebPayslipsGraph data={graphData} />
+      </div>
+      <div className="p-4">
+        <PubblicaWebEmployeeCostBalanceGraph
+          data={balanceGraphData}
+          invoicesData={invoicesGraphData}
+        />
+      </div>
     </div>
   );
 }
