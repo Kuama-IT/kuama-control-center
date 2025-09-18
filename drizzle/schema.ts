@@ -12,9 +12,11 @@ import {
   serial,
   text,
   timestamp,
+  unique,
   varchar,
 } from "drizzle-orm/pg-core";
 import { sql, SQL } from "drizzle-orm";
+import { string } from "zod";
 
 export const kExternalPlatforms = pgEnum("external_platforms", [
   "github",
@@ -56,7 +58,7 @@ export const kPlatformCredentialsToEmployeesAndProjects = pgTable(
       foreignColumns: [kProjects.id],
       name: "fk_project_id",
     }),
-  ],
+  ]
 );
 
 export const kInvoices = pgTable("k_invoices", {
@@ -93,7 +95,7 @@ export const kClientsVats = pgTable(
     vatId: serial().references(() => kVats.id),
     clientId: serial().references(() => kClients.id),
   },
-  (t) => [primaryKey({ columns: [t.vatId, t.clientId] })],
+  (t) => [primaryKey({ columns: [t.vatId, t.clientId] })]
 );
 
 export const kClients = pgTable("k_clients", {
@@ -248,9 +250,90 @@ export const kAccessTokens = pgTable("k_access_tokens", {
   usageCount: integer().default(0),
 });
 
+export const pubblicaWebPayrolls = pgTable(
+  "pubblica_web_payrolls",
+  {
+    id: serial().primaryKey(),
+    employeeName: varchar({ length: 256 }).notNull(),
+    year: integer().notNull(),
+    month: integer().notNull(),
+    birthDate: varchar({ length: 10 }),
+    createdAt: timestamp().notNull().defaultNow(),
+    net: real().notNull(),
+    gross: real().notNull(),
+  },
+  (t) => [
+    // each employee can have only one payslip for each month of a year
+    unique("employeeName_year_month").on(t.employeeName, t.year, t.month),
+  ]
+);
+export const pubblicaWebMonthlyBalances = pgTable(
+  "pubblica_web_monthly_balances",
+  {
+    id: serial().primaryKey(),
+    year: integer().notNull(),
+    month: integer().notNull(),
+    createdAt: timestamp().notNull().defaultNow(),
+    total: real().notNull(),
+  },
+  (t) => [
+    // only one balance for each month of a year
+    unique("year_month").on(t.year, t.month),
+  ]
+);
+
+//
 // TODO
-export const kCommits = pgTable("k_commits", {});
-export const kRepositories = pgTable("k_repositories", {});
+// export const kCommits = pgTable("k_commits", {});
+// export const kRepositories = pgTable("k_repositories", {});
+//
+// // Cash Flow Category
+// export const cashFlowCategoryType = pgEnum("cash_flow_category_type", [
+//   "income",
+//   "expense",
+// ]);
+// export const cashFlowCategory = pgTable("cash_flow_category", {
+//   id: serial().primaryKey(),
+//   name: varchar({ length: 128 }).notNull(),
+//   type: cashFlowCategoryType().notNull(),
+//   description: text(),
+// });
+//
+// // Cash Flow Client
+// export const cashFlowClient = pgTable("cash_flow_client", {
+//   id: serial().primaryKey(),
+//   name: varchar({ length: 128 }).notNull(),
+//   externalId: varchar({ length: 128 }), // id esterno (es. Fatture in Cloud)
+// });
+//
+// // Cash Flow Entry
+// export const cashFlowSource = pgEnum("cash_flow_source", [
+//   "fatture_in_cloud",
+//   "pubblica_web",
+//   "excel",
+//   "manual",
+// ]);
+// export const cashFlowEntry = pgTable("cash_flow_entry", {
+//   id: serial().primaryKey(),
+//   date: timestamp().notNull(),
+//   amount: real().notNull(),
+//   description: text(),
+//   categoryId: integer()
+//     .references(() => cashFlowCategory.id)
+//     .notNull(),
+//   clientId: integer().references(() => cashFlowClient.id),
+//   source: cashFlowSource().notNull(),
+//   externalId: varchar({ length: 128 }),
+//   isIncome: boolean().notNull(),
+// });
+//
+// // Cash Flow Import (Excel)
+// export const cashFlowImport = pgTable("cash_flow_import", {
+//   id: serial().primaryKey(),
+//   filename: varchar({ length: 256 }).notNull(),
+//   importedAt: timestamp().notNull(),
+//   importedBy: varchar({ length: 128 }),
+// });
 
 export function lower(email: AnyPgColumn): SQL {
   return sql`lower(${email})`;

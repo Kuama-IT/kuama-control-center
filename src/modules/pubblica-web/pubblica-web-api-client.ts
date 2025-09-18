@@ -99,7 +99,7 @@ export class PubblicaWebApi {
 
       allPayslips.push(
         ...payslips.map((payslip, index) => ({
-          bytes: payslipsBuffer[index],
+          bytes: payslipsBuffer[index]!,
           mimeType: payslip.MimeType,
           name: payslip.Name,
         })),
@@ -107,6 +107,13 @@ export class PubblicaWebApi {
     }
 
     return allPayslips;
+  }
+
+  async listRootFolders() {
+    const repository = await this.getDefaultRepository();
+
+    const folderTree = await this.readFolderTreeAtPath(repository.Id);
+    return folderTree;
   }
 
   /**
@@ -122,10 +129,8 @@ export class PubblicaWebApi {
    *     └── ...
    * @param yearAndMonth
    */
-  async fetchPayslips(yearAndMonth: Date) {
-    const year = yearAndMonth.getFullYear();
-    const monthNumber = yearAndMonth.getMonth() + 1;
-    const formattedMonth = `${year}-${monthNumber.toString().padStart(2, "0")}`;
+  async fetchPayslips(year: number, month: number) {
+    const formattedMonth = `${year}-${month.toString().padStart(2, "0")}`;
 
     const repository = await this.getDefaultRepository();
 
@@ -165,6 +170,54 @@ export class PubblicaWebApi {
       bytes: buffer,
       mimeType: allPaySlipsDocument.MimeType,
       name: allPaySlipsDocument.Name,
+    };
+  }
+
+  public async fetchMonthlyBalance(year: number, month: number) {
+    const formattedMonth = `${year}-${month.toString().padStart(2, "0")}`;
+
+    const repository = await this.getDefaultRepository();
+
+    const folderTree = await this.readFolderTreeAtPath(repository.Id);
+    const folderTreeYearItem = folderTree.find(
+      (item) => item.text === year.toString(),
+    );
+
+    if (!folderTreeYearItem) {
+      return null;
+    }
+
+    const yearFolderTree = await this.readFolderTreeAtPath(
+      repository.Id,
+      folderTreeYearItem.data.path,
+    );
+
+    const monthFolderTreeItem = yearFolderTree.find(
+      (item) => item.text === formattedMonth,
+    );
+    if (!monthFolderTreeItem) {
+      return null;
+    }
+    const documents = await this.readDocumentsAtPath(
+      repository.Id,
+      monthFolderTreeItem.data.path,
+    );
+
+    const allPaySlipsDocuments = documents.filter((document) =>
+      document.Name.toLowerCase().startsWith("bilanci"),
+    );
+
+    const balanceDocument = allPaySlipsDocuments[0];
+
+    if (!balanceDocument) {
+      return null;
+    }
+
+    const buffer = await this.downloadDocument(balanceDocument.Id);
+    return {
+      bytes: buffer,
+      mimeType: balanceDocument.MimeType,
+      name: balanceDocument.Name,
     };
   }
 

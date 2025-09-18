@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "dev:turbo": "next dev --turbopack",
-    "build": "next build --turbopack",
+    "build": "next build --experimental-compiler typescript-experimental --turbopack",
     "help": "next build --help",
     "build:ci": "next build --experimental-build-mode compile",
     "start": "next start",
@@ -44,7 +44,7 @@
     "drizzle-orm": "^0.38.4",
     "drizzle-zod": "^0.6.1",
     "lucide-react": "^0.474.0",
-    "next": "15.3.0",
+    "next": "15.5.3",
     "next-auth": "5.0.0-beta.25",
     "next-themes": "^0.4.4",
     "node-fetch": "^3.3.2",
@@ -74,6 +74,7 @@
     "@types/pg": "^8.11.13",
     "@types/react": "19.0.10",
     "@types/react-dom": "19.0.4",
+    "@typescript/native-preview": "7.0.0-dev.20250917.1",
     "@vitejs/plugin-react": "^4.3.4",
     "dotenv": "^16.4.7",
     "drizzle-kit": "^0.30.2",
@@ -83,7 +84,7 @@
     "prettier": "^3.4.2",
     "tailwindcss": "^4.0.8",
     "tsx": "^4.19.2",
-    "typescript": "^5",
+    "typescript": "5.9.2",
     "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^3.0.2"
   }

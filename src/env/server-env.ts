@@ -3,6 +3,9 @@ import { z } from "zod";
 const serverEnvSchema = z
   .object({
     DATABASE_URL: z.string().nonempty(),
+    POSTGRES_USER: z.string().nonempty(),
+    POSTGRES_PASSWORD: z.string().nonempty(),
+    POSTGRES_DB: z.string().nonempty(),
     DIPENDENTI_IN_CLOUD_API_ENDPOINT: z.string().nonempty().endsWith("/"),
     DIPENDENTI_IN_CLOUD_PERSISTENT_TOKEN: z.string().nonempty(),
     FATTURE_IN_CLOUD_PERSISTENT_TOKEN: z.string().nonempty(),
@@ -25,6 +28,9 @@ const serverEnvSchema = z
   .transform((data) => {
     return {
       databaseUrl: data.DATABASE_URL,
+      postgresUser: data.POSTGRES_USER,
+      postgresPassword: data.POSTGRES_PASSWORD,
+      postgresDb: data.POSTGRES_DB,
       dipendentiInCloudApiEndpoint: data.DIPENDENTI_IN_CLOUD_API_ENDPOINT,
       dipendentiInCloudApiPersistentToken:
         data.DIPENDENTI_IN_CLOUD_PERSISTENT_TOKEN,

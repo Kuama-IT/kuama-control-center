@@ -1,8 +1,8 @@
 import { DipendentiInCloudApi } from "@/modules/dipendenti-in-cloud/dipendenti-in-cloud-api-client";
 import { EmployeeSalaryWithGrossHistory } from "@/modules/dipendenti-in-cloud/schemas/dipendenti-in-cloud-schemas";
-import PDFParser, { type Output, type Text } from "pdf2json";
+import PDFParser, { type Output, Page, type Text } from "pdf2json";
 
-const parseSalaryPdf = (pdfBuffer: ArrayBufferLike): Promise<Output> =>
+export const parseSalaryPdf = (pdfBuffer: ArrayBufferLike): Promise<Output> =>
   new Promise((resolve, reject) => {
     const pdfParser = new PDFParser();
 
@@ -15,7 +15,7 @@ const parseSalaryPdf = (pdfBuffer: ArrayBufferLike): Promise<Output> =>
     pdfParser.parseBuffer(Buffer.from(pdfBuffer));
   });
 
-const calculatePointDistance = (
+export const calculatePointDistance = (
   point1: { x: number; y: number },
   point2: { x: number; y: number },
 ) => {
@@ -24,21 +24,48 @@ const calculatePointDistance = (
   return Math.sqrt(dx * dx + dy * dy);
 };
 
-const GROSS_AMOUNT_LABEL = encodeURI("LORDO");
-const NET_AMOUNT_LABEL = encodeURI("NETTO");
-const BIRTH_DATE_LABEL = encodeURI("DATA DI NASCITA");
-const HIRE_DATE_LABEL = encodeURI("DATA ASSUNZIONE");
-const YEARLY_WORKING_HOURS_LABEL = encodeURI("ORE LAVOR. ANNUALI");
+export const GROSS_AMOUNT_LABEL = encodeURI("LORDO");
+export const NET_AMOUNT_LABEL = encodeURI("NETTO");
+export const BIRTH_DATE_LABEL = encodeURI("DATA DI NASCITA");
+export const HIRE_DATE_LABEL = encodeURI("DATA ASSUNZIONE");
+export const YEARLY_WORKING_HOURS_LABEL = encodeURI("ORE LAVOR. ANNUALI");
+export const FULL_NAME_LABEL = encodeURI("COGNOME NOME");
 
-const ITALIAN_AMOUNT_REGEX = /\d{1,3}(?:\.\d{3})*,\d{2}/;
-const ITALIAN_DATE_REGEX = /\d{2}\/\d{2}\/\d{4}/;
+export const ITALIAN_AMOUNT_REGEX = /\d{1,3}(?:\.\d{3})*,\d{2}/;
+export const ITALIAN_DATE_REGEX = /\d{2}\/\d{2}\/\d{4}/;
 
-const parseItalianNumber = (value: string): number => {
+export const parseItalianNumber = (value: string): number => {
   const normalized = value
     .trim()
     .replace(".", "") // Remove thousands separator
     .replace(",", "."); // Convert decimal separator
   return parseFloat(normalized);
+};
+
+export const parseMultipleSalaries = async (buffer: ArrayBufferLike) => {
+  const parsedPdf = await parseSalaryPdf(buffer);
+
+  // all pages except the last one are salaries
+  const salaries = [];
+  for (let i = 0; i < parsedPdf.Pages.length - 1; i++) {
+    const pageWithAmounts = parsedPdf.Pages[i];
+    if (!pageWithAmounts) {
+      throw new Error(
+        `Could not find page ${i} in the salary PDF or salary has no pages`,
+      );
+    }
+    try {
+      const salaryInfo = await parsePageToPayroll(pageWithAmounts);
+      salaries.push(salaryInfo);
+    } catch (e) {
+      console.error(`Error parsing salary on page ${i + 1}:`, e);
+      // some LUL have salaries up to the last 4 pages, so don't throw
+      if (i < parsedPdf.Pages.length - 4) {
+        throw e;
+      }
+    }
+  }
+  return salaries;
 };
 
 // todo get from pdf also the "ORE LAVOR. ANNUALI". It's optional hence don't throw if not found
@@ -51,6 +78,10 @@ export const parseSalary = async (buffer: ArrayBufferLike) => {
       `Could not find any page in the salary PDF or salary has more than one page`,
     );
   }
+  return await parsePageToPayroll(pageWithAmounts);
+};
+
+async function parsePageToPayroll(pageWithAmounts: Page) {
   const { Texts: content } = pageWithAmounts;
 
   let grossAmountLabelItem: Text | undefined = undefined;
@@ -58,6 +89,7 @@ export const parseSalary = async (buffer: ArrayBufferLike) => {
   let birthDateLabelItem: Text | undefined = undefined;
   let hireDateLabelItem: Text | undefined = undefined;
   let yearlyWorkingHoursLabelItem: Text | undefined = undefined;
+  let fullNameLabelItem: Text | undefined = undefined;
 
   for (const item of content) {
     for (const textRun of item.R) {
@@ -79,6 +111,9 @@ export const parseSalary = async (buffer: ArrayBufferLike) => {
 
       if (textRun.T.includes(YEARLY_WORKING_HOURS_LABEL)) {
         yearlyWorkingHoursLabelItem = item;
+      }
+      if (textRun.T.includes(FULL_NAME_LABEL)) {
+        fullNameLabelItem = item;
       }
     }
   }
@@ -107,6 +142,12 @@ export const parseSalary = async (buffer: ArrayBufferLike) => {
     );
   }
 
+  if (fullNameLabelItem === undefined) {
+    throw new Error(
+      `Could not find "${FULL_NAME_LABEL}" label in the salary PDF`,
+    );
+  }
+
   const parsedAmounts: {
     parsed: number;
     distanceFromGross: number;
@@ -121,6 +162,14 @@ export const parseSalary = async (buffer: ArrayBufferLike) => {
     distanceFromHireDate: number;
     x: number;
     y: number;
+  }[] = [];
+
+  const parsedStrings: {
+    parsed: string;
+    distanceFromFullName: number;
+    x: number;
+    y: number;
+    width: number;
   }[] = [];
 
   for (const item of pageWithAmounts.Texts) {
@@ -156,6 +205,16 @@ export const parseSalary = async (buffer: ArrayBufferLike) => {
         y: item.y,
       });
     }
+
+    // consider as string
+    const parsed = rawContent;
+    parsedStrings.push({
+      parsed,
+      distanceFromFullName: calculatePointDistance(item, fullNameLabelItem),
+      x: item.x,
+      y: item.y,
+      width: item.w,
+    });
   }
 
   if (!parsedAmounts.length) {
@@ -189,13 +248,31 @@ export const parseSalary = async (buffer: ArrayBufferLike) => {
     .sort((a, b) => a.distanceFromHireDate - b.distanceFromHireDate);
   const hireDate = sortedParsedDatesHire[0].parsed;
 
+  // sort by largest width and get the nearest and largest full name
+  const sortedParsedStrings = parsedStrings
+    .filter((str) => str.y > fullNameLabelItem.y)
+    .sort((a, b) => {
+      // const distanceDiff = a.distanceFromFullName - b.distanceFromFullName;
+      // if (distanceDiff !== 0) {
+      //   return distanceDiff;
+      // }
+      return b.width - a.width; // larger width first
+    });
+
+  // between the largest top 5, take the nearest
+  const possibleFullNames = sortedParsedStrings
+    .slice(0, 5)
+    .sort((a, b) => a.distanceFromFullName - b.distanceFromFullName);
+  const fullName = possibleFullNames[0].parsed;
+
   return {
     gross,
     net,
     birthDate,
     hireDate,
+    fullName,
   };
-};
+}
 
 // todo rename
 export const getSalaryHistoryWithGrossAmounts = async (
