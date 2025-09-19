@@ -175,7 +175,12 @@ export const handledGetPubblicaWebGraphData = handleServerErrors(
     // aggregate by month
     const dataMap: Record<
       string,
-      { month: string; currentYear: number; previousYear: number }
+      {
+        month: string;
+        currentYear: number;
+        previousYear: number;
+        currentYearEstimate: number;
+      }
     > = {};
 
     for (const payroll of payrolls) {
@@ -185,6 +190,7 @@ export const handledGetPubblicaWebGraphData = handleServerErrors(
           month: monthKey,
           currentYear: 0,
           previousYear: 0,
+          currentYearEstimate: 0,
         };
       }
       if (payroll.year === currentYear) {
@@ -201,6 +207,7 @@ export const handledGetPubblicaWebGraphData = handleServerErrors(
           month: "12",
           currentYear: 0,
           previousYear: 0,
+          currentYearEstimate: 0,
         };
       }
 
@@ -209,11 +216,72 @@ export const handledGetPubblicaWebGraphData = handleServerErrors(
       delete dataMap["13"];
     }
 
+    // Find the last month with current year payslips
+    let lastMonthWithPayslip = 0;
+    for (const payroll of payrolls) {
+      if (
+        payroll.year === currentYear &&
+        payroll.month > lastMonthWithPayslip
+      ) {
+        lastMonthWithPayslip = payroll.month;
+      }
+    }
+
+    // Forecast payslips for remaining months
+    // Use the last available month's value as forecast for next months
+    // For December (month 12), add estimated 13esima
+    // Store estimates in a separate field: currentYearEstimate
+    if (lastMonthWithPayslip > 0 && lastMonthWithPayslip < 12) {
+      // Get the last available month's net
+      const lastMonthKey = String(lastMonthWithPayslip).padStart(2, "0");
+      const lastMonthNet = dataMap[lastMonthKey]?.currentYear || 0;
+
+      // Fill forecast for months after lastMonthWithPayslip up to December
+      for (let m = lastMonthWithPayslip + 1; m <= 12; m++) {
+        const key = String(m).padStart(2, "0");
+        if (!dataMap[key]) {
+          dataMap[key] = {
+            month: key,
+            currentYear: 0,
+            previousYear: 0,
+            currentYearEstimate: 0,
+          };
+        } else if (
+          dataMap[key] &&
+          dataMap[key].currentYearEstimate === undefined
+        ) {
+          dataMap[key].currentYearEstimate = 0;
+        }
+
+        dataMap[key].currentYearEstimate = lastMonthNet;
+      }
+
+      // Estimate 13esima: average of all current year months so far
+      let monthsCount = 0;
+      let netSum = 0;
+      for (let m = 1; m <= 12; m++) {
+        const key = String(m).padStart(2, "0");
+        if (dataMap[key]?.currentYear) {
+          netSum += dataMap[key].currentYear;
+          monthsCount++;
+        }
+
+        if (dataMap[key]?.currentYearEstimate) {
+          netSum += dataMap[key].currentYearEstimate;
+          monthsCount++;
+        }
+      }
+      const estimated13esima = monthsCount > 0 ? netSum / monthsCount : 0;
+      // For December, add estimated 13esima
+      dataMap["12"].currentYearEstimate += estimated13esima;
+    }
+
     const data = Object.values(dataMap);
     // ensure is still sorted by month, ensure net is rounded to 2 decimals
     data.forEach((it) => {
       it.currentYear = parseFloat(it.currentYear.toFixed(2));
       it.previousYear = parseFloat(it.previousYear.toFixed(2));
+      it.currentYearEstimate = parseFloat(it.currentYearEstimate.toFixed(2));
     });
     data.sort((a, b) => a.month.localeCompare(b.month));
 
@@ -254,8 +322,6 @@ export const handledGetPubblicaWebEmployeesCostOverMonthsGraphData =
         desc(pubblicaWebMonthlyBalances.year),
         desc(pubblicaWebMonthlyBalances.month)
       );
-
-    console.log("Total costs:", totalCosts);
 
     // compute cost per employee per month
 

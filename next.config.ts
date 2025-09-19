@@ -12,6 +12,7 @@ const nextConfig: NextConfig = {
       { hostname: "avatars.githubusercontent.com" },
     ],
   },
+  outputFileTracingRoot: __dirname,
 };
 
 export default nextConfig;

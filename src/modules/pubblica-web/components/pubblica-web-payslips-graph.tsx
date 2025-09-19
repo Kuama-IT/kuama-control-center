@@ -14,6 +14,7 @@ export type PayslipsGraphData = {
   month: string;
   currentYear: number;
   previousYear: number;
+  currentYearEstimate: number;
 };
 
 interface PubblicaWebPayslipsGraphProps {
@@ -42,6 +43,14 @@ export function PubblicaWebPayslipsGraph({
             name="Current Year"
             stroke="#8884d8"
             strokeWidth={3}
+            activeDot={{ r: 8 }}
+          />
+          <Line
+            type="monotone"
+            dataKey="currentYearEstimate"
+            name="Current Year Estimate"
+            stroke="#8884d8"
+            strokeWidth={2}
             activeDot={{ r: 8 }}
           />
           <Line
