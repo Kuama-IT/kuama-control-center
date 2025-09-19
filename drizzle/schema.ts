@@ -288,52 +288,54 @@ export const pubblicaWebMonthlyBalances = pgTable(
 // export const kRepositories = pgTable("k_repositories", {});
 //
 // // Cash Flow Category
-// export const cashFlowCategoryType = pgEnum("cash_flow_category_type", [
-//   "income",
-//   "expense",
-// ]);
-// export const cashFlowCategory = pgTable("cash_flow_category", {
-//   id: serial().primaryKey(),
-//   name: varchar({ length: 128 }).notNull(),
-//   type: cashFlowCategoryType().notNull(),
-//   description: text(),
-// });
-//
+export const cashFlowCategoryType = pgEnum("cash_flow_category_type", [
+  "income",
+  "expense",
+]);
+export const cashFlowCategory = pgTable("cash_flow_category", {
+  id: serial().primaryKey(),
+  name: varchar({ length: 128 }).notNull(),
+  type: cashFlowCategoryType().notNull(),
+  description: text(),
+});
+
 // // Cash Flow Client
-// export const cashFlowClient = pgTable("cash_flow_client", {
-//   id: serial().primaryKey(),
-//   name: varchar({ length: 128 }).notNull(),
-//   externalId: varchar({ length: 128 }), // id esterno (es. Fatture in Cloud)
-// });
-//
-// // Cash Flow Entry
-// export const cashFlowSource = pgEnum("cash_flow_source", [
-//   "fatture_in_cloud",
-//   "pubblica_web",
-//   "excel",
-//   "manual",
-// ]);
-// export const cashFlowEntry = pgTable("cash_flow_entry", {
-//   id: serial().primaryKey(),
-//   date: timestamp().notNull(),
-//   amount: real().notNull(),
-//   description: text(),
-//   categoryId: integer()
-//     .references(() => cashFlowCategory.id)
-//     .notNull(),
-//   clientId: integer().references(() => cashFlowClient.id),
-//   source: cashFlowSource().notNull(),
-//   externalId: varchar({ length: 128 }),
-//   isIncome: boolean().notNull(),
-// });
-//
-// // Cash Flow Import (Excel)
-// export const cashFlowImport = pgTable("cash_flow_import", {
-//   id: serial().primaryKey(),
-//   filename: varchar({ length: 256 }).notNull(),
-//   importedAt: timestamp().notNull(),
-//   importedBy: varchar({ length: 128 }),
-// });
+export const cashFlowSubject = pgTable("cash_flow_subject", {
+  id: serial().primaryKey(),
+  name: varchar({ length: 128 }).notNull(),
+  externalId: varchar({ length: 128 }),
+});
+
+
+export const cashFlowEntry = pgTable("cash_flow_entry", {
+  id: serial().primaryKey(),
+  date: timestamp().notNull(),
+  amount: real().notNull(),
+  description: text(),
+  categoryId: integer()
+    .references(() => cashFlowCategory.id)
+    .notNull(),
+  subjectId: integer().references(() => cashFlowSubject.id),
+  externalId: varchar({ length: 128 }),
+  isIncome: boolean().notNull(),
+});
+
+// Cash Flow Import (Excel)
+export const cashFlowImport = pgTable("cash_flow_import", {
+  id: serial().primaryKey(),
+  fileBase64: text().notNull(),
+  importedAt: timestamp(),
+  createdAt: timestamp().notNull().defaultNow(),
+});
+
+// Table to store bank account balance snapshots
+export const cashFlowAccountBalance = pgTable("cash_flow_account_balance", {
+  id: serial().primaryKey(),
+  date: timestamp().notNull(), // When the balance was recorded
+  balance: real().notNull(), // The balance amount
+  source: text(), // Optional: manual, import, etc.
+  note: text(), // Optional: any additional info
+});
 
 export function lower(email: AnyPgColumn): SQL {
   return sql`lower(${email})`;
