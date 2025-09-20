@@ -306,7 +306,6 @@ export const cashFlowSubject = pgTable("cash_flow_subject", {
   externalId: varchar({ length: 128 }),
 });
 
-
 export const cashFlowEntry = pgTable("cash_flow_entry", {
   id: serial().primaryKey(),
   date: timestamp().notNull(),
@@ -324,6 +323,7 @@ export const cashFlowEntry = pgTable("cash_flow_entry", {
 export const cashFlowImport = pgTable("cash_flow_import", {
   id: serial().primaryKey(),
   fileBase64: text().notNull(),
+  fileName: varchar({ length: 256 }).notNull(),
   importedAt: timestamp(),
   createdAt: timestamp().notNull().defaultNow(),
 });

@@ -64,7 +64,7 @@ export async function GET(request: NextRequest) {
   });
 
   await browser.close();
-  return new Response(pdfBuffer, {
+  return new Response(Buffer.from(pdfBuffer), {
     headers: {
       "Content-Disposition": `attachment; filename="${fileName}"`,
       "Content-Type": "application/pdf",
