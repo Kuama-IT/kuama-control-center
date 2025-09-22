@@ -16,7 +16,6 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { sql, SQL } from "drizzle-orm";
-import { string } from "zod";
 
 export const kExternalPlatforms = pgEnum("external_platforms", [
   "github",
@@ -201,6 +200,22 @@ export const kProjects = pgTable("k_projects", {
   clientId: serial().references(() => kClients.id),
   endDate: date(),
   startDate: date(),
+  salePrice: real().default(0),
+});
+
+// Payment schedule for projects - tracks how the total project price will be divided over future months
+export const kProjectPaymentSchedule = pgTable("k_project_payment_schedule", {
+  id: serial().primaryKey(),
+  projectId: serial()
+    .references(() => kProjects.id)
+    .notNull(),
+  amount: real().notNull(),
+  dueDate: date().notNull(),
+  description: text(),
+  invoiceId: integer().references(() => kInvoices.id), // Reference to invoice when payment is invoiced
+  cashFlowEntryId: integer().references(() => cashFlowEntry.id), // Reference to cash flow entry when payment is received
+  createdAt: timestamp().notNull().defaultNow(),
+  updatedAt: timestamp().notNull().defaultNow(),
 });
 
 // A nice gallery of what we did for the client
@@ -287,7 +302,7 @@ export const pubblicaWebMonthlyBalances = pgTable(
 // export const kCommits = pgTable("k_commits", {});
 // export const kRepositories = pgTable("k_repositories", {});
 //
-// // Cash Flow Category
+
 export const cashFlowCategoryType = pgEnum("cash_flow_category_type", [
   "income",
   "expense",
@@ -299,7 +314,6 @@ export const cashFlowCategory = pgTable("cash_flow_category", {
   description: text(),
 });
 
-// // Cash Flow Client
 export const cashFlowSubject = pgTable("cash_flow_subject", {
   id: serial().primaryKey(),
   name: varchar({ length: 128 }).notNull(),
@@ -311,6 +325,7 @@ export const cashFlowEntry = pgTable("cash_flow_entry", {
   date: timestamp().notNull(),
   amount: real().notNull(),
   description: text(),
+  extendedDescription: text(),
   categoryId: integer()
     .references(() => cashFlowCategory.id)
     .notNull(),
