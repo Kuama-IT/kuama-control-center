@@ -10,10 +10,10 @@ async function Page() {
   return (
     <div className="pt-4 px-4">
       <CashFlowImports />
-      {/* <Suspense fallback={<Skeleton className="h-[200px] w-full rounded-xl" />}>
+      <Suspense fallback={<Skeleton className="h-[200px] w-full rounded-xl" />}>
         <WeeklyAbsence />
       </Suspense>
-      <PubblicaWebFolders /> */}
+      <PubblicaWebFolders />
     </div>
   );
 }

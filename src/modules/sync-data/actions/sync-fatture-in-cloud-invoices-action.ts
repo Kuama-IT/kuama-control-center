@@ -11,7 +11,8 @@ const BATCH_SIZE = 100;
 type KInvoiceInsert = typeof kInvoices.$inferInsert;
 
 const handled = handleServerErrors(async () => {
-  const fattureInCloudInvoices = await fattureInCloudApiClient.getInvoices();
+  const fattureInCloudInvoices =
+    await fattureInCloudApiClient.getIssuedInvoices();
   // group invoices by vat
   const invoicesByVat = new Map<string, IssuedDocument[]>();
   for (const fattureInCloudInvoice of fattureInCloudInvoices) {
@@ -38,7 +39,7 @@ const handled = handleServerErrors(async () => {
       FROM vat_list
       LEFT JOIN ${kVats} ON vat_list.vat = ${kVats}.vat
       WHERE ${kVats}.vat IS NULL;
-    `,
+    `
   );
 
   const missingVats: string[] = missingVatsRows.map((row) => row.vat as string);
@@ -92,13 +93,13 @@ const handled = handleServerErrors(async () => {
           };
 
           return record;
-        }),
+        })
       );
 
       await tx
         .insert(kInvoices)
         .values(
-          records.filter((record): record is KInvoiceInsert => record != null),
+          records.filter((record): record is KInvoiceInsert => record != null)
         )
         .onConflictDoNothing();
     }

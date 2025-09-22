@@ -5,6 +5,7 @@ import { handledDeleteCashFlowImport } from "../cash-flow.actions";
 import { isFailure } from "@/utils/server-action-utils";
 import { notifyError, notifySuccess } from "@/modules/ui/components/notify";
 import { Trash2 } from "lucide-react";
+import Link from "next/link";
 
 export function CashFlowImportEntry({
   entry,
@@ -57,6 +58,12 @@ export function CashFlowImportEntry({
         <div className="text-sm font-bold text-gray-600">
           File Size: {entry.fileSizeInKB} KB
         </div>
+        <Link
+          href={`/cash-flow/imports/${entry.id}/preview`}
+          className="text-sm text-blue-600 hover:underline"
+        >
+          Preview import
+        </Link>
       </div>
 
       {isPending && <div className="text-xs text-red-600">Deleting...</div>}

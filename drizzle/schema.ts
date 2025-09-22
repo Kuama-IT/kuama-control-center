@@ -70,6 +70,8 @@ export const kInvoices = pgTable("k_invoices", {
   amountGross: real().notNull().default(0),
   amountVat: real().notNull().default(0),
   date: date().notNull(),
+  dueDate: date().notNull(),
+  externalId: varchar({ length: 256 }).notNull().unique(), // id from fatture in cloud
   number: integer().notNull(),
   createdAt: timestamp().notNull().defaultNow(),
   updatedAt: timestamp().notNull().defaultNow(),
@@ -320,19 +322,32 @@ export const cashFlowSubject = pgTable("cash_flow_subject", {
   externalId: varchar({ length: 128 }),
 });
 
-export const cashFlowEntry = pgTable("cash_flow_entry", {
-  id: serial().primaryKey(),
-  date: timestamp().notNull(),
-  amount: real().notNull(),
-  description: text(),
-  extendedDescription: text(),
-  categoryId: integer()
-    .references(() => cashFlowCategory.id)
-    .notNull(),
-  subjectId: integer().references(() => cashFlowSubject.id),
-  externalId: varchar({ length: 128 }),
-  isIncome: boolean().notNull(),
-});
+export const cashFlowEntry = pgTable(
+  "cash_flow_entry",
+  {
+    id: serial().primaryKey(),
+    date: timestamp().notNull(),
+    amount: real().notNull(),
+    description: text(),
+    extendedDescription: text(),
+    categoryId: integer()
+      .references(() => cashFlowCategory.id)
+      .notNull(),
+    subjectId: integer().references(() => cashFlowSubject.id),
+    externalId: varchar({ length: 128 }),
+    isIncome: boolean().notNull(),
+  },
+  (table) => {
+    return {
+      uniqueEntry: unique("cash_flow_entry_unique").on(
+        table.date,
+        table.amount,
+        table.description,
+        table.extendedDescription
+      ),
+    };
+  }
+);
 
 // Cash Flow Import (Excel)
 export const cashFlowImport = pgTable("cash_flow_import", {

@@ -3,7 +3,9 @@ import {
   ClientsApi,
   Configuration,
   IssuedDocument,
+  IssuedDocumentsApi,
   ListIssuedDocumentsResponse,
+  ReceivedDocument,
   SuppliersApi,
 } from "@fattureincloud/fattureincloud-ts-sdk";
 import type { ListClientsResponse } from "@fattureincloud/fattureincloud-ts-sdk/src/models";
@@ -17,7 +19,7 @@ export class FattureInCloudApi {
 
   constructor(
     public readonly apiToken: string,
-    public readonly companyId: string,
+    public readonly companyId: string
   ) {
     const apiConfig = new Configuration({
       accessToken: apiToken,
@@ -36,7 +38,7 @@ export class FattureInCloudApi {
       {
         method: "GET",
         headers: this.baseHeaders,
-      },
+      }
     );
     return await res.json();
   }
@@ -50,7 +52,7 @@ export class FattureInCloudApi {
         {
           method: "GET",
           headers: this.baseHeaders,
-        },
+        }
       );
       const data: ListClientsResponse = await res.json();
       clients.push(...(data.data?.filter((it) => !!it.vat_number) ?? []));
@@ -60,10 +62,37 @@ export class FattureInCloudApi {
     return clients;
   }
 
-  async getInvoices(): Promise<Array<IssuedDocument>> {
+  async getIssuedInvoices(params?: {
+    date_from?: Date;
+    date_to?: Date;
+  }): Promise<Array<IssuedDocument>> {
     const invoices: Array<IssuedDocument> = [];
+
+    // format dates: YYYY-MM-DD
+    const formatDate = (date: Date) => {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    };
+
+    const p = new IssuedDocumentsApi();
+    // Build query parameters (note: issued documents API doesn't support date filtering)
+    const queryParams = new URLSearchParams({
+      type: "invoice",
+      per_page: "100",
+      fieldset: "detailed",
+    });
+    if (params?.date_from && params?.date_to) {
+      queryParams.append(
+        "q",
+        `date>='${formatDate(params.date_from)}' AND date<='${formatDate(params.date_to)}'`
+      );
+    }
+
     let url: string | undefined | null =
-      `${this.baseEndpoint}${this.companyId}/issued_documents?type=invoice&per_page=100`;
+      `${this.baseEndpoint}${this.companyId}/issued_documents?${queryParams.toString()}`;
+
     while (url) {
       const res = await fetch(url, {
         method: "GET",
@@ -74,11 +103,81 @@ export class FattureInCloudApi {
       url = data.next_page_url;
     }
 
+    // Filter by date after fetching (since API doesn't support date filtering)
+    if (params?.date_from || params?.date_to) {
+      return invoices.filter((invoice) => {
+        if (!invoice.date) return false;
+
+        const invoiceDate = new Date(invoice.date);
+
+        if (params.date_from) {
+          const fromDate = new Date(params.date_from);
+          if (invoiceDate < fromDate) return false;
+        }
+
+        if (params.date_to) {
+          const toDate = new Date(params.date_to);
+          if (invoiceDate > toDate) return false;
+        }
+
+        return true;
+      });
+    }
+
     return invoices;
+  }
+
+  async getReceivedInvoices(params?: {
+    date_from?: string;
+    date_to?: string;
+  }): Promise<Array<ReceivedDocument>> {
+    const receivedInvoices: Array<ReceivedDocument> = [];
+
+    // Build query parameters (note: received documents API doesn't support date filtering)
+    const queryParams = new URLSearchParams({
+      type: "expense",
+      per_page: "100",
+    });
+
+    let url: string | undefined | null =
+      `${this.baseEndpoint}${this.companyId}/received_documents?${queryParams.toString()}`;
+
+    while (url) {
+      const res = await fetch(url, {
+        method: "GET",
+        headers: this.baseHeaders,
+      });
+      const data: any = await res.json();
+      receivedInvoices.push(...(data.data ?? []));
+      url = data.next_page_url;
+    }
+
+    // Filter by date after fetching (since API doesn't support date filtering)
+    if (params?.date_from || params?.date_to) {
+      return receivedInvoices.filter((invoice) => {
+        if (!invoice.date) return false;
+
+        const invoiceDate = new Date(invoice.date);
+
+        if (params.date_from) {
+          const fromDate = new Date(params.date_from);
+          if (invoiceDate < fromDate) return false;
+        }
+
+        if (params.date_to) {
+          const toDate = new Date(params.date_to);
+          if (invoiceDate > toDate) return false;
+        }
+
+        return true;
+      });
+    }
+
+    return receivedInvoices;
   }
 }
 
 export const fattureInCloudApiClient = new FattureInCloudApi(
   serverEnv.fattureInCloudApiPersistentToken,
-  serverEnv.fattureInCloudCompanyId,
+  serverEnv.fattureInCloudCompanyId
 );

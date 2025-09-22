@@ -2,7 +2,7 @@ import { AuthenticatedPageWrapper } from "@/modules/auth/authenticated-page-wrap
 import { PageParams } from "@/modules/routing/schemas/routing-schemas";
 import { z } from "zod";
 import { ErrorMessage } from "@/modules/ui/components/error-message";
-import CashFlowImportPreview from "@/modules/cash-flow/components/cash-flow-import-preview";
+import CashFlowImportPreviewServer from "@/modules/cash-flow/components/cash-flow-import-preview-server";
 
 const paramsSchema = z.object({
   id: z.string(),
@@ -22,7 +22,7 @@ async function Page(pageParams: PageParams | undefined) {
   }
   const awaited = await pageParams.params;
   const { id } = paramsSchema.parse(awaited);
-  return <CashFlowImportPreview id={id} />;
+  return <CashFlowImportPreviewServer id={id} />;
 }
 
 export default async function (params: PageParams) {

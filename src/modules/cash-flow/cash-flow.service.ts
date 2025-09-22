@@ -1,10 +1,11 @@
 import { db } from "@/drizzle/drizzle-db";
 import { bankStatementUtils } from "./bank-statement.utils";
 import { BankStatementRead, Transaction } from "./schemas/bank-statement-read";
-import { cashFlowImport } from "@/drizzle/schema";
+import { cashFlowImport, cashFlowEntry } from "@/drizzle/schema";
 import { CashFlowImportRead } from "./schemas/cash-flow-import-read";
-import { eq } from "drizzle-orm";
+import { eq, gte, lte, and } from "drizzle-orm";
 import { CashFlowImportReadExtended } from "./schemas/cash-flow-import-read-extended";
+import { CashFlowEntryRead } from "./schemas/cash-flow-entry-read";
 import { firstOrThrow } from "@/utils/array-utils";
 
 export const cashFlowService = {
@@ -103,5 +104,85 @@ export const cashFlowService = {
       ...record,
       fileSizeInKB: ((record.fileBase64.length * 3) / 4 / 1024).toFixed(2),
     };
+  },
+
+  async getCashFlowEntriesByDateRange(
+    startDate: Date,
+    endDate: Date
+  ): Promise<CashFlowEntryRead[]> {
+    return await db
+      .select({
+        id: cashFlowEntry.id,
+        date: cashFlowEntry.date,
+        amount: cashFlowEntry.amount,
+        description: cashFlowEntry.description,
+        extendedDescription: cashFlowEntry.extendedDescription,
+        isIncome: cashFlowEntry.isIncome,
+        categoryId: cashFlowEntry.categoryId,
+      })
+      .from(cashFlowEntry)
+      .where(
+        and(
+          gte(cashFlowEntry.date, startDate),
+          lte(cashFlowEntry.date, endDate)
+        )
+      )
+      .orderBy(cashFlowEntry.date);
+  },
+
+  async createCashFlowEntries(
+    entries: {
+      date: Date;
+      amount: number;
+      description: string;
+      extendedDescription: string;
+      categoryId: number;
+      isIncome: boolean;
+      externalId?: string;
+    }[]
+  ): Promise<{ created: number; skipped: number }> {
+    if (entries.length === 0) return { created: 0, skipped: 0 };
+
+    const result = await db
+      .insert(cashFlowEntry)
+      .values(entries)
+      .onConflictDoNothing({
+        target: [
+          cashFlowEntry.date,
+          cashFlowEntry.amount,
+          cashFlowEntry.description,
+          cashFlowEntry.extendedDescription,
+        ],
+      })
+      .returning({ id: cashFlowEntry.id });
+
+    return {
+      created: result.length,
+      skipped: entries.length - result.length,
+    };
+  },
+
+  async createCashFlowEntriesFromTransactions(
+    transactions: Transaction[],
+    categoryMap: Map<number, number>
+  ): Promise<{ created: number; skipped: number }> {
+    const entries = transactions
+      .map((transaction, index) => {
+        const categoryId = categoryMap.get(index);
+        if (!categoryId) return null;
+
+        return {
+          date: transaction.date,
+          amount: Math.abs(transaction.amount),
+          description: transaction.description,
+          extendedDescription: transaction.extendedDescription,
+          categoryId,
+          isIncome: transaction.amount > 0,
+          externalId: `import_${Date.now()}_${index}`,
+        };
+      })
+      .filter((entry): entry is NonNullable<typeof entry> => entry !== null);
+
+    return await this.createCashFlowEntries(entries);
   },
 };
