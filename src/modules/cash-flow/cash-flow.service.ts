@@ -4,6 +4,8 @@ import { BankStatementRead, Transaction } from "./schemas/bank-statement-read";
 import { cashFlowImport } from "@/drizzle/schema";
 import { CashFlowImportRead } from "./schemas/cash-flow-import-read";
 import { eq } from "drizzle-orm";
+import { CashFlowImportReadExtended } from "./schemas/cash-flow-import-read-extended";
+import { firstOrThrow } from "@/utils/array-utils";
 
 export const cashFlowService = {
   async parseBankStatementXlsx(bytes: Buffer): Promise<BankStatementRead> {
@@ -80,5 +82,26 @@ export const cashFlowService = {
 
   async deleteCashFlowImport(id: number): Promise<void> {
     await db.delete(cashFlowImport).where(eq(cashFlowImport.id, id));
+  },
+  async getCashFlowImportExtended(
+    id: number
+  ): Promise<CashFlowImportReadExtended> {
+    const result = await db
+      .select({
+        id: cashFlowImport.id,
+        fileBase64: cashFlowImport.fileBase64,
+        fileName: cashFlowImport.fileName,
+        importedAt: cashFlowImport.importedAt,
+        createdAt: cashFlowImport.createdAt,
+      })
+      .from(cashFlowImport)
+      .where(eq(cashFlowImport.id, id));
+
+    const record = firstOrThrow(result);
+
+    return {
+      ...record,
+      fileSizeInKB: ((record.fileBase64.length * 3) / 4 / 1024).toFixed(2),
+    };
   },
 };
