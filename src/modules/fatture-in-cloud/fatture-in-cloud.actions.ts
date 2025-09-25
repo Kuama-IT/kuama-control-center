@@ -2,6 +2,19 @@ import { db } from "@/drizzle/drizzle-db";
 import { kInvoices } from "@/drizzle/schema";
 import { handleServerErrors } from "@/utils/server-action-utils";
 import { gte, lte, desc, and } from "drizzle-orm";
+import { fattureInCloudApiClient } from "./fatture-in-cloud-api-client";
+
+export const handledFattureInCloudClientsAll = handleServerErrors(
+  async function () {
+    return await fattureInCloudApiClient.getClients();
+  }
+);
+
+export const handledFattureInCloudSuppliersAll = handleServerErrors(
+  async function () {
+    return await fattureInCloudApiClient.getSuppliers();
+  }
+);
 
 export const handledGetFattureInCloudEmittedInvoicesGraphData =
   handleServerErrors(async function () {

@@ -34,4 +34,4 @@ export default async function (params: PageParams) {
   return await AuthenticatedPageWrapper(Page, params);
 }
 
-export const dynamic = "force-dynamic"; // opt-out of static rendering
+// export const dynamic = "force-dynamic"; // opt-out of static rendering

@@ -5,7 +5,9 @@ import {
   IssuedDocument,
   IssuedDocumentsApi,
   ListIssuedDocumentsResponse,
+  ListSuppliersResponse,
   ReceivedDocument,
+  Supplier,
   SuppliersApi,
 } from "@fattureincloud/fattureincloud-ts-sdk";
 import type { ListClientsResponse } from "@fattureincloud/fattureincloud-ts-sdk/src/models";
@@ -32,19 +34,27 @@ export class FattureInCloudApi {
     });
   }
 
-  async getSuppliers() {
-    const res = await fetch(
-      `${this.baseEndpoint}${this.companyId}/entities/suppliers`,
-      {
-        method: "GET",
-        headers: this.baseHeaders,
-      }
-    );
-    return await res.json();
+  async getSuppliers():Promise<Supplier[]> {
+    const suppliers: Supplier[] = [];
+    let hasNextPage = true;
+    while (hasNextPage) {
+      const res = await fetch(
+        `${this.baseEndpoint}${this.companyId}/entities/suppliers?per_page=100`,
+        {
+          method: "GET",
+          headers: this.baseHeaders,
+        }
+      );
+      const data: ListSuppliersResponse = await res.json();
+      suppliers.push(...(data.data?.filter((it) => !!it.vat_number) ?? []));
+      hasNextPage = data.next_page_url !== null;
+    }
+
+    return suppliers;
   }
 
-  async getClients(): Promise<Array<Client>> {
-    const clients: Array<Client> = [];
+  async getClients(): Promise<Client[]> {
+    const clients: Client[] = [];
     let hasNextPage = true;
     while (hasNextPage) {
       const res = await fetch(

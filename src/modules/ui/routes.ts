@@ -1,8 +1,8 @@
 export const routes = {
-  clients: () => "/k-clients",
+  clients: () => "/clients",
+  client: (id: number) => `/clients/${id}`,
   employees: () => "/k-employees",
+  employee: (id: number) => `/k-employees/${id}`,
   dashboard: () => "/k-dashboard",
   settings: () => "/settings",
-  client: (id: number) => `/k-clients/${id}`,
-  employee: (id: number) => `/k-employees/${id}`,
 };
