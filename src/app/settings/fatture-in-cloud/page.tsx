@@ -33,6 +33,8 @@ export default async function Page() {
       <div className="flex gap-4 items-center">
         <BackButton />
         <Title icon={<IoMdSettings />}>Gestione Fatture in Cloud </Title>
+      </div>
+      <div className="flex flex-col gap-4">
         <FattureInCloudClientList clients={fattureInCloudClients} />
         <FattureInCloudSupplierList suppliers={fattureInCloudSuppliers} />
       </div>

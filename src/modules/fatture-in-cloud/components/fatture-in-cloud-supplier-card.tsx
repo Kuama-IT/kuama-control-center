@@ -1,3 +1,4 @@
+"use client";
 import { Supplier } from "@fattureincloud/fattureincloud-ts-sdk";
 
 export function FattureInCloudSupplierCard({

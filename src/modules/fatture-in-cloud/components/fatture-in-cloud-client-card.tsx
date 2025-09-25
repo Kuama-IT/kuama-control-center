@@ -1,6 +1,6 @@
+"use client";
 import { cn } from "@/lib/utils";
 import { Client } from "@fattureincloud/fattureincloud-ts-sdk";
-import { on } from "events";
 
 export const FattureInCloudClientCard = ({
   client,

@@ -34,20 +34,19 @@ export class FattureInCloudApi {
     });
   }
 
-  async getSuppliers():Promise<Supplier[]> {
+  async getSuppliers(): Promise<Supplier[]> {
     const suppliers: Supplier[] = [];
     let hasNextPage = true;
+    let url = `${this.baseEndpoint}${this.companyId}/entities/suppliers?per_page=100`;
     while (hasNextPage) {
-      const res = await fetch(
-        `${this.baseEndpoint}${this.companyId}/entities/suppliers?per_page=100`,
-        {
-          method: "GET",
-          headers: this.baseHeaders,
-        }
-      );
+      const res = await fetch(url, {
+        method: "GET",
+        headers: this.baseHeaders,
+      });
       const data: ListSuppliersResponse = await res.json();
-      suppliers.push(...(data.data?.filter((it) => !!it.vat_number) ?? []));
+      suppliers.push(...(data.data ?? []));
       hasNextPage = data.next_page_url !== null;
+      url = data.next_page_url ?? "";
     }
 
     return suppliers;
@@ -56,17 +55,16 @@ export class FattureInCloudApi {
   async getClients(): Promise<Client[]> {
     const clients: Client[] = [];
     let hasNextPage = true;
+    let url = `${this.baseEndpoint}${this.companyId}/entities/clients?per_page=100`;
     while (hasNextPage) {
-      const res = await fetch(
-        `${this.baseEndpoint}${this.companyId}/entities/clients?per_page=100`,
-        {
-          method: "GET",
-          headers: this.baseHeaders,
-        }
-      );
+      const res = await fetch(url, {
+        method: "GET",
+        headers: this.baseHeaders,
+      });
       const data: ListClientsResponse = await res.json();
-      clients.push(...(data.data?.filter((it) => !!it.vat_number) ?? []));
+      clients.push(...(data.data ?? []));
       hasNextPage = data.next_page_url !== null;
+      url = data.next_page_url ?? "";
     }
 
     return clients;
