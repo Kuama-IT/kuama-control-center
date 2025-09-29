@@ -280,7 +280,6 @@ export const pubblicaWebPayrolls = pgTable(
     gross: real().notNull(),
   },
   (t) => [
-    // each employee can have only one payslip for each month of a year
     unique("employeeName_year_month").on(t.employeeName, t.year, t.month),
   ]
 );
@@ -294,7 +293,6 @@ export const pubblicaWebMonthlyBalances = pgTable(
     total: real().notNull(),
   },
   (t) => [
-    // only one balance for each month of a year
     unique("year_month").on(t.year, t.month),
   ]
 );

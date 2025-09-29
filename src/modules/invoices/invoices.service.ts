@@ -9,7 +9,13 @@ export const invoicesService = {
     // group invoices by vat
     const invoicesByVat = new Map<string, IssuedDocument[]>();
     for (const fattureInCloudInvoice of issuedDocuments) {
+      // for some reason we are not receiving vat for Nimika...
+      if (fattureInCloudInvoice.entity?.name === "Ennkaye Consulting Limited") {
+        fattureInCloudInvoice.entity.vat_number = "13352539";
+      }
+
       const vat = fattureInCloudInvoice.entity?.vat_number;
+
       if (!vat) {
         continue;
       }
@@ -32,11 +38,11 @@ export const invoicesService = {
       FROM vat_list
       LEFT JOIN ${kVats} ON vat_list.vat = ${kVats}.vat
       WHERE ${kVats}.vat IS NULL;
-    `
+    `,
     );
 
     const missingVats: string[] = missingVatsRows.map(
-      (row) => row.vat as string
+      (row) => row.vat as string,
     );
 
     if (missingVats.length > 0) {
@@ -68,15 +74,15 @@ export const invoicesService = {
         .where(
           inArray(
             kInvoices.externalId,
-            issuedDocuments.map((doc) => doc.id?.toString() || "")
-          )
+            issuedDocuments.map((doc) => doc.id?.toString() || ""),
+          ),
         );
       const existingInvoiceIds = new Set(
-        existingInvoices.map((inv) => inv.externalId)
+        existingInvoices.map((inv) => inv.externalId),
       );
 
       const newInvoices = issuedDocuments.filter(
-        (doc) => doc.id && !existingInvoiceIds.has(doc.id.toString())
+        (doc) => doc.id && !existingInvoiceIds.has(doc.id.toString()),
       );
       if (newInvoices.length === 0) {
         return { success: true, message: "No new invoices to create" };
@@ -85,10 +91,13 @@ export const invoicesService = {
       for (const fattureInCloudInvoice of newInvoices) {
         const vat = fattureInCloudInvoice.entity?.vat_number;
         if (!vat) {
-          throw new Error("Invoice entity VAT number is missing");
+          console.error(fattureInCloudInvoice.entity);
+          throw new Error(
+            `Invoice entity VAT number is missing for ${fattureInCloudInvoice.number} - ${fattureInCloudInvoice.entity?.name}`,
+          );
         }
         const vatRecord = await firstOrThrow(
-          await tx.select().from(kVats).where(eq(kVats.vat, vat))
+          await tx.select().from(kVats).where(eq(kVats.vat, vat)),
         );
 
         if (!fattureInCloudInvoice.payments_list?.[0]?.due_date) {
@@ -105,7 +114,7 @@ export const invoicesService = {
           externalId: fattureInCloudInvoice.id?.toString() || "",
           number: fattureInCloudInvoice.number ?? 0,
         };
-        
+
         insertValues.push(record);
       }
 
