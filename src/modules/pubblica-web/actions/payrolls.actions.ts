@@ -30,54 +30,91 @@ export const handledSyncEmployeePayrolls = handleServerErrors(async function ({
 
   // fetch all monthly payslips for the year
   for (let month = 1; month < 14; month++) {
-    let payslips: {
-      bytes: ArrayBuffer;
-      mimeType: string;
-      name: string;
-    };
-    try {
-      payslips = await pubblicaWebClient.fetchPayslips(parseInt(year), month);
-    } catch (e) {
-      console.log(`No payslip found for ${year}/${month}`);
-      continue;
-    }
-
-    console.log(`fetching payslips for ${year}/${month}`);
-    const salaryInfos = await pubblicaWebUtils.parseMultiPageSalaries(
-      new Uint8Array(payslips.bytes).buffer
+    await downloadAndUpsertEmployeePayrollsByYearAndMonth(
+      year,
+      month,
+      pubblicaWebClient
     );
-
-    // payslip.name = LUL-2021-01.pdf
-
-    for (const salaryInfo of salaryInfos) {
-      console.log(
-        `Saving payslip for ${salaryInfo.fullName} - ${year}/${month} - birthdate: ${salaryInfo.birthDate} - net: ${salaryInfo.net} - gross: ${salaryInfo.gross}`
-      );
-      await db
-        .insert(pubblicaWebPayrolls)
-        .values({
-          employeeName: salaryInfo.fullName,
-          year: parseInt(year),
-          month: month,
-          birthDate: salaryInfo.birthDate,
-          net: salaryInfo.net,
-          gross: salaryInfo.gross,
-        })
-        .onConflictDoUpdate({
-          target: [
-            pubblicaWebPayrolls.employeeName,
-            pubblicaWebPayrolls.year,
-            pubblicaWebPayrolls.month,
-          ],
-          set: {
-            net: salaryInfo.net,
-            gross: salaryInfo.gross,
-            birthDate: salaryInfo.birthDate,
-          },
-        });
-    }
   }
 });
+
+export const handledSynccurrentMonthEmployeePayrolls = handleServerErrors(
+  async function () {
+    const now = new Date();
+    const year = now.getFullYear().toString();
+    const month = now.getMonth() + 1;
+
+    // TODO handle 13esima in December
+
+    const pubblicaWebClient = new PubblicaWebApi(
+      serverEnv.pubblicaWebUsername,
+      serverEnv.pubblicaWebPassword
+    );
+
+    await pubblicaWebClient.authenticate();
+
+    await downloadAndUpsertEmployeePayrollsByYearAndMonth(
+      year,
+      month,
+      pubblicaWebClient
+    );
+  }
+);
+
+const downloadAndUpsertEmployeePayrollsByYearAndMonth = async (
+  year: string,
+  month: number,
+  pubblicaWebClient: PubblicaWebApi
+) => {
+  let payslips: {
+    bytes: ArrayBuffer;
+    mimeType: string;
+    name: string;
+  };
+  try {
+    payslips = await pubblicaWebClient.fetchPayslips(parseInt(year), month);
+  } catch (e) {
+    console.log(`No payslip found for ${year}/${month}`);
+    return;
+  }
+
+  console.log(`fetching payslips for ${year}/${month}`);
+  const salaryInfos = await pubblicaWebUtils.parseMultiPageSalaries(
+    new Uint8Array(payslips.bytes).buffer
+  );
+
+  // payslip.name = LUL-2021-01.pdf
+
+  for (const salaryInfo of salaryInfos) {
+    console.log(
+      `Saving payslip for ${salaryInfo.fullName} - ${year}/${month} - birthdate: ${salaryInfo.birthDate} - net: ${salaryInfo.net} - gross: ${salaryInfo.gross}`
+    );
+    await db
+      .insert(pubblicaWebPayrolls)
+      .values({
+        employeeName: salaryInfo.fullName,
+        year: parseInt(year),
+        month: month,
+        net: salaryInfo.net,
+        gross: salaryInfo.gross,
+        birthDate: salaryInfo.birthDate,
+        payrollFileBase64: salaryInfo.pageAsPdfBase64,
+      })
+      .onConflictDoUpdate({
+        target: [
+          pubblicaWebPayrolls.employeeName,
+          pubblicaWebPayrolls.year,
+          pubblicaWebPayrolls.month,
+        ],
+        set: {
+          net: salaryInfo.net,
+          gross: salaryInfo.gross,
+          birthDate: salaryInfo.birthDate,
+          payrollFileBase64: salaryInfo.pageAsPdfBase64,
+        },
+      });
+  }
+};
 
 export const handledSyncPayslipsMonthlyBalances = handleServerErrors(
   async function ({ year }: { year: string }) {
@@ -106,6 +143,10 @@ export const handledSyncPayslipsMonthlyBalances = handleServerErrors(
         new Uint8Array(balanceDocuments.bytes).buffer
       );
 
+      const fileBase64 = Buffer.from(
+        new Uint8Array(balanceDocuments.bytes)
+      ).toString("base64");
+
       console.log(`Saving monthly balance for ${year}/${month}`);
       await db
         .insert(pubblicaWebMonthlyBalances)
@@ -113,6 +154,7 @@ export const handledSyncPayslipsMonthlyBalances = handleServerErrors(
           year: parseInt(year),
           month: month,
           total: balance.totalBusinessCost,
+          fileBase64,
         })
         .onConflictDoUpdate({
           target: [
@@ -121,6 +163,7 @@ export const handledSyncPayslipsMonthlyBalances = handleServerErrors(
           ],
           set: {
             total: balance.totalBusinessCost,
+            fileBase64,
           },
         });
     }

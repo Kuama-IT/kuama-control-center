@@ -278,10 +278,9 @@ export const pubblicaWebPayrolls = pgTable(
     createdAt: timestamp().notNull().defaultNow(),
     net: real().notNull(),
     gross: real().notNull(),
+    payrollFileBase64: text(),
   },
-  (t) => [
-    unique("employeeName_year_month").on(t.employeeName, t.year, t.month),
-  ]
+  (t) => [unique("employeeName_year_month").on(t.employeeName, t.year, t.month)]
 );
 export const pubblicaWebMonthlyBalances = pgTable(
   "pubblica_web_monthly_balances",
@@ -291,10 +290,9 @@ export const pubblicaWebMonthlyBalances = pgTable(
     month: integer().notNull(),
     createdAt: timestamp().notNull().defaultNow(),
     total: real().notNull(),
+    fileBase64: text(),
   },
-  (t) => [
-    unique("year_month").on(t.year, t.month),
-  ]
+  (t) => [unique("year_month").on(t.year, t.month)]
 );
 
 //
@@ -307,6 +305,7 @@ export const cashFlowCategoryType = pgEnum("cash_flow_category_type", [
   "income",
   "expense",
 ]);
+
 export const cashFlowCategory = pgTable("cash_flow_category", {
   id: serial().primaryKey(),
   name: varchar({ length: 128 }).notNull(),
@@ -335,16 +334,14 @@ export const cashFlowEntry = pgTable(
     externalId: varchar({ length: 128 }),
     isIncome: boolean().notNull(),
   },
-  (table) => {
-    return {
-      uniqueEntry: unique("cash_flow_entry_unique").on(
-        table.date,
-        table.amount,
-        table.description,
-        table.extendedDescription
-      ),
-    };
-  }
+  (table) => [
+    unique("cash_flow_entry_unique").on(
+      table.date,
+      table.amount,
+      table.description,
+      table.extendedDescription
+    ),
+  ]
 );
 
 // Cash Flow Import (Excel)

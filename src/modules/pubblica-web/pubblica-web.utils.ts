@@ -30,7 +30,17 @@ export const pubblicaWebUtils = {
         `Could not find any page in the salary PDF or salary has more than one page`
       );
     }
-    return await readPayrollInfosFromfPage(salaryPage);
+
+    const salaryInfo = await readPayrollInfosFromfPage(salaryPage);
+
+    // For single page, extract the entire document as PDF
+    const pageAsPdf = await pdfUtils.extractPageAsPdf(buffer, 0);
+    const pageAsPdfBase64 = Buffer.from(pageAsPdf).toString("base64");
+
+    return {
+      ...salaryInfo,
+      pageAsPdfBase64,
+    };
   },
   async parseMultiPageSalaries(buffer: ArrayBufferLike) {
     const parsedPdf = await pdfUtils.loadPdfStructure(buffer);
@@ -46,7 +56,15 @@ export const pubblicaWebUtils = {
       }
       try {
         const salaryInfo = await readPayrollInfosFromfPage(pageWithAmounts);
-        salaries.push(salaryInfo);
+
+        // Extract the individual page as PDF
+        const pageAsPdf = await pdfUtils.extractPageAsPdf(buffer, i);
+        const pageAsPdfBase64 = Buffer.from(pageAsPdf).toString("base64");
+
+        salaries.push({
+          ...salaryInfo,
+          pageAsPdfBase64,
+        });
       } catch (e) {
         console.error(`Error parsing salary on page ${i + 1}:`, e);
         // some LUL have salaries up to the last 4 pages, a.k.a. it's ok to get exceptions on the last 4 pages
