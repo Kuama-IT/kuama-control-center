@@ -12,8 +12,8 @@
 
 # testing
 /coverage
-.pdf
-.xlsx
+*.pdf
+*.xlsx
 
 # next.js
 /.next/
