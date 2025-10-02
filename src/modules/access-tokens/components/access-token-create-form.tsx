@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useTransition } from "react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -25,8 +25,7 @@ import {
 import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 
-import createKAccessToken from "@/modules/k-access-tokens/actions/k-access-token-create";
-import { isFailure } from "@/utils/server-action-utils";
+import { useCreateAccessTokenMutation } from "@/modules/access-tokens/mutations/access-tokens.mutations";
 import { notifyError, notifySuccess } from "@/modules/ui/components/notify";
 import { useRouter } from "next/navigation";
 
@@ -58,9 +57,9 @@ const formSchema = z
 
 type FormData = z.infer<typeof formSchema>;
 
-export const KAccessTokenCreateForm = () => {
-  const [isPending, transition] = useTransition();
+export const AccessTokenCreateForm = () => {
   const router = useRouter();
+  const { mutateAsync, isPending } = useCreateAccessTokenMutation();
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -91,22 +90,23 @@ export const KAccessTokenCreateForm = () => {
     }
   }, [watchInfinity, watchExpires]);
 
-  const onSubmit = (values: FormData) => {
-    transition(async () => {
-      const res = await createKAccessToken({
+  const onSubmit = async (values: FormData) => {
+    try {
+      const res = await mutateAsync({
         purpose: values.purpose,
         expiresAt: values.expiresAt ?? null,
         allowedUsages: values.allowedUsages,
       });
 
-      if (isFailure(res)) {
-        notifyError("Error while creating access token, check server logs");
-        return;
-      }
-
       notifySuccess(res.message);
       router.refresh();
-    });
+    } catch (error) {
+      const message =
+        typeof error === "object" && error !== null && "message" in error
+          ? String((error as { message: string }).message)
+          : "Error while creating access token, check server logs";
+      notifyError(message);
+    }
   };
 
   return (
@@ -198,7 +198,7 @@ export const KAccessTokenCreateForm = () => {
                         variant={"outline"}
                         className={cn(
                           "w-[240px] pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground",
+                          !field.value && "text-muted-foreground"
                         )}
                       >
                         {field.value ? (

@@ -3,7 +3,7 @@ import { kEmployeesServer } from "@/modules/k-employees/k-employee-server";
 import { isFailure } from "@/utils/server-action-utils";
 import { kAbsenceDaysServer } from "@/modules/k-absence-days/k-absence-days-server";
 import { parse } from "date-fns";
-import { kAccessTokensServer } from "@/modules/k-access-tokens/k-access-tokens-server";
+import { accessTokensServer } from "@/modules/access-tokens/access-tokens.server";
 import {
   accessTokenParamsSchema,
   datePeriodParamsSchema,
@@ -30,9 +30,7 @@ export default async function Page({ searchParams }: PageParams) {
     );
   }
 
-  const result = await kAccessTokensServer.manage(
-    parsedParams.data.accessToken,
-  );
+  const result = await accessTokensServer.manage(parsedParams.data.accessToken);
   if (isFailure(result)) {
     return <ErrorMessage failure={result} />;
   }

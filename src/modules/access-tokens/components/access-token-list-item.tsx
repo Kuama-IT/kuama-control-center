@@ -4,23 +4,19 @@ import { InfinityIcon, TrashIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
-import deleteKAccessToken from "@/modules/k-access-tokens/actions/k-access-token-delete";
-import { isFailure } from "@/utils/server-action-utils";
-import { notifyError, notifySuccess } from "@/modules/ui/components/notify";
-import { format } from "date-fns";
+import { deleteAccessToken } from "@/modules/access-tokens/access-tokens.actions";
+import { AccessTokenRead } from "@/modules/access-tokens/schemas/access-token.schema";
 import { CopyButton } from "@/modules/ui/components/copy-button";
-import { KAccessTokenRead } from "@/modules/k-access-tokens/schemas/k-access-token-schemas";
+import { notifyError, notifySuccess } from "@/modules/ui/components/notify";
+import { isFailure } from "@/utils/server-action-utils";
+import { format } from "date-fns";
 
-export const KAccessTokenListItem = ({
-  token,
-}: {
-  token: KAccessTokenRead;
-}) => {
+export const AccessTokenListItem = ({ token }: { token: AccessTokenRead }) => {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
   const deleteToken = () => {
     startTransition(async () => {
-      const res = await deleteKAccessToken({ id: token.id });
+      const res = await deleteAccessToken({ id: token.id });
 
       if (isFailure(res)) {
         notifyError("Error while deleting access token, check server logs");

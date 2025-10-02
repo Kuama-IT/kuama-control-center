@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import puppeteer from "puppeteer-core";
 import { serverEnv } from "@/env/server-env";
-import { kAccessTokensServer } from "@/modules/k-access-tokens/k-access-tokens-server";
+import { accessTokensServer } from "@/modules/access-tokens/access-tokens.server";
 import { isFailure } from "@/utils/server-action-utils";
 
 export async function GET(request: NextRequest) {
@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
   if (!url) {
     return Response.json(
       { message: `A ?url query-parameter is required` },
-      { status: 400 },
+      { status: 400 }
     );
   }
 
@@ -26,11 +26,11 @@ export async function GET(request: NextRequest) {
   if (!fileName) {
     return Response.json(
       { message: `A ?fileName query-parameter is required` },
-      { status: 400 },
+      { status: 400 }
     );
   }
 
-  const accessTokenCreateResult = await kAccessTokensServer.create({
+  const accessTokenCreateResult = await accessTokensServer.create({
     purpose: `PDF generation for ${url}`,
     allowedUsages: 1,
     expiresAt: null,

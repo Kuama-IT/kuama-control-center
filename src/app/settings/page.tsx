@@ -5,8 +5,8 @@ import SyncDipendentiInCloud from "@/modules/dipendenti-in-cloud/components/sync
 import SyncFattureInCloud from "@/modules/fatture-in-cloud/components/sync-fatture-in-cloud";
 import { SyncYoutrack } from "@/modules/settings/components/sync-youtrack";
 import SyncPubblicaWeb from "@/modules/pubblica-web/components/sync-pubblica-web";
+import AccessTokenManagement from "@/modules/access-tokens/components/access-token-management";
 import KPlatformCredentialsList from "@/modules/k-platform-credentials/components/k-platform-credentials-list";
-import KAccessTokenManagement from "@/modules/k-access-tokens/components/k-access-token-management";
 import { BackButton } from "@/modules/ui/components/back-button";
 import { AuthenticatedPageWrapper } from "@/modules/auth/authenticated-page-wrapper";
 
@@ -30,7 +30,7 @@ async function Page() {
         <SyncPubblicaWeb />
         <SyncFattureInCloud />
         <div className="col-span-4">
-          <KAccessTokenManagement />
+          <AccessTokenManagement />
         </div>
       </div>
     </div>

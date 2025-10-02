@@ -6,7 +6,7 @@ import { DateRange } from "react-day-picker";
 import syncDipendentiInCloudTimesheet from "@/modules/dipendenti-in-cloud/actions/sync-dipendenti-in-cloud-timesheet-action";
 import syncDipendentiInCloudEmployees from "@/modules/dipendenti-in-cloud/actions/dipendenti-in-cloud-import-employees-action";
 import syncDipendentiInCloudAbsenceReasonsAndClosures from "@/modules/dipendenti-in-cloud/actions/dipendenti-in-cloud-import-absence-reasons-and-closures";
-import getNonExpiredToken from "@/modules/k-access-tokens/actions/k-access-token-get-not-expired";
+import { getUnlimitedAccessToken } from "@/modules/access-tokens/access-tokens.actions";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { FaArrowRight, FaCalendar, FaEye, FaSync } from "react-icons/fa";
@@ -54,9 +54,9 @@ const PreviewEmployeePresenceReport = () => {
   useEffect(() => {
     setOrigin(location?.origin);
     startTransition(async () => {
-      const kAccessToken = await getNonExpiredToken();
-      if (!isFailure(kAccessToken)) {
-        setAccessToken(kAccessToken.token);
+      const accessTokenRecord = await getUnlimitedAccessToken();
+      if (!isFailure(accessTokenRecord)) {
+        setAccessToken(accessTokenRecord.token);
       }
     });
   }, []);
@@ -120,7 +120,7 @@ const SyncEmployeeData = () => {
       const res = await syncDipendentiInCloudEmployees();
       if (isFailure(res)) {
         notifyError(
-          "Error while syncing dipendenti in cloud employees general info",
+          "Error while syncing dipendenti in cloud employees general info"
         );
         return;
       }

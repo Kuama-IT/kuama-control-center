@@ -5,7 +5,7 @@ import {
   PageParams,
 } from "@/modules/routing/schemas/routing-schemas";
 import { z } from "zod";
-import { kAccessTokensServer } from "@/modules/k-access-tokens/k-access-tokens-server";
+import { accessTokensServer } from "@/modules/access-tokens/access-tokens.server";
 import { isFailure } from "@/utils/server-action-utils";
 import { parse } from "date-fns";
 import { ErrorMessage } from "@/modules/ui/components/error-message";
@@ -13,7 +13,7 @@ import { ErrorMessage } from "@/modules/ui/components/error-message";
 const paramsSchema = datePeriodParamsSchema.and(accessTokenParamsSchema).and(
   z.object({
     credentialsId: z.string(),
-  }),
+  })
 );
 
 export default async function Page({ searchParams }: PageParams) {
@@ -31,9 +31,7 @@ export default async function Page({ searchParams }: PageParams) {
     );
   }
 
-  const result = await kAccessTokensServer.manage(
-    parsedParams.data.accessToken,
-  );
+  const result = await accessTokensServer.manage(parsedParams.data.accessToken);
   if (isFailure(result)) {
     return <ErrorMessage failure={result} />;
   }
