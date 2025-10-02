@@ -3,10 +3,10 @@ import {
   YouTrackIssue,
 } from "@/modules/you-track/schemas/youtrack-schemas";
 import { db } from "@/drizzle/drizzle-db";
-import { kTasks, kTeams } from "@/drizzle/schema";
+import { kTasks, teams } from "@/drizzle/schema";
 
 import { format } from "date-fns";
-import { KProjectsRead } from "@/modules/k-projects/schemas/k-projects-schemas";
+import { ProjectRead } from "@/modules/projects/schemas/projects.read.schema";
 
 export type SyncYouTrackIssuesFromWorkItemsResult = {
   id: number;
@@ -15,8 +15,8 @@ export type SyncYouTrackIssuesFromWorkItemsResult = {
 
 export const syncYouTrackIssuesFromWorkItems = async (
   workItems: WorkTimeListResponse,
-  projects: KProjectsRead[],
-  employeeId: number,
+  projects: ProjectRead[],
+  employeeId: number
 ) => {
   console.log(`syncYouTrackIssuesFromWorkItems -> ${workItems.length}`);
   const workItemsIssues = workItems.map((workItem) => workItem.issue);
@@ -53,12 +53,12 @@ export const syncYouTrackIssuesFromWorkItems = async (
   // get all projects unique
   await db.transaction(async (tx) => {
     for (const [projectRingId, projectId] of teamProjectsMap) {
-      const payload: typeof kTeams.$inferInsert = {
+      const payload: typeof teams.$inferInsert = {
         employeeId: employeeId,
         projectId: projectId,
       };
 
-      await tx.insert(kTeams).values(payload).onConflictDoNothing();
+      await tx.insert(teams).values(payload).onConflictDoNothing();
     }
   });
 
@@ -67,7 +67,7 @@ export const syncYouTrackIssuesFromWorkItems = async (
   await db.transaction(async (tx) => {
     for (const issue of issues) {
       const project = projects.find(
-        (it) => it.youTrackRingId === issue.project.ringId,
+        (it) => it.youTrackRingId === issue.project.ringId
       );
 
       if (!project) {

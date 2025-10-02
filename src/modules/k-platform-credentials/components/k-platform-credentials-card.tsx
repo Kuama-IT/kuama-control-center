@@ -67,8 +67,8 @@ export const KPlatformCredentialsCard = ({
         </Badge>
         <h3 className="font-bold uppercase text-sm">{credentials.name}</h3>
 
-        {credentials.kProject && <p>{credentials.kProject.name}</p>}
-        {credentials.kEmployee && <p>{credentials.kEmployee.fullName}</p>}
+        {credentials.project && <p>{credentials.project.name}</p>}
+        {credentials.employee && <p>{credentials.employee.fullName}</p>}
       </div>
 
       <div className="flex items-center justify-between w-full">
@@ -119,7 +119,7 @@ const DownloadTimesheetButton = ({
 }) => {
   // TODO, we should just use location.origin, but Bless service cannot reach us in localhost...
 
-  const reportName = credentials.kEmployee?.fullName ?? credentials.name;
+  const reportName = credentials.employee?.fullName ?? credentials.name;
   const fileName = `${reportName.toLowerCase().replaceAll(" ", "-")}-report.pdf`;
 
   const syncButtonToggle = useRef<HTMLButtonElement>(null);

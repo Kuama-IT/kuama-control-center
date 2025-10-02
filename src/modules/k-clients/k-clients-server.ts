@@ -10,7 +10,7 @@ import {
   KVatRead,
 } from "@/modules/k-clients/schemas/k-clients-schemas";
 
-export type KProjectWithTeam = {
+export type ProjectWithTeam = {
   id: number;
   name: string | null;
   team: KEmployeesRead[];
@@ -20,7 +20,7 @@ export type KClientListItem = KClientRead & {
   projectsCount: number;
   employeesWorkingForClientCount: number;
   kVats: Array<KVatRead>;
-  projects: KProjectWithTeam[];
+  projects: ProjectWithTeam[];
 };
 
 export const kClientsServer = {

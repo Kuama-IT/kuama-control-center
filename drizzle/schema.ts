@@ -54,7 +54,7 @@ export const kPlatformCredentialsToEmployeesAndProjects = pgTable(
     }),
     foreignKey({
       columns: [table.projectId],
-      foreignColumns: [kProjects.id],
+      foreignColumns: [projects.id],
       name: "fk_project_id",
     }),
   ]
@@ -77,9 +77,9 @@ export const kInvoices = pgTable("k_invoices", {
   updatedAt: timestamp().notNull().defaultNow(),
 });
 
-export const kInvoicesToProjects = pgTable("k_invoices_to_projects", {
+export const invoiceProjects = pgTable("invoice_projects", {
   invoiceId: serial().references(() => kInvoices.id),
-  projectId: serial().references(() => kProjects.id),
+  projectId: serial().references(() => projects.id),
 });
 
 // Our clients can have more than one VAT number
@@ -107,17 +107,17 @@ export const kClients = pgTable("k_clients", {
 });
 
 // We can agree with the client to have a fixed daily rate for a project...
-export const kProjectDailyRates = pgTable("k_project_daily_rates", {
+export const projectDailyRates = pgTable("project_daily_rates", {
   id: serial().primaryKey(),
   employee: serial().references(() => kEmployees.id),
-  project: serial().references(() => kProjects.id),
+  project: serial().references(() => projects.id),
   rate: real().notNull(),
 });
 
 // ... or a fixed monthly rate
-export const kProjectsMonthlyRates = pgTable("k_projects_monthly_rates", {
+export const projectMonthlyRates = pgTable("project_monthly_rates", {
   id: serial().primaryKey(),
-  project: serial().references(() => kProjects.id),
+  project: serial().references(() => projects.id),
   rate: real().notNull(),
 });
 
@@ -194,7 +194,7 @@ export const kPresenceDays = pgTable("k_presence_days", {
   duration: interval({ fields: "minute" }),
 });
 
-export const kProjects = pgTable("k_projects", {
+export const projects = pgTable("projects", {
   id: serial().primaryKey(),
   name: varchar({ length: 256 }),
   description: text(),
@@ -206,10 +206,10 @@ export const kProjects = pgTable("k_projects", {
 });
 
 // Payment schedule for projects - tracks how the total project price will be divided over future months
-export const kProjectPaymentSchedule = pgTable("k_project_payment_schedule", {
+export const projectPaymentSchedule = pgTable("project_payment_schedule", {
   id: serial().primaryKey(),
   projectId: serial()
-    .references(() => kProjects.id)
+    .references(() => projects.id)
     .notNull(),
   amount: real().notNull(),
   dueDate: date().notNull(),
@@ -221,10 +221,10 @@ export const kProjectPaymentSchedule = pgTable("k_project_payment_schedule", {
 });
 
 // A nice gallery of what we did for the client
-export const kProjectMedias = pgTable("k_project_medias", {
+export const projectMedias = pgTable("project_medias", {
   id: serial().primaryKey(),
   url: text(),
-  projectId: serial().references(() => kProjects.id),
+  projectId: serial().references(() => projects.id),
 });
 
 // Mainly used to generate reports
@@ -234,7 +234,7 @@ export const kTasks = pgTable("k_tasks", {
   description: text(),
   platform: kExternalPlatforms().notNull(),
   externalTrackerId: varchar({ length: 256 }).unique(),
-  projectId: serial().references(() => kProjects.id),
+  projectId: serial().references(() => projects.id),
   employeeId: serial().references(() => kEmployees.id),
   creationDate: date(),
 });
@@ -250,10 +250,10 @@ export const kSpentTimes = pgTable("k_spent_times", {
   taskId: serial().references(() => kTasks.id),
 });
 
-export const kTeams = pgTable("k_teams", {
+export const teams = pgTable("teams", {
   id: serial().primaryKey(),
   employeeId: serial().references(() => kEmployees.id),
-  projectId: serial().references(() => kProjects.id),
+  projectId: serial().references(() => projects.id),
 });
 
 // Used to grant access temporarily to the site to user that do not have an account

@@ -7,6 +7,7 @@
     "dev:turbo": "next dev --turbopack",
     "build": "next build --experimental-compiler typescript-experimental --turbopack",
     "help": "next build --help",
+    "type-check": "tsc --noEmit",
     "build:ci": "next build --experimental-build-mode compile",
     "start": "next start",
     "lint": "next lint",

@@ -3,8 +3,8 @@ import {
   kClients,
   kClientsVats,
   kEmployees,
-  kProjects,
-  kTeams,
+  projects as projectsTable,
+  teams,
   kVats,
 } from "@/drizzle/schema";
 import { asc, eq } from "drizzle-orm";
@@ -22,18 +22,18 @@ const readClientsWithDetails = async () =>
       youTrackRingId: kClients.youTrackRingId,
       vatId: kClientsVats.vatId,
       vat: kVats,
-      projectId: kProjects.id,
-      projectName: kProjects.name,
-      teamEmployeeId: kTeams.employeeId,
+      projectId: projectsTable.id,
+      projectName: projectsTable.name,
+      teamEmployeeId: teams.employeeId,
       employeeId: kEmployees.id,
       employee: kEmployees,
     })
     .from(kClients)
     .leftJoin(kClientsVats, eq(kClients.id, kClientsVats.clientId))
     .leftJoin(kVats, eq(kClientsVats.vatId, kVats.id))
-    .leftJoin(kProjects, eq(kClients.id, kProjects.clientId))
-    .leftJoin(kTeams, eq(kProjects.id, kTeams.projectId))
-    .leftJoin(kEmployees, eq(kTeams.employeeId, kEmployees.id))
+    .leftJoin(projectsTable, eq(kClients.id, projectsTable.clientId))
+    .leftJoin(teams, eq(projectsTable.id, teams.projectId))
+    .leftJoin(kEmployees, eq(teams.employeeId, kEmployees.id))
     .orderBy(asc(kClients.name));
 
 const clientsWithProjectsAndTeam = async () => {
@@ -98,7 +98,7 @@ const clientsWithProjectsAndTeam = async () => {
 const kClientsListAllAction = async (): Promise<KClientListItem[]> => {
   const clients = await clientsWithProjectsAndTeam();
   return clients.filter(
-    (client) => client.projectsCount > 0 || client.name === "Kuama",
+    (client) => client.projectsCount > 0 || client.name === "Kuama"
   );
 };
 

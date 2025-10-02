@@ -6,7 +6,7 @@ import KClientReportedSpentTimeGraph from "@/modules/k-clients/components/k-clie
 
 import { KClientGetOneResult } from "@/modules/k-clients/actions/k-client-get-one-action";
 import { BackButton } from "@/modules/ui/components/back-button";
-import { KProject } from "@/modules/k-projects/components/k-project";
+import { Project } from "@/modules/projects/components/project";
 import { Skeleton } from "@/components/ui/skeleton";
 import { isFailure } from "@/utils/server-action-utils";
 import { ErrorMessage } from "@/modules/ui/components/error-message";
@@ -28,8 +28,8 @@ export default async function KClientDetail({ id }: { id: string }) {
 
       <div className="bg-background relative z-10 flex flex-col gap-16">
         <div className="flex flex-col gap-8">
-          {client.kProjects?.map((project) => (
-            <KProject project={project} key={project.id} />
+          {client.projects?.map((project) => (
+            <Project project={project} key={project.id} />
           ))}
         </div>
       </div>
@@ -57,7 +57,7 @@ const InnerHeader = ({ client }: { client: KClientGetOneResult }) => {
         <p className="text-xs italic">All time tasks</p>
       </div>
       <div className="aspect-square p-4 rounded bg-accent h-32 flex flex-col gap-4 items-center justify-center text-foreground animate-fade-in-from-left  stagger-animation-900">
-        <h3 className="text-3xl mono">{client.kProjects?.length ?? 0}</h3>
+        <h3 className="text-3xl mono">{client.projects?.length ?? 0}</h3>
         <p className="text-xs italic">projects</p>
       </div>
       <div className=" p-4 rounded bg-accent h-32 flex flex-col gap-4 items-center justify-center text-foreground animate-fade-in-from-left  stagger-animation-900">
@@ -65,7 +65,7 @@ const InnerHeader = ({ client }: { client: KClientGetOneResult }) => {
           <KClientSpentTime
             className="text-3xl mono"
             date={new Date()}
-            projectIds={client.kProjects?.map((it) => it.id) ?? []}
+            projectIds={client.projects?.map((it) => it.id) ?? []}
           />
         </Suspense>
         <p className="text-xs italic">Monthly reported spent time</p>

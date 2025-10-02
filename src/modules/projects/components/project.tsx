@@ -1,11 +1,11 @@
 import { Suspense } from "react";
 import KClientSpentTime from "@/modules/k-clients/components/k-client-spent-time";
-import { AddImageToProject } from "@/modules/k-projects/components/k-projects-upload-images-button";
-import { ProjectSlider } from "@/modules/k-projects/components/k-project-slider";
+import { AddImageToProject } from "@/modules/projects/components/project-upload-images-button";
+import { ProjectSlider } from "@/modules/projects/components/project-slider";
 import { KEmployeeAvatar } from "@/modules/k-employees/components/k-employee-avatar";
-import { KProjectsReadFull } from "@/modules/k-projects/schemas/k-projects-schemas";
+import { ProjectReadExtended } from "@/modules/projects/schemas/projects.read.schema";
 
-export const KProject = ({ project }: { project: KProjectsReadFull }) => {
+export const Project = ({ project }: { project: ProjectReadExtended }) => {
   return (
     <div>
       <div className="flex justify-between items-center px-8">
@@ -30,15 +30,15 @@ export const KProject = ({ project }: { project: KProjectsReadFull }) => {
       </div>
 
       <div className="flex gap-2 py-4 px-8">
-        {project.kTeams.map((member) => (
-          <KEmployeeAvatar key={member.id} employee={member.kEmployee} />
+        {project.teams.map((member) => (
+          <KEmployeeAvatar key={member.id} employee={member.employee} />
         ))}
       </div>
 
-      {project.kProjectMedias.length > 0 && (
+      {project.projectMedias.length > 0 && (
         <ProjectSlider
           projectName={project.name ?? ""}
-          images={project.kProjectMedias}
+          images={project.projectMedias}
         />
       )}
 

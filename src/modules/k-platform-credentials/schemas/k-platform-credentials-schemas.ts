@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { KEmployeesRead } from "@/modules/k-employees/schemas/k-employees-schemas";
-import { KProjectsRead } from "@/modules/k-projects/schemas/k-projects-schemas";
+import { ProjectRead } from "@/modules/projects/schemas/projects.read.schema";
 
 export const KSupportedPlatforms = z.enum([
   "github",
@@ -58,6 +58,6 @@ export type KPlatformCredentialsRead = z.infer<
 >;
 
 export type KPlatformCredentialsFullRead = KPlatformCredentialsRead & {
-  kEmployee?: KEmployeesRead;
-  kProject?: KProjectsRead;
+  employee?: KEmployeesRead;
+  project?: ProjectRead;
 };

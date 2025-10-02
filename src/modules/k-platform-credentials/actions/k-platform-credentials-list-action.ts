@@ -1,6 +1,6 @@
 "use server";
 import { db } from "@/drizzle/drizzle-db";
-import { kEmployees, kProjects } from "@/drizzle/schema";
+import { kEmployees, projects as projectsTable } from "@/drizzle/schema";
 import { inArray } from "drizzle-orm";
 import { handleServerErrors } from "@/utils/server-action-utils";
 import { firstOrThrow } from "@/utils/array-utils";
@@ -22,7 +22,7 @@ const listAllKPlatformCredentials = async () => {
       ({ employeeId, projectId }) => {
         if (employeeId) employeeIds.add(employeeId);
         if (projectId) projectIds.add(projectId);
-      },
+      }
     );
   });
 
@@ -35,17 +35,17 @@ const listAllKPlatformCredentials = async () => {
           .where(inArray(kEmployees.id, Array.from(employeeIds)))
       : [];
 
-  const projects =
+  const projectsResult =
     projectIds.size > 0
       ? await db
           .select()
-          .from(kProjects)
-          .where(inArray(kProjects.id, Array.from(projectIds)))
+          .from(projectsTable)
+          .where(inArray(projectsTable.id, Array.from(projectIds)))
       : [];
 
   // Create lookup maps
   const employeeMap = new Map(employees.map((emp) => [emp.id, emp]));
-  const projectMap = new Map(projects.map((proj) => [proj.id, proj]));
+  const projectMap = new Map(projectsResult.map((proj) => [proj.id, proj]));
 
   return await Promise.all(
     res.map(
@@ -55,28 +55,28 @@ const listAllKPlatformCredentials = async () => {
         };
         if (kPlatformCredentialsToEmployeesAndProjects.length > 0) {
           const relations = firstOrThrow(
-            kPlatformCredentialsToEmployeesAndProjects,
+            kPlatformCredentialsToEmployeesAndProjects
           );
 
-          const kProject = projectMap.get(relations.projectId);
-          if (kProject) {
+          const project = projectMap.get(relations.projectId);
+          if (project) {
             credentialEnhanced = {
               ...credentialEnhanced,
-              kProject,
+              project,
             };
           }
-          const kEmployee = employeeMap.get(relations.employeeId);
-          if (kEmployee) {
+          const employee = employeeMap.get(relations.employeeId);
+          if (employee) {
             credentialEnhanced = {
               ...credentialEnhanced,
-              kEmployee,
+              employee,
             };
           }
         }
 
         return credentialEnhanced;
-      },
-    ),
+      }
+    )
   );
 };
 

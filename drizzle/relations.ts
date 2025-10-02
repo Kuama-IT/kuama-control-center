@@ -1,9 +1,9 @@
 import { relations } from "drizzle-orm/relations";
 import {
   kEmployees,
-  kTeams,
-  kProjects,
-  kProjectMedias,
+  teams,
+  projects,
+  projectMedias,
   kPayrolls,
   kTasks,
   kSpentTimes,
@@ -14,57 +14,57 @@ import {
   kPlatformCredentialsToEmployeesAndProjects,
   kPlatformCredentials,
   kEmployeeEstimatedCosts,
-  kInvoicesToProjects,
+  invoiceProjects,
   kPresenceDays,
-  kProjectDailyRates,
-  kProjectsMonthlyRates,
+  projectDailyRates,
+  projectMonthlyRates,
   kClientsVats,
 } from "./schema";
 
-export const kTeamsRelations = relations(kTeams, ({ one }) => ({
-  kEmployee: one(kEmployees, {
-    fields: [kTeams.employeeId],
+export const teamRelations = relations(teams, ({ one }) => ({
+  employee: one(kEmployees, {
+    fields: [teams.employeeId],
     references: [kEmployees.id],
   }),
-  kProject: one(kProjects, {
-    fields: [kTeams.projectId],
-    references: [kProjects.id],
+  project: one(projects, {
+    fields: [teams.projectId],
+    references: [projects.id],
   }),
 }));
 
 export const kEmployeesRelations = relations(kEmployees, ({ many }) => ({
-  kTeams: many(kTeams),
+  teams: many(teams),
   kPayrolls: many(kPayrolls),
   kTasks: many(kTasks),
   kAbsenceDays: many(kAbsenceDays),
   kPlatformCredentialsToEmployeesAndProjects: many(
-    kPlatformCredentialsToEmployeesAndProjects,
+    kPlatformCredentialsToEmployeesAndProjects
   ),
   kEmployeeEstimatedCosts: many(kEmployeeEstimatedCosts),
   kPresenceDays: many(kPresenceDays),
-  kProjectDailyRates: many(kProjectDailyRates),
+  projectDailyRates: many(projectDailyRates),
 }));
 
-export const kProjectsRelations = relations(kProjects, ({ one, many }) => ({
-  kTeams: many(kTeams),
-  kProjectMedias: many(kProjectMedias),
-  kClient: one(kClients, {
-    fields: [kProjects.clientId],
+export const projectRelations = relations(projects, ({ one, many }) => ({
+  teams: many(teams),
+  projectMedias: many(projectMedias),
+  client: one(kClients, {
+    fields: [projects.clientId],
     references: [kClients.id],
   }),
   kTasks: many(kTasks),
   kPlatformCredentialsToEmployeesAndProjects: many(
-    kPlatformCredentialsToEmployeesAndProjects,
+    kPlatformCredentialsToEmployeesAndProjects
   ),
-  kInvoicesToProjects: many(kInvoicesToProjects),
-  kProjectDailyRates: many(kProjectDailyRates),
-  kProjectsMonthlyRates: many(kProjectsMonthlyRates),
+  invoiceProjects: many(invoiceProjects),
+  projectDailyRates: many(projectDailyRates),
+  projectMonthlyRates: many(projectMonthlyRates),
 }));
 
-export const kProjectMediasRelations = relations(kProjectMedias, ({ one }) => ({
-  kProject: one(kProjects, {
-    fields: [kProjectMedias.projectId],
-    references: [kProjects.id],
+export const projectMediaRelations = relations(projectMedias, ({ one }) => ({
+  project: one(projects, {
+    fields: [projectMedias.projectId],
+    references: [projects.id],
   }),
 }));
 
@@ -82,20 +82,20 @@ export const kSpentTimesRelations = relations(kSpentTimes, ({ one }) => ({
   }),
 }));
 
-export const kTasksRelations = relations(kTasks, ({ one, many }) => ({
+export const taskRelations = relations(kTasks, ({ one, many }) => ({
   kSpentTimes: many(kSpentTimes),
   kEmployee: one(kEmployees, {
     fields: [kTasks.employeeId],
     references: [kEmployees.id],
   }),
-  kProject: one(kProjects, {
+  project: one(projects, {
     fields: [kTasks.projectId],
-    references: [kProjects.id],
+    references: [projects.id],
   }),
 }));
 
-export const kClientsRelations = relations(kClients, ({ many }) => ({
-  kProjects: many(kProjects),
+export const clientRelations = relations(kClients, ({ many }) => ({
+  projects: many(projects),
   kClientsVats: many(kClientsVats),
 }));
 
@@ -106,12 +106,12 @@ export const kAbsenceDaysRelations = relations(kAbsenceDays, ({ one }) => ({
   }),
 }));
 
-export const kInvoicesRelations = relations(kInvoices, ({ one, many }) => ({
+export const invoiceRelations = relations(kInvoices, ({ one, many }) => ({
   kVat: one(kVats, {
     fields: [kInvoices.vat],
     references: [kVats.id],
   }),
-  kInvoicesToProjects: many(kInvoicesToProjects),
+  invoiceProjects: many(invoiceProjects),
 }));
 
 export const kVatsRelations = relations(kVats, ({ many }) => ({
@@ -132,20 +132,20 @@ export const kPlatformCredentialsToEmployeesAndProjectsRelations = relations(
       ],
       references: [kPlatformCredentials.id],
     }),
-    kProject: one(kProjects, {
+    project: one(projects, {
       fields: [kPlatformCredentialsToEmployeesAndProjects.projectId],
-      references: [kProjects.id],
+      references: [projects.id],
     }),
-  }),
+  })
 );
 
 export const kPlatformCredentialsRelations = relations(
   kPlatformCredentials,
   ({ many }) => ({
     kPlatformCredentialsToEmployeesAndProjects: many(
-      kPlatformCredentialsToEmployeesAndProjects,
+      kPlatformCredentialsToEmployeesAndProjects
     ),
-  }),
+  })
 );
 
 export const kEmployeeEstimatedCostsRelations = relations(
@@ -155,21 +155,21 @@ export const kEmployeeEstimatedCostsRelations = relations(
       fields: [kEmployeeEstimatedCosts.employeeId],
       references: [kEmployees.id],
     }),
-  }),
+  })
 );
 
-export const kInvoicesToProjectsRelations = relations(
-  kInvoicesToProjects,
+export const invoiceProjectsRelations = relations(
+  invoiceProjects,
   ({ one }) => ({
     kInvoice: one(kInvoices, {
-      fields: [kInvoicesToProjects.invoiceId],
+      fields: [invoiceProjects.invoiceId],
       references: [kInvoices.id],
     }),
-    kProject: one(kProjects, {
-      fields: [kInvoicesToProjects.projectId],
-      references: [kProjects.id],
+    project: one(projects, {
+      fields: [invoiceProjects.projectId],
+      references: [projects.id],
     }),
-  }),
+  })
 );
 
 export const kPresenceDaysRelations = relations(kPresenceDays, ({ one }) => ({
@@ -179,28 +179,28 @@ export const kPresenceDaysRelations = relations(kPresenceDays, ({ one }) => ({
   }),
 }));
 
-export const kProjectDailyRatesRelations = relations(
-  kProjectDailyRates,
+export const projectDailyRatesRelations = relations(
+  projectDailyRates,
   ({ one }) => ({
     kEmployee: one(kEmployees, {
-      fields: [kProjectDailyRates.employee],
+      fields: [projectDailyRates.employee],
       references: [kEmployees.id],
     }),
-    kProject: one(kProjects, {
-      fields: [kProjectDailyRates.project],
-      references: [kProjects.id],
+    project: one(projects, {
+      fields: [projectDailyRates.project],
+      references: [projects.id],
     }),
-  }),
+  })
 );
 
-export const kProjectsMonthlyRatesRelations = relations(
-  kProjectsMonthlyRates,
+export const projectMonthlyRatesRelations = relations(
+  projectMonthlyRates,
   ({ one }) => ({
-    kProject: one(kProjects, {
-      fields: [kProjectsMonthlyRates.project],
-      references: [kProjects.id],
+    project: one(projects, {
+      fields: [projectMonthlyRates.project],
+      references: [projects.id],
     }),
-  }),
+  })
 );
 
 export const kClientsVatsRelations = relations(kClientsVats, ({ one }) => ({

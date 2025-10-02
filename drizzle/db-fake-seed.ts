@@ -5,12 +5,12 @@ import {
   kClientsVats,
   kEmployees,
   kInvoices,
-  kInvoicesToProjects,
+  invoiceProjects,
   kPayrolls,
-  kProjects,
+  projects,
   kSpentTimes,
   kTasks,
-  kTeams,
+  teams,
   kVats,
 } from "./schema";
 import path from "path";
@@ -118,6 +118,8 @@ async function seedDatabase() {
       amountGross,
       amountVat,
       date: faker.date.past({ years: 1 }).toISOString(),
+      dueDate: faker.date.future({ years: 1 }).toISOString(),
+      externalId: faker.string.uuid(),
       number: faker.number.int({ min: 1, max: 1000 }),
     });
   }
@@ -127,9 +129,9 @@ async function seedDatabase() {
     .returning({ id: kInvoices.id });
 
   console.log("Seeding projects...");
-  const projects = [];
+  const projectSeedData = [];
   for (let i = 0; i < 10; i++) {
-    projects.push({
+    projectSeedData.push({
       name: faker.commerce.productName(),
       description: faker.lorem.sentence(),
       clientId: faker.helpers.arrayElement(clientIds).id,
@@ -137,9 +139,12 @@ async function seedDatabase() {
       endDate: faker.date.future({ years: 1 }).toISOString(),
     });
   }
-  const projectIds = await db.insert(kProjects).values(projects).returning({
-    id: kProjects.id,
-  });
+  const projectIds = await db
+    .insert(projects)
+    .values(projectSeedData)
+    .returning({
+      id: projects.id,
+    });
 
   const invoicesToProjects = [];
   for (const invoice of invoiceIds) {
@@ -148,7 +153,7 @@ async function seedDatabase() {
       projectId: faker.helpers.arrayElement(projectIds).id,
     });
   }
-  await db.insert(kInvoicesToProjects).values(invoicesToProjects);
+  await db.insert(invoiceProjects).values(invoicesToProjects);
 
   console.log("Seeding tasks...");
   const tasks = [];
@@ -192,14 +197,14 @@ async function seedDatabase() {
   await db.insert(kSpentTimes).values(spentTimes);
 
   console.log("Seeding teams...");
-  const teams = [];
+  const teamSeedData = [];
   for (let i = 0; i < 10; i++) {
-    teams.push({
+    teamSeedData.push({
       employeeId: faker.helpers.arrayElement(employeesIds).id,
       projectId: faker.helpers.arrayElement(projectIds).id,
     });
   }
-  await db.insert(kTeams).values(teams);
+  await db.insert(teams).values(teamSeedData);
 
   // seed employees payrolls
   console.log("Seeding employees payrolls...");
@@ -239,10 +244,10 @@ async function clearDatabase() {
 
   await db.delete(kSpentTimes).execute();
   await db.delete(kTasks).execute();
-  await db.delete(kInvoicesToProjects).execute();
+  await db.delete(invoiceProjects).execute();
   await db.delete(kInvoices).execute();
-  await db.delete(kProjects).execute();
-  await db.delete(kTeams).execute();
+  await db.delete(projects).execute();
+  await db.delete(teams).execute();
   await db.delete(kClientsVats).execute();
   await db.delete(kVats).execute();
   await db.delete(kClients).execute();

@@ -4,7 +4,7 @@ import {
   kEmployees,
   kPlatformCredentials,
   kPlatformCredentialsToEmployeesAndProjects,
-  kProjects,
+  projects as projectsTable,
 } from "@/drizzle/schema";
 import { eq } from "drizzle-orm";
 import { handleServerErrors } from "@/utils/server-action-utils";
@@ -22,7 +22,7 @@ const handled = handleServerErrors(async (id: number) => {
     .select()
     .from(kPlatformCredentialsToEmployeesAndProjects)
     .where(
-      eq(kPlatformCredentialsToEmployeesAndProjects.platformCredentialsId, id),
+      eq(kPlatformCredentialsToEmployeesAndProjects.platformCredentialsId, id)
     )
     .limit(1);
 
@@ -36,13 +36,13 @@ const handled = handleServerErrors(async (id: number) => {
     if (projectId) {
       const projectRes = await db
         .select()
-        .from(kProjects)
-        .where(eq(kProjects.id, projectId))
+        .from(projectsTable)
+        .where(eq(projectsTable.id, projectId))
         .limit(1);
-      const kProject = firstOrThrow(projectRes);
+      const project = firstOrThrow(projectRes);
       credentialEnhanced = {
         ...credentialEnhanced,
-        kProject,
+        project,
       };
     }
     if (employeeId) {
@@ -51,10 +51,10 @@ const handled = handleServerErrors(async (id: number) => {
         .from(kEmployees)
         .where(eq(kEmployees.id, employeeId))
         .limit(1);
-      const kEmployee = firstOrThrow(employeeRes);
+      const employee = firstOrThrow(employeeRes);
       credentialEnhanced = {
         ...credentialEnhanced,
-        kEmployee,
+        employee,
       };
     }
   }

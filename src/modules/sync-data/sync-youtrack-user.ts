@@ -5,7 +5,7 @@ import { youtrackApiClient } from "@/modules/you-track/youtrack-api-client";
 import { format } from "date-fns";
 
 import { syncYouTrackIssuesFromWorkItems } from "@/modules/sync-data/sync-youtrack-issues";
-import { KProjectsRead } from "@/modules/k-projects/schemas/k-projects-schemas";
+import { ProjectRead } from "@/modules/projects/schemas/projects.read.schema";
 
 /**
  * This functions assumes that all YT projects are already in the database
@@ -14,7 +14,7 @@ import { KProjectsRead } from "@/modules/k-projects/schemas/k-projects-schemas";
  */
 export const syncYouTrackUser = async (
   user: ReducedUser & { employeeId: number },
-  projects: KProjectsRead[],
+  projects: ProjectRead[]
 ) => {
   const employeeId = user.employeeId;
 
@@ -47,7 +47,7 @@ export const syncYouTrackUser = async (
   const tasks = await syncYouTrackIssuesFromWorkItems(
     workItems,
     projects,
-    employeeId,
+    employeeId
   );
   console.timeEnd(`syncing tasks for ${user.email}`);
   // const tasks = await db
@@ -61,7 +61,7 @@ export const syncYouTrackUser = async (
   await db.transaction(async (tx) => {
     for (const workItem of workItems) {
       const project = projects.find(
-        (it) => it.youTrackRingId === workItem.issue.project.ringId,
+        (it) => it.youTrackRingId === workItem.issue.project.ringId
       );
 
       if (!project) {

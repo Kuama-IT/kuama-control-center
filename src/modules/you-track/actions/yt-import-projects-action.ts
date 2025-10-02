@@ -2,7 +2,7 @@
 import { db } from "@/drizzle/drizzle-db";
 import { handleServerErrors } from "@/utils/server-action-utils";
 import { youtrackApiClient } from "@/modules/you-track/youtrack-api-client";
-import { kClients, kProjects } from "@/drizzle/schema";
+import { kClients, projects as projectsTable } from "@/drizzle/schema";
 import { count } from "drizzle-orm";
 import { firstOrThrow } from "@/utils/array-utils";
 
@@ -12,20 +12,20 @@ const handled = handleServerErrors(async () => {
   const projects = await youtrackApiClient.getProjects();
   const organizations = await youtrackApiClient.getOrganizations();
 
-  const projectsPayload: (typeof kProjects.$inferInsert)[] = [];
+  const projectsPayload: (typeof projectsTable.$inferInsert)[] = [];
 
   for (const project of projects) {
     const organization = organizations.find((it) =>
-      it.projects.find((p) => p.ringId === project.ringId),
+      it.projects.find((p) => p.ringId === project.ringId)
     );
     if (!organization) {
       throw new Error(
-        `Organization not found for project ${project.name}. Try importing organizations first.`,
+        `Organization not found for project ${project.name}. Try importing organizations first.`
       );
     }
 
     const client = clients.find(
-      (it) => it.youTrackRingId === organization.ringId,
+      (it) => it.youTrackRingId === organization.ringId
     );
     if (!client && organization.name.toLowerCase().includes("kuama")) {
       continue;
@@ -33,7 +33,7 @@ const handled = handleServerErrors(async () => {
 
     if (!client) {
       throw new Error(
-        `Client ${organization.name} not found for project ${project.name}. Try importing organizations first.`,
+        `Client ${organization.name} not found for project ${project.name}. Try importing organizations first.`
       );
     }
 
@@ -45,11 +45,11 @@ const handled = handleServerErrors(async () => {
   }
 
   await db.transaction(async (tx) => {
-    await tx.delete(kProjects);
-    await tx.insert(kProjects).values(projectsPayload);
+    await tx.delete(projectsTable);
+    await tx.insert(projectsTable).values(projectsPayload);
   });
 
-  const query = await db.select({ count: count() }).from(kProjects);
+  const query = await db.select({ count: count() }).from(projectsTable);
   const result = firstOrThrow(query);
 
   return { message: `Now you have ${result.count} projects` };

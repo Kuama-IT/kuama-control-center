@@ -3,7 +3,7 @@ import {
   type FileRouter as UploadthingFileRouter,
 } from "uploadthing/next";
 import { z } from "zod";
-import { kProjectsServer } from "@/modules/k-projects/k-projects-server";
+import { projectsServer } from "@/modules/projects/projects.server";
 
 const f = createUploadthing();
 
@@ -25,7 +25,7 @@ export const fileRouter = {
     .input(
       z.object({
         projectId: z.number(),
-      }),
+      })
     )
     // Set permissions and file types for this FileRoute
     .middleware(async ({ req, files, input }) => {
@@ -42,7 +42,7 @@ export const fileRouter = {
       };
     })
     .onUploadComplete(async ({ metadata, file }) => {
-      await kProjectsServer.addImages({
+      await projectsServer.addImages({
         projectId: metadata.projectId,
         images: [file.ufsUrl],
       });

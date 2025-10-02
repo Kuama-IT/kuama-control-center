@@ -15,23 +15,23 @@ const kClientGetOneAction = async ({
   const queryResult = await db.query.kClients.findFirst({
     where: eq(kClients.id, parseInt(id)),
     with: {
-      kProjects: {
+      projects: {
         with: {
-          kTeams: {
+          teams: {
             with: {
-              kEmployee: true,
+              employee: true,
             },
           },
-          kProjectMedias: true,
+          projectMedias: true,
           kTasks: {
             with: {
               kSpentTimes: {
                 where: and(
                   gte(
                     kSpentTimes.date,
-                    format(startOfMonth(date), "yyyy-MM-dd"),
+                    format(startOfMonth(date), "yyyy-MM-dd")
                   ),
-                  lte(kSpentTimes.date, format(endOfMonth(date), "yyyy-MM-dd")),
+                  lte(kSpentTimes.date, format(endOfMonth(date), "yyyy-MM-dd"))
                 ),
               },
             },
@@ -45,23 +45,23 @@ const kClientGetOneAction = async ({
     throw new Error("Client not found");
   }
 
-  const allTimeTasksCount = queryResult?.kProjects.reduce(
+  const allTimeTasksCount = queryResult?.projects.reduce(
     (acc, project) => acc + project.kTasks.length,
-    0,
+    0
   );
-  const kProjects = queryResult?.kProjects.map((project) => ({
+  const projects = queryResult?.projects.map((project) => ({
     ...project,
-    kTeams: project.kTeams.map((team) => ({
+    teams: project.teams.map((team) => ({
       ...team,
-      kEmployee: {
-        ...team.kEmployee,
-        avatarUrl: team.kEmployee.avatarUrl,
+      employee: {
+        ...team.employee,
+        avatarUrl: team.employee.avatarUrl,
       },
     })),
   }));
   return {
     ...queryResult,
-    kProjects,
+    projects,
     avatarUrl: queryResult?.avatarUrl,
     allTimeTasksCount,
   };

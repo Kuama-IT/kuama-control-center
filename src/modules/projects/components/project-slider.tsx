@@ -3,13 +3,13 @@
 import { ImageSlide } from "@/modules/ui/components/image-slide";
 import { useEffect, useRef, useState } from "react";
 import { ArrowLeftCircle, ArrowRightCircle } from "lucide-react";
-import { KProjectMediaRead } from "@/modules/k-projects/schemas/k-projects-schemas";
+import { ProjectMediaRead } from "@/modules/projects/schemas/projects.read.schema";
 
 export const ProjectSlider = ({
   images,
   projectName,
 }: {
-  images: KProjectMediaRead[];
+  images: ProjectMediaRead[];
   projectName: string;
 }) => {
   const containerRef = useRef<HTMLDivElement>(null!);

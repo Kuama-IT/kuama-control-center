@@ -3,7 +3,12 @@ import { handleServerErrors } from "@/utils/server-action-utils";
 import { youtrackApiClient } from "@/modules/you-track/youtrack-api-client";
 import { db } from "@/drizzle/drizzle-db";
 import { eq } from "drizzle-orm";
-import { kEmployees, kProjects, kTeams, lower } from "@/drizzle/schema";
+import {
+  kEmployees,
+  projects as projectsTable,
+  teams,
+  lower,
+} from "@/drizzle/schema";
 import { firstOrThrow } from "@/utils/array-utils";
 
 const handled = handleServerErrors(async () => {
@@ -16,8 +21,8 @@ const handled = handleServerErrors(async () => {
     for (const ytProject of ytProjects) {
       const projectQuery = await tx
         .select()
-        .from(kProjects)
-        .where(eq(kProjects.youTrackRingId, ytProject.ringId));
+        .from(projectsTable)
+        .where(eq(projectsTable.youTrackRingId, ytProject.ringId));
 
       if (projectQuery.length === 0) {
         skippedProjects++;
@@ -37,19 +42,19 @@ const handled = handleServerErrors(async () => {
           .where(
             eq(
               lower(kEmployees.email),
-              ytUser.profile.email?.email?.toLowerCase(),
-            ),
+              ytUser.profile.email?.email?.toLowerCase()
+            )
           );
 
         if (employeeQuery.length > 0) {
-          const payload: typeof kTeams.$inferInsert = {
+          const payload: typeof teams.$inferInsert = {
             employeeId: employeeQuery[0].id,
             projectId: project.id,
           };
 
           // Track successful team creation
           teamsCreated++;
-          await tx.insert(kTeams).values(payload).onConflictDoNothing();
+          await tx.insert(teams).values(payload).onConflictDoNothing();
         }
       }
     }

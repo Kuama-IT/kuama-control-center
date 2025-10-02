@@ -9,7 +9,7 @@ import { firstOrThrow } from "@/utils/array-utils";
 
 const action = async (
   credentialId: number,
-  range: { from: Date; to: Date },
+  range: { from: Date; to: Date }
 ) => {
   // TODO complete (we're missing jira)
   const credentials = await kPlatformCredentialsServer.byId(credentialId);
@@ -18,12 +18,12 @@ const action = async (
     throw new Error(JSON.parse(credentials.message));
   }
 
-  const projectId = credentials.kProject?.id;
-  const employeeId = credentials.kEmployee?.id;
+  const projectId = credentials.project?.id;
+  const employeeId = credentials.employee?.id;
 
   if (!projectId || !employeeId) {
     throw new Error(
-      `Project ID or Employee ID not found for credential ${credentialId}`,
+      `Project ID or Employee ID not found for credential ${credentialId}`
     );
   }
 
@@ -31,7 +31,7 @@ const action = async (
   if (credentials.platform === "easyredmine") {
     const client = new EasyRedmineApiClient(
       credentials.endpoint,
-      credentials.persistentToken,
+      credentials.persistentToken
     );
 
     const spentTimes = await client.getSpentTimes(range);
@@ -63,7 +63,7 @@ const action = async (
         const { taskId } = firstOrThrow(res);
 
         console.log(
-          `spending time for task ${spentTime.task.subject}: ${spentTime.spentTime}`,
+          `spending time for task ${spentTime.task.subject}: ${spentTime.spentTime}`
         );
         const spentTimePayload: typeof kSpentTimes.$inferInsert = {
           duration: `${spentTime.spentTime} hour`,
@@ -93,7 +93,7 @@ const handled = handleServerErrors(
     // do not make user to wait until import is done
     void action(credentialId, range);
     console.log("request completed");
-  },
+  }
 );
 
 export default handled;

@@ -1,6 +1,6 @@
 "use server";
 import { db } from "@/drizzle/drizzle-db";
-import { kProjects } from "@/drizzle/schema";
+import { projects } from "@/drizzle/schema";
 import { eq } from "drizzle-orm";
 
 import parsePostgresInterval from "postgres-interval";
@@ -11,18 +11,18 @@ import { unstable_cache } from "next/cache";
 // Returns a list of spent times for a client, grouped by date
 const kClientGetMonthlySpentTimesAction = async (
   clientId: number,
-  date: Date = new Date(),
+  date: Date = new Date()
 ) => {
   const cached = unstable_cache(
     async () => {
       const projectIds = await db
-        .select({ id: kProjects.id })
-        .from(kProjects)
-        .where(eq(kProjects.clientId, clientId));
+        .select({ id: projects.id })
+        .from(projects)
+        .where(eq(projects.clientId, clientId));
 
       const queryResult = await getAllClientSpentTimesByProjectAndDateQuery(
         projectIds.map((it) => it.id),
-        date,
+        date
       );
 
       if (!queryResult || queryResult.length === 0) {
@@ -48,7 +48,7 @@ const kClientGetMonthlySpentTimesAction = async (
         const currentValue = acc.get(spentTime.date) ?? 0;
         acc.set(
           spentTime.date,
-          currentValue + daysInHours + hours + minutesInHours,
+          currentValue + daysInHours + hours + minutesInHours
         );
 
         return acc;
@@ -63,7 +63,7 @@ const kClientGetMonthlySpentTimesAction = async (
     {
       revalidate: 60 * 60 * 24,
       tags: ["kClientGetMonthlySpentTimesAction"],
-    },
+    }
   );
 
   return cached();

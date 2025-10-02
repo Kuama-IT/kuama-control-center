@@ -3,16 +3,17 @@ import Link from "next/link";
 import { routes } from "@/modules/ui/routes";
 import { HiArrowSmRight } from "react-icons/hi";
 import KClientSpentTime from "@/modules/k-clients/components/k-client-spent-time";
-import { KProjectsRead } from "@/modules/k-projects/schemas/k-projects-schemas";
+import { ProjectRead } from "@/modules/projects/schemas/projects.read.schema";
 import { KClientRead } from "@/modules/k-clients/schemas/k-clients-schemas";
 
 type Props = {
-  project: KProjectsRead & {
-    kClient: KClientRead;
+  project: ProjectRead & {
+    client: KClientRead;
   };
   index?: number;
 };
-export const KProjectCard = ({ project, index = 0 }: Props) => {
+
+export const ProjectCard = ({ project, index = 0 }: Props) => {
   const style = {
     "--animation-duration": `${0.3 + index}s`,
   } as CSSProperties;
@@ -29,10 +30,10 @@ export const KProjectCard = ({ project, index = 0 }: Props) => {
             </span>
             <div className="flex gap-2 flex-col">
               <h2 className="text-xl">{project.name}</h2>
-              <p>{project.kClient.name}</p>
+              <p>{project.client.name}</p>
               <Suspense>
                 <div className="absolute inset-0 opacity-50 pointer-events-none">
-                  {/* todo KProjectReportedSpentTimeGraph */}
+                  {/* todo ProjectReportedSpentTimeGraph */}
                   <KClientSpentTime
                     className="text-sm"
                     date={new Date()}

@@ -1,16 +1,16 @@
 "use server";
 import { db } from "@/drizzle/drizzle-db";
-import { kProjects } from "@/drizzle/schema";
+import { projects as projectsTable } from "@/drizzle/schema";
 import { eq } from "drizzle-orm";
 import { handleServerErrors } from "@/utils/server-action-utils";
 
 const handled = handleServerErrors(async (clientId: number) => {
   const projects = await db
     .select({
-      projectId: kProjects.id,
+      projectId: projectsTable.id,
     })
-    .from(kProjects)
-    .where(eq(kProjects.clientId, clientId));
+    .from(projectsTable)
+    .where(eq(projectsTable.clientId, clientId));
 
   return await db.query.kPlatformCredentials.findMany({
     with: {
@@ -18,7 +18,7 @@ const handled = handleServerErrors(async (clientId: number) => {
         where: (records, { inArray }) => {
           return inArray(
             records.projectId,
-            projects.map((project) => project.projectId),
+            projects.map((project) => project.projectId)
           );
         },
       },
