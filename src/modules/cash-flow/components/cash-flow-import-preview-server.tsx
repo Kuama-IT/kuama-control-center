@@ -1,6 +1,6 @@
 import React from "react";
 import { cashFlowService } from "../cash-flow.service";
-import { cashFlowCategoryService } from "../cash-flow-category.service";
+import { cashFlowCategoryServer } from "../cash-flow-category.server";
 import CashFlowImportPreview from "./cash-flow-import-preview";
 
 interface CashFlowImportPreviewServerProps {
@@ -15,7 +15,7 @@ export default async function CashFlowImportPreviewServer({
     parseInt(id)
   );
 
-  const cashFlowCategories = await cashFlowCategoryService.getAll();
+  const cashFlowCategories = await cashFlowCategoryServer.list();
 
   // Parse the Excel file to get bank statement data
   const fileBuffer = Buffer.from(cashFlowImport.fileBase64, "base64");

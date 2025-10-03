@@ -8,7 +8,7 @@ import { eachDayOfInterval, format } from "date-fns";
 import { handleServerErrors } from "@/utils/server-action-utils";
 import { firstOrThrow } from "@/utils/array-utils";
 import { revalidateTag } from "next/cache";
-import { kAbsenceDaysListCacheTag } from "@/modules/k-absence-days/k-absence-days-cache-tags";
+import { absenceDaysCacheTag } from "@/modules/timesheets/cache/cache-tags";
 
 const syncTimesheet = async ({ from, to }: { from: Date; to: Date }) => {
   const employees = await db
@@ -142,7 +142,7 @@ const syncTimesheet = async ({ from, to }: { from: Date; to: Date }) => {
     }
   }
 
-  revalidateTag(kAbsenceDaysListCacheTag);
+  revalidateTag(absenceDaysCacheTag);
 };
 
 const handled = handleServerErrors(syncTimesheet);

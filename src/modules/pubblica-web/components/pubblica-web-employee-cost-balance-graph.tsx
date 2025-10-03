@@ -1,10 +1,11 @@
 "use client";
 // Custom tooltip to show only the four plotted values (including 0)
-import type { TooltipProps } from "recharts";
 import type {
   ValueType,
   NameType,
+  Payload,
 } from "recharts/types/component/DefaultTooltipContent";
+import type { TooltipContentProps } from "recharts/types/component/Tooltip";
 
 const plottedKeys = [
   "currentYearBusinessCost",
@@ -13,12 +14,30 @@ const plottedKeys = [
   "previousYearInvoices",
 ];
 
+type PlottableEntry = Payload<ValueType, NameType> & { dataKey: string };
+
+function isPlottableEntry(
+  entry: unknown,
+): entry is PlottableEntry {
+  if (!entry || typeof entry !== "object") return false;
+
+  const candidate = entry as Payload<ValueType, NameType>;
+  return (
+    typeof candidate.dataKey === "string" &&
+    plottedKeys.includes(candidate.dataKey)
+  );
+}
+
 function CustomTooltip({
   active,
   payload,
   label,
-}: TooltipProps<ValueType, NameType>) {
+}: TooltipContentProps<ValueType, NameType>) {
   if (!active || !payload || payload.length === 0) return null;
+
+  const filteredPayload = payload.filter(isPlottableEntry);
+
+  if (filteredPayload.length === 0) return null;
   return (
     <div
       style={{
@@ -29,9 +48,7 @@ function CustomTooltip({
       }}
     >
       <div style={{ fontWeight: 600, marginBottom: 4 }}>{label}</div>
-      {payload
-        .filter((entry) => plottedKeys.includes(entry.dataKey as string))
-        .map((entry) => (
+      {filteredPayload.map((entry) => (
           <div
             key={entry.dataKey}
             style={{ color: entry.color, marginBottom: 2 }}
@@ -145,7 +162,9 @@ export function PubblicaWebEmployeeCostBalanceGraph({
           </defs>
           <XAxis dataKey="month" />
           <YAxis />
-          <Tooltip content={<CustomTooltip />} />
+          <Tooltip
+            content={(tooltipProps) => <CustomTooltip {...tooltipProps} />}
+          />
           <Legend />
           <Area
             type="monotone"

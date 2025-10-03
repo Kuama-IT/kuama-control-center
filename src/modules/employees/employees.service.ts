@@ -1,7 +1,7 @@
 import { db } from "@/drizzle/drizzle-db";
 import { kEmployees, pubblicaWebPayrolls } from "@/drizzle/schema";
 import { desc, eq } from "drizzle-orm";
-import { parse, differenceInYears, isValid } from "date-fns";
+import { differenceInYears, isValid, parse } from "date-fns";
 
 export type EmployeeWithPayrolls = Omit<
   typeof kEmployees.$inferSelect,
@@ -32,18 +32,18 @@ export const employeesService = {
               .where(
                 eq(
                   pubblicaWebPayrolls.employeeName,
-                  employee.fullName.toUpperCase()
-                )
+                  employee.fullName.toUpperCase(),
+                ),
               )
               .orderBy(
                 desc(pubblicaWebPayrolls.year),
-                desc(pubblicaWebPayrolls.month)
+                desc(pubblicaWebPayrolls.month),
               )
           : [];
 
         const payrollBirthdate = parsePayrollBirthdate(payrolls[0]?.birthDate);
         const employeeBirthdate = toDate(rawBirthdate);
-  const birthdate = employeeBirthdate ?? payrollBirthdate;
+        const birthdate = employeeBirthdate ?? payrollBirthdate;
 
         const age = calculateAge(birthdate, today);
         const averagePayroll = calculateAveragePayroll(payrolls);
@@ -59,14 +59,17 @@ export const employeesService = {
           averagePayroll,
           yearsWithCompany,
         } satisfies EmployeeWithPayrolls;
-      })
+      }),
     );
 
     return data;
   },
 };
 
-const calculateAge = (birthdate: Date | null, referenceDate: Date): number | null => {
+const calculateAge = (
+  birthdate: Date | null,
+  referenceDate: Date,
+): number | null => {
   if (!birthdate || !isValid(birthdate)) return null;
   try {
     return differenceInYears(referenceDate, birthdate);
@@ -77,7 +80,7 @@ const calculateAge = (birthdate: Date | null, referenceDate: Date): number | nul
 };
 
 const calculateAveragePayroll = (
-  payrolls: Array<{ net: number }>
+  payrolls: Array<{ net: number }>,
 ): number => {
   if (payrolls.length === 0) return 0;
   const total = payrolls.reduce((sum, payroll) => sum + payroll.net, 0);

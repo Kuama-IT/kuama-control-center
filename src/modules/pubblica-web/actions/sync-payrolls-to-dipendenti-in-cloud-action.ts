@@ -13,7 +13,7 @@ const handled = handleServerErrors(async function ({ date }: { date: Date }) {
 
   await pubblicaWebClient.authenticate();
 
-  const payslips = await pubblicaWebClient.fetchPayslips(date);
+  const payslips = await pubblicaWebClient.fetchPayslips(date.getFullYear(), date.getMonth() + 1);
   return await dipendentiInCloudApiClient.sendPayrolls({
     content: new Uint8Array(payslips.bytes),
     fileName: payslips.name,

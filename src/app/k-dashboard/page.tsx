@@ -1,4 +1,4 @@
-import WeeklyAbsence from "@/modules/k-absence-days/components/weekly-absence";
+import WeeklyAbsence from "@/modules/timesheets/components/weekly-absence";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Suspense } from "react";
 import { AuthenticatedPageWrapper } from "@/modules/auth/authenticated-page-wrapper";

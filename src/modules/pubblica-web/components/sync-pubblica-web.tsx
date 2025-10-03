@@ -34,23 +34,17 @@ const months = Array.from({ length: 12 }, (_, i) => {
 });
 
 const formSchema = z.object({
-  month: z
-    .string()
-    .transform((val) => parseInt(val, 10))
-    .pipe(z.number().positive()),
-  year: z
-    .string()
-    .transform((val) => parseInt(val, 10))
-    .pipe(z.number().positive()),
+  month: z.number().int().min(0).max(11),
+  year: z.number().int().positive(),
 });
 
 type FormSchema = z.infer<typeof formSchema>;
 
 export default function SyncPubblicaWeb() {
   const [isPending, startTransition] = useTransition();
-  const date = new Date();
+  const today = new Date();
   const startOfBusinessYear = 2019;
-  const currentYear = date.getFullYear();
+  const currentYear = today.getFullYear();
   const years = Array.from(
     { length: currentYear - startOfBusinessYear + 1 },
     (_, i) => startOfBusinessYear + i,
@@ -58,16 +52,20 @@ export default function SyncPubblicaWeb() {
 
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
+    defaultValues: {
+      month: today.getMonth(),
+      year: currentYear,
+    },
   });
 
   const onSubmit = (values: FormSchema) => {
     startTransition(async () => {
-      const date = new Date();
-      date.setFullYear(values.year);
-      date.setMonth(values.month);
+      const executionDate = new Date();
+      executionDate.setFullYear(values.year);
+      executionDate.setMonth(values.month);
 
       const res = await syncPayrollsToDipendentiInCloudAction({
-        date,
+        date: executionDate,
       });
       if (isFailure(res)) {
         notifyError("Error while syncing PubblicaWeb payrolls");
@@ -96,8 +94,12 @@ export default function SyncPubblicaWeb() {
               render={({ field }) => (
                 <FormItem className="flex-1">
                   <Select
-                    onValueChange={field.onChange}
-                    defaultValue={date.getMonth().toString()}
+                    onValueChange={(value) => field.onChange(Number(value))}
+                    value={
+                      typeof field.value === "number"
+                        ? field.value.toString()
+                        : undefined
+                    }
                   >
                     <FormControl>
                       <SelectTrigger>
@@ -124,8 +126,12 @@ export default function SyncPubblicaWeb() {
               render={({ field }) => (
                 <FormItem className="flex-1">
                   <Select
-                    onValueChange={field.onChange}
-                    defaultValue={date.getFullYear().toString()}
+                    onValueChange={(value) => field.onChange(Number(value))}
+                    value={
+                      typeof field.value === "number"
+                        ? field.value.toString()
+                        : undefined
+                    }
                   >
                     <FormControl>
                       <SelectTrigger>

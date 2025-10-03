@@ -1,20 +1,20 @@
 import { eachDayOfInterval, format, getDate, getDay, parseISO } from "date-fns";
 import { it } from "date-fns/locale";
-import { KAbsenceDaysList } from "@/modules/k-absence-days/actions/k-absence-days-list";
+import { AbsenceDaysList } from "@/modules/timesheets/timesheets-absence.server";
 import { KEmployeesListAllActionResult } from "@/modules/k-employees/actions/k-employee-list-all-action";
 import parsePostgresInterval from "postgres-interval";
-import { KAbsenceReasonList } from "@/modules/k-absence-days/actions/k-absence-reasons-list";
-import type { KClosuresList } from "@/modules/k-closures/actions/k-closures-list";
+import { AbsenceReasonList } from "@/modules/timesheets/timesheets-absence.server";
+import type { ClosuresList } from "@/modules/timesheets/timesheets-closures.server";
 import { ChronoUnit, Duration } from "@js-joda/core";
 
 export type DipendentiInCloudReportProps = {
   from: Date;
   to: Date;
-  absences: KAbsenceDaysList;
+  absences: AbsenceDaysList;
   uniqueAbsenceReasons: string[];
   employees: KEmployeesListAllActionResult;
-  absenceReasons: KAbsenceReasonList;
-  closures: KClosuresList;
+  absenceReasons: AbsenceReasonList;
+  closures: ClosuresList;
 };
 
 /**
@@ -59,7 +59,7 @@ export type MonthDayItem = {
   formattedDate: string;
 };
 
-const toMonthDayItem = (date: Date, closures: KClosuresList) => {
+const toMonthDayItem = (date: Date, closures: ClosuresList) => {
   const dayWeekNumber = getDay(parseISO(date.toISOString()));
   const dayMonthNumber = getDate(date.toISOString());
   const isSaturday = dayWeekNumber === 6;
@@ -101,7 +101,7 @@ const getDaysForPeriod = ({
 }: {
   from: Date;
   to: Date;
-  closures: KClosuresList;
+  closures: ClosuresList;
 }) => {
   // Calculate days in the received period
   const daysInMonth = eachDayOfInterval({

@@ -3,7 +3,6 @@
 import { useState, useCallback } from "react";
 import { cashFlowService } from "../cash-flow.service";
 import BankTransactionsTable from "./bank-transactions-table";
-import { cashFlowCategoryService } from "../cash-flow-category.service";
 import {
   handledCreateCashFlowCategory,
   handledGetAllCashFlowCategory,

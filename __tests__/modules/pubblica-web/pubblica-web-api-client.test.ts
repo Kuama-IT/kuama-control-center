@@ -4,7 +4,6 @@ import { serverEnv } from "@/env/server-env";
 import { kEmployeesServer } from "@/modules/k-employees/k-employee-server";
 import { isFailure } from "@/utils/server-action-utils";
 import * as fs from "node:fs";
-import { parseSalary } from "@/modules/dipendenti-in-cloud/dipendenti-in-cloud-utils";
 
 describe("pubblica-web-api", () => {
   const client = new PubblicaWebApi(

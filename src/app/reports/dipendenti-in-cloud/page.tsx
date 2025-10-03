@@ -1,7 +1,11 @@
 import DipendentiInCloudReport from "@/modules/dipendenti-in-cloud/components/dipendenti-in-cloud-report";
 import { kEmployeesServer } from "@/modules/k-employees/k-employee-server";
 import { isFailure } from "@/utils/server-action-utils";
-import { kAbsenceDaysServer } from "@/modules/k-absence-days/k-absence-days-server";
+import {
+  timesheetsAbsenceServer,
+  type AbsenceDaysList,
+  type AbsenceReasonList,
+} from "@/modules/timesheets/timesheets-absence.server";
 import { parse } from "date-fns";
 import { accessTokensServer } from "@/modules/access-tokens/access-tokens.server";
 import {
@@ -11,7 +15,10 @@ import {
   SearchParams,
 } from "@/modules/routing/schemas/routing-schemas";
 import { ErrorMessage } from "@/modules/ui/components/error-message";
-import { kClosuresServer } from "@/modules/k-closures/k-closures-server";
+import {
+  timesheetsClosuresServer,
+  type ClosuresList,
+} from "@/modules/timesheets/timesheets-closures.server";
 
 const paramsSchema = datePeriodParamsSchema.and(accessTokenParamsSchema);
 
@@ -44,23 +51,55 @@ export default async function Page({ searchParams }: PageParams) {
   const from = parse(parsedParams.data.from, "dd-MM-yyyy", new Date());
   const to = parse(parsedParams.data.to, "dd-MM-yyyy", new Date());
 
-  const absences = await kAbsenceDaysServer.list({
-    from,
-    to,
-  });
-
-  if (isFailure(absences)) {
-    return <ErrorMessage failure={absences} />;
+  let absences: AbsenceDaysList;
+  try {
+    absences = await timesheetsAbsenceServer.list({
+      from,
+      to,
+    });
+  } catch (error) {
+    console.error(error);
+    return (
+      <ErrorMessage
+        failure={{
+          type: "__failure__",
+          code: "timesheets_absences_load_failed",
+          message: error instanceof Error ? error.message : String(error),
+        }}
+      />
+    );
   }
 
-  const absenceReasons = await kAbsenceDaysServer.listReasons();
-  if (isFailure(absenceReasons)) {
-    return <ErrorMessage failure={absenceReasons} />;
+  let absenceReasons: AbsenceReasonList;
+  try {
+    absenceReasons = await timesheetsAbsenceServer.listReasons();
+  } catch (error) {
+    console.error(error);
+    return (
+      <ErrorMessage
+        failure={{
+          type: "__failure__",
+          code: "timesheets_absence_reasons_load_failed",
+          message: error instanceof Error ? error.message : String(error),
+        }}
+      />
+    );
   }
 
-  const closures = await kClosuresServer.closures();
-  if (isFailure(closures)) {
-    return <ErrorMessage failure={closures} />;
+  let closures: ClosuresList;
+  try {
+    closures = await timesheetsClosuresServer.list();
+  } catch (error) {
+    console.error(error);
+    return (
+      <ErrorMessage
+        failure={{
+          type: "__failure__",
+          code: "timesheets_closures_load_failed",
+          message: error instanceof Error ? error.message : String(error),
+        }}
+      />
+    );
   }
 
   const uniqueReasons: string[] = [];

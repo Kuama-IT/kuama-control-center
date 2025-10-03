@@ -1,29 +1,39 @@
 "use server";
 
 import { handleServerErrors } from "@/utils/server-action-utils";
-import { cashFlowCategoryService } from "./cash-flow-category.service";
-import { CashFlowCategoryForm } from "./schemas/cash-flow-catefory-form.schema";
+import { cashFlowCategoryServer } from "./cash-flow-category.server";
+import {
+  cashFlowCategoryFormSchema,
+  CashFlowCategoryForm,
+} from "./schemas/cash-flow-catefory-form.schema";
+import { cashFlowCategoryUpdateSchema } from "./schemas/cash-flow-category.update.schema";
 
 export const handledDeleteCashFlowCategory = handleServerErrors(
   async (id: string) => {
-    const categoryId = parseInt(id, 10);
-    return await cashFlowCategoryService.delete(categoryId);
+    const categoryId = cashFlowCategoryUpdateSchema.shape.id.parse(
+      Number(id),
+    );
+    await cashFlowCategoryServer.remove(categoryId);
   }
 );
 
 export const handledCreateCashFlowCategory = handleServerErrors(
   async (dto: CashFlowCategoryForm) => {
-    return await cashFlowCategoryService.create(dto.name, dto.type);
+    const input = cashFlowCategoryFormSchema.parse(dto);
+    await cashFlowCategoryServer.create(input);
   }
 );
 
 export const handledUpdateCashFlowCategory = handleServerErrors(
   async ({ id, ...dto }: CashFlowCategoryForm & { id: string }) => {
-    const categoryId = parseInt(id, 10);
-    return await cashFlowCategoryService.update(categoryId, dto.name);
+    const data = cashFlowCategoryUpdateSchema.parse({
+      id: Number(id),
+      name: dto.name,
+    });
+    await cashFlowCategoryServer.update(data);
   }
 );
 
 export const handledGetAllCashFlowCategory = handleServerErrors(async () => {
-  return await cashFlowCategoryService.getAll();
+  return await cashFlowCategoryServer.list();
 });

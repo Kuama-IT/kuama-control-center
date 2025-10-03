@@ -4,7 +4,10 @@ import { kAbsenceReasons, kClosures } from "@/drizzle/schema";
 import { db } from "@/drizzle/drizzle-db";
 import { dipendentiInCloudApiClient } from "@/modules/dipendenti-in-cloud/dipendenti-in-cloud-api-client";
 import { revalidateTag } from "next/cache";
-import { KClosuresCacheTag } from "@/modules/k-closures/k-closures-cache-tags";
+import {
+  absenceReasonsCacheTag,
+  closuresCacheTag,
+} from "@/modules/timesheets/cache/cache-tags";
 
 const dipendentiInCloudImportAbsenceReasonsAndClosures = async () => {
   const absenceReasons = await dipendentiInCloudApiClient.getAbsenceReasons();
@@ -24,7 +27,8 @@ const dipendentiInCloudImportAbsenceReasonsAndClosures = async () => {
     );
   });
 
-  revalidateTag(KClosuresCacheTag);
+  revalidateTag(absenceReasonsCacheTag);
+  revalidateTag(closuresCacheTag);
 
   return {
     message: `Imported ${absenceReasons.length} absence reasons and ${closures.length} closures`,
