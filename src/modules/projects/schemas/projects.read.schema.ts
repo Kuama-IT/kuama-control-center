@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { TaskRead as KTaskRead } from "@/modules/tasks/schemas/tasks-schemas";
-import { KEmployeesRead } from "@/modules/employees/schemas/employees-schemas";
+import { TaskRead } from "@/modules/tasks/schemas/tasks-schemas";
+import { EmployeesRead } from "@/modules/employees/schemas/employees-schemas";
 
 export const projectReadSchema = z.object({
   id: z.number(),
@@ -12,7 +12,7 @@ export const projectReadSchema = z.object({
   endDate: z.string().nullable(),
 });
 export type ProjectRead = z.infer<typeof projectReadSchema>;
-export type ProjectReadExtended = ProjectRead & { tasks: KTaskRead[] } & {
+export type ProjectReadExtended = ProjectRead & { tasks: TaskRead[] } & {
   teams: TeamWithEmployeeRead[];
   projectMedias: ProjectMediaRead[];
 };
@@ -28,5 +28,5 @@ export const projectMediaReadSchema = z.object({
   projectId: z.number(),
 });
 export type TeamRead = z.infer<typeof teamReadSchema>;
-export type TeamWithEmployeeRead = TeamRead & { employee: KEmployeesRead };
+export type TeamWithEmployeeRead = TeamRead & { employee: EmployeesRead };
 export type ProjectMediaRead = z.infer<typeof projectMediaReadSchema>;

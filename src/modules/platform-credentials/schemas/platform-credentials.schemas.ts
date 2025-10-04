@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { KEmployeesRead as EmployeesRead } from "@/modules/employees/schemas/employees-schemas";
+import { EmployeesRead } from "@/modules/employees/schemas/employees-schemas";
 import { ProjectRead } from "@/modules/projects/schemas/projects.read.schema";
 
 export const SupportedPlatforms = z.enum([

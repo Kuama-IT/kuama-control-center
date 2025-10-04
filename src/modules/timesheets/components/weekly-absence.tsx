@@ -5,7 +5,7 @@ import {
   isToday,
   startOfWeek,
 } from "date-fns";
-import { KEmployeeAvatar } from "@/modules/employees/components/k-employee-avatar";
+import { EmployeeAvatar } from "@/modules/employees/components/employee-avatar";
 import parsePostgresInterval from "postgres-interval";
 import { Title } from "@/modules/ui/components/title";
 import { timesheetsAbsenceServer } from "@/modules/timesheets/timesheets-absence.server";
@@ -74,7 +74,7 @@ export default async function WeeklyAbsence() {
                   );
                   return (
                     <div key={index} className="flex gap-4 p-4 border rounded-lg">
-                      <KEmployeeAvatar employee={employee!} />
+                      <EmployeeAvatar avatarUrl={employee!.avatarUrl} fullName={employee!.fullName} />
                       <div className="flex flex-col gap-2">
                         {absence?.duration && (
                           <span className="font-bold">

@@ -47,7 +47,7 @@ const InnerHeader = ({
 	return (
 		<div className="flex gap-4 items-center p-8 top-0 relative z-10">
 			<BackButton />
-			<Image src={client.avatarUrl!} alt={client.name!} width={100} height={100} className="rounded-full animate-fade-in-from-left" />
+			<Image src={client.avatarUrl ?? "/youtrack-logo.svg"} alt={client.name!} width={100} height={100} className="rounded-full animate-fade-in-from-left" />
 			<h2 className="text-2xl animate-fade-in-from-left stagger-animation-700">{client.name}</h2>
 			<div className="flex-1"></div>
 			<div className="aspect-square p-4 rounded bg-accent h-32 flex flex-col gap-4 items-center justify-center text-foreground animate-fade-in-from-left stagger-animation-900">

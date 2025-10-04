@@ -6,7 +6,7 @@ import SyncFattureInCloud from "@/modules/fatture-in-cloud/components/sync-fattu
 import { SyncYoutrack } from "@/modules/settings/components/sync-youtrack";
 import SyncPubblicaWeb from "@/modules/pubblica-web/components/sync-pubblica-web";
 import AccessTokenManagement from "@/modules/access-tokens/components/access-token-management";
-import KPlatformCredentialsList from "@/modules/platform-credentials/components/platform-credentials-list";
+import PlatformCredentialsList from "@/modules/platform-credentials/components/platform-credentials-list";
 import { BackButton } from "@/modules/ui/components/back-button";
 import { AuthenticatedPageWrapper } from "@/modules/auth/authenticated-page-wrapper";
 
@@ -23,7 +23,7 @@ async function Page() {
       </div>
       <div className="grid grid-cols-4 gap-4">
         <div className="col-span-4">
-          <KPlatformCredentialsList />
+          <PlatformCredentialsList />
         </div>
         <SyncDipendentiInCloud />
         <SyncYoutrack />

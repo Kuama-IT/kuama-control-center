@@ -1,8 +1,8 @@
 import { Suspense } from "react";
-import KClientSpentTime from "@/modules/clients/components/client-spent-time";
+import ClientSpentTime from "@/modules/clients/components/client-spent-time";
 import { AddImageToProject } from "@/modules/projects/components/project-upload-images-button";
 import { ProjectSlider } from "@/modules/projects/components/project-slider";
-import { KEmployeeAvatar } from "@/modules/employees/components/k-employee-avatar";
+import { EmployeeAvatar } from "@/modules/employees/components/employee-avatar";
 import { ProjectReadExtended } from "@/modules/projects/schemas/projects.read.schema";
 
 export const Project = ({ project }: { project: ProjectReadExtended }) => {
@@ -19,7 +19,7 @@ export const Project = ({ project }: { project: ProjectReadExtended }) => {
         <div className="flex divide-x items-center">
           <div className="px-4">
             <Suspense fallback={"loading project month spent time total"}>
-              <KClientSpentTime date={new Date()} projectIds={[project.id]} />
+              <ClientSpentTime date={new Date()} projectIds={[project.id]} />
             </Suspense>
           </div>
 
@@ -31,7 +31,11 @@ export const Project = ({ project }: { project: ProjectReadExtended }) => {
 
       <div className="flex gap-2 py-4 px-8">
         {project.teams.map((member) => (
-          <KEmployeeAvatar key={member.id} employee={member.employee} />
+          <EmployeeAvatar
+            key={member.id}
+            avatarUrl={member.employee.avatarUrl}
+            fullName={member.employee.fullName}
+          />
         ))}
       </div>
 

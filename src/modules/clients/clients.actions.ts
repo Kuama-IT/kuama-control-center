@@ -5,6 +5,7 @@ import {
 	clientsVats,
 	employees,
 	invoices,
+	organizations,
 	projects as projectsTable,
 	spentTimes,
 	teams,
@@ -28,8 +29,8 @@ const readClientsWithDetails = async () =>
 		.select({
 			clientId: clients.id,
 			clientName: clients.name,
-			clientAvatarUrl: clients.avatarUrl,
-			youTrackRingId: clients.youTrackRingId,
+			clientAvatarUrl: organizations.avatarUrl,
+			youTrackRingId: organizations.youTrackRingId,
 			vatId: clientsVats.vatId,
 			vat: vats,
 			projectId: projectsTable.id,
@@ -39,6 +40,7 @@ const readClientsWithDetails = async () =>
 			employee: employees,
 		})
 		.from(clients)
+		.leftJoin(organizations, eq(organizations.clientId, clients.id))
 		.leftJoin(clientsVats, eq(clients.id, clientsVats.clientId))
 		.leftJoin(vats, eq(clientsVats.vatId, vats.id))
 		.leftJoin(projectsTable, eq(clients.id, projectsTable.clientId))
@@ -127,8 +129,9 @@ export const listAllAction = handleServerErrors(clientsListAllAction);
 
 // get one client with nested relations and month spent times
 const clientGetOneAction = async ({ id, date = new Date() }: { id: string; date?: Date }) => {
+		const clientId = parseInt(id);
 		const queryResult = await db.query.clients.findFirst({
-		where: eq(clients.id, parseInt(id)),
+		where: eq(clients.id, clientId),
 		with: {
 			projects: {
 				with: {
@@ -153,6 +156,11 @@ const clientGetOneAction = async ({ id, date = new Date() }: { id: string; date?
 		throw new Error("Client not found");
 	}
 
+	// Fetch organization info (avatarUrl, youTrackRingId) associated to this client
+	const organization = await db.query.organizations.findFirst({
+		where: eq(organizations.clientId, clientId),
+	});
+
 	const allTimeTasksCount = queryResult?.projects.reduce((acc, project) => acc + project.tasks.length, 0);
 	const projects = queryResult?.projects.map((project) => ({
 		...project,
@@ -167,7 +175,8 @@ const clientGetOneAction = async ({ id, date = new Date() }: { id: string; date?
 	return {
 		...queryResult,
 		projects,
-		avatarUrl: queryResult?.avatarUrl,
+		avatarUrl: organization?.avatarUrl ?? null,
+		youTrackRingId: organization?.youTrackRingId ?? null,
 		allTimeTasksCount,
 	};
 };

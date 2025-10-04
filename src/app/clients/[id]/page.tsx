@@ -1,4 +1,4 @@
-import KClientDetail from "@/modules/clients/components/client-detail";
+import ClientDetail from "@/modules/clients/components/client-detail";
 import { AuthenticatedPageWrapper } from "@/modules/auth/authenticated-page-wrapper";
 import { PageParams } from "@/modules/routing/schemas/routing-schemas";
 import { z } from "zod";
@@ -25,7 +25,7 @@ async function Page(pageParams: PageParams | undefined) {
   const { id } = paramsSchema.parse(awaited);
   return (
     <div>
-      <KClientDetail id={id} />
+  <ClientDetail id={id} />
     </div>
   );
 }

@@ -1,40 +1,44 @@
 "use client";
 import type { ClientListItem } from "@/modules/clients/clients.server";
 import { Client } from "@fattureincloud/fattureincloud-ts-sdk/src/models/client";
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import associateFattureInCloudClientAction from "@/modules/sync-data/actions/associate-fatture-in-cloud-client-action";
 import { useRouter } from "next/navigation";
-import { isFailure } from "@/utils/server-action-utils";
 import { notifyError, notifySuccess } from "@/modules/ui/components/notify";
+import { useServerActionMutation } from "@/modules/ui/hooks/useServerActionMutation";
 
 type Props = {
-  kClients: ClientListItem[];
+  clients: ClientListItem[];
   fattureInCloudClients: Array<Client>;
 };
-export const ClientsSelector = ({ kClients, fattureInCloudClients }: Props) => {
-  const [kClientId, setKClientId] = useState<number | undefined>(undefined);
+export const ClientsSelector = ({ clients, fattureInCloudClients }: Props) => {
+  const [selectedClientId, setSelectedClientId] = useState<number | undefined>(
+    undefined,
+  );
   const [fattureInCloudClient, setFattureInCloudClient] = useState<
     Client | undefined
   >(undefined);
   const router = useRouter();
-  const [isPending, startTransition] = useTransition();
+  const { mutateAsync, isPending } = useServerActionMutation(
+    associateFattureInCloudClientAction,
+  );
 
   return (
     <div className="flex flex-col gap-8">
       <div className="flex flex-col gap-4">
-        <h1 className="uppercase text-sm">K-Clients</h1>
+  <h1 className="uppercase text-sm">Clients</h1>
         <div className="overflow-x-auto px-2 py-4 max-w-xl">
           <ul className="flex gap-4">
-            {kClients.map((client) => (
+            {clients.map((client) => (
               <li
                 className={cn("rounded-lg transition-all p-4 cursor-pointer", {
-                  "shadow-lg": kClientId !== client.id,
-                  shadow: kClientId === client.id,
+                  "shadow-lg": selectedClientId !== client.id,
+                  shadow: selectedClientId === client.id,
                 })}
                 key={client.id}
-                onClick={() => setKClientId(client.id)}
+                onClick={() => setSelectedClientId(client.id)}
               >
                 <p className="font-bold text-sm">{client.name}</p>
                 {client.vats.map(({ vat, id }) => (
@@ -69,34 +73,27 @@ export const ClientsSelector = ({ kClients, fattureInCloudClients }: Props) => {
       </div>
       <div>
         <Button
-          disabled={!fattureInCloudClient || !kClientId || isPending}
+          disabled={!fattureInCloudClient || !selectedClientId || isPending}
           size="lg"
           className="sticky top-4"
-          onClick={() =>
-            startTransition(async () => {
-              if (!kClientId || !fattureInCloudClient) {
-                return;
-              }
-              const res = await associateFattureInCloudClientAction({
-                kClientId,
+          onClick={async () => {
+            if (!selectedClientId || !fattureInCloudClient) return;
+            try {
+              await mutateAsync({
+                kClientId: selectedClientId,
                 fattureInCloudClient,
               });
-
-              if (isFailure(res)) {
-                notifyError("Error while associating clients");
-                return;
-              }
-
-              const kClient = kClients.find(
-                (kClient) => kClient.id === kClientId,
+              const selectedClient = clients.find(
+                (client) => client.id === selectedClientId,
               );
-
               notifySuccess(
-                `Correctly associated ${fattureInCloudClient.vat_number} to ${kClient?.name}`,
+                `Correctly associated ${fattureInCloudClient.vat_number} to ${selectedClient?.name}`,
               );
               router.refresh();
-            })
-          }
+            } catch (e) {
+              notifyError("Error while associating clients");
+            }
+          }}
         >
           Associate
         </Button>

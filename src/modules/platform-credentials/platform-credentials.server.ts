@@ -12,7 +12,7 @@ import {
   platformCredentialsInsertSchema,
 } from "./schemas/platform-credentials.schemas";
 import type { ProjectRead } from "@/modules/projects/schemas/projects.read.schema";
-import type { KEmployeesRead as EmployeesRead } from "@/modules/employees/schemas/employees-schemas";
+import type { EmployeesRead } from "@/modules/employees/schemas/employees-schemas";
 import { auth } from "@/modules/auth/auth";
 
 const idSchema = z.number().int().positive();
@@ -151,9 +151,10 @@ async function remove(rawId: unknown) {
 }
 
 export const platformCredentialsServer = {
-  all: handleServerErrors(listAll),
-  byClient: handleServerErrors(byClient),
-  byId: handleServerErrors(byId),
-  create: handleServerErrors(create),
-  delete: handleServerErrors(remove),
+  // Note: do not wrap with handleServerErrors here; actions layer is responsible for wrapping
+  all: listAll,
+  byClient: byClient,
+  byId: byId,
+  create: create,
+  delete: remove,
 };

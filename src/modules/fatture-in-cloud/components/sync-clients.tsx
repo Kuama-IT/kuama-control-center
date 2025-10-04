@@ -6,15 +6,15 @@ import { ErrorMessage } from "@/modules/ui/components/error-message";
 
 export default async function SyncClients() {
   const fattureInCloudClients = await fattureInCloudApiClient.getClients();
-  const kClients = await clientsServer.listAll();
-  if (isFailure(kClients)) {
-    return <ErrorMessage failure={kClients} />;
+  const clients = await clientsServer.listAll();
+  if (isFailure(clients)) {
+    return <ErrorMessage failure={clients} />;
   }
   // filter out already associated clients
   const notAssociatedFattureInCloudClients = fattureInCloudClients.filter(
     (fattureInCloudClient) => {
-      return !kClients.some((kClient) => {
-        return kClient.vats.some(({ vat }) => {
+      return !clients.some((client) => {
+        return client.vats.some(({ vat }) => {
           return vat === fattureInCloudClient.vat_number;
         });
       });
@@ -23,7 +23,7 @@ export default async function SyncClients() {
 
   return (
     <ClientsSelector
-      kClients={kClients}
+      clients={clients}
       fattureInCloudClients={notAssociatedFattureInCloudClients}
     />
   );

@@ -7,12 +7,12 @@ import {
   listAllAction,
 } from "./clients.actions";
 import type { ClientRead, VatRead } from "./schemas/clients-schemas";
-import type { KEmployeesRead } from "@/modules/employees/schemas/employees-schemas";
+import type { EmployeesRead } from "@/modules/employees/schemas/employees-schemas";
 
 export type ProjectWithTeam = {
   id: number;
   name: string | null;
-  team: KEmployeesRead[];
+  team: EmployeesRead[];
 };
 
 export type ClientListItem = ClientRead & {

@@ -1,1 +1,1 @@
-export { platformCredentialsServer as kPlatformCredentialsServer } from "./platform-credentials.server";
+// Removed legacy compat export. If you need kPlatformCredentialsServer, import platformCredentialsServer directly.

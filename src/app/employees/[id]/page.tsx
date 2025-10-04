@@ -1,5 +1,5 @@
 import { AuthenticatedPageWrapper } from "@/modules/auth/authenticated-page-wrapper";
-import KEmployeeDetail from "@/modules/employees/components/k-employee-detail";
+import EmployeeDetail from "@/modules/employees/components/employee-detail";
 import { PageParams } from "@/modules/routing/schemas/routing-schemas";
 import { ErrorMessage } from "@/modules/ui/components/error-message";
 import { z } from "zod";
@@ -24,7 +24,7 @@ async function Page(pageParams: PageParams | undefined) {
 
   const { id } = paramsSchema.parse(awaited);
 
-  return <KEmployeeDetail id={Number(id)} />;
+  return <EmployeeDetail id={Number(id)} />;
 }
 
 export default async function (params: PageParams) {

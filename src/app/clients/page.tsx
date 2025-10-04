@@ -1,4 +1,4 @@
-import KClientsList from "@/modules/clients/components/clients-list";
+import ClientsList from "@/modules/clients/components/clients-list";
 import type { Metadata } from "next";
 import { AuthenticatedPageWrapper } from "@/modules/auth/authenticated-page-wrapper";
 
@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 async function Page() {
   return (
     <div className="max-w-(--breakpoint-lg) mx-auto">
-      <KClientsList />
+  <ClientsList />
     </div>
   );
 }

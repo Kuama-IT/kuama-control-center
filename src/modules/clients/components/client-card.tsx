@@ -12,6 +12,7 @@ type Props = {
   client: ClientListItem;
   index?: number;
 };
+
 export default async function ClientCard({ client, index = 0 }: Props) {
   const style = {
     "--animation-duration": `${0.3 + index}s`,
@@ -31,7 +32,7 @@ export default async function ClientCard({ client, index = 0 }: Props) {
           </Suspense>
           <div className="flex gap-4 items-center">
             <div className="rounded-full w-[50px] h-[50px] relative overflow-hidden bg-white flex items-center justify-center">
-              <Image src={client.avatarUrl!} alt={client.name!} height={100} width={100} />
+              <Image src={client.avatarUrl ?? "/youtrack-logo.svg"} alt={client.name!} height={100} width={100} />
             </div>
             <h2 className="text-xl">{client.name}</h2>
           </div>

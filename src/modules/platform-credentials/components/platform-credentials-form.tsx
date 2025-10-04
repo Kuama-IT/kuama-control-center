@@ -27,10 +27,10 @@ import {
 } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { createAction } from "../platform-credentials.actions";
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { isFailure } from "@/utils/server-action-utils";
 import { notifyError, notifySuccess } from "@/modules/ui/components/notify";
+import { useServerActionMutation } from "@/modules/ui/hooks/useServerActionMutation";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -78,22 +78,20 @@ export default function PlatformCredentialsForm({
 	const formClientId = form.watch("clientId");
 	const formProjectId = form.watch("projectId");
 	const router = useRouter();
-	const [isPending, startTransition] = useTransition();
+		const { mutateAsync, isPending } = useServerActionMutation(createAction);
 
-	const onCredentialsValidAction = async (
-		credentials: PlatformCredentialsValidForm,
-	) => {
-		startTransition(async () => {
-			const res = await createAction({ ...credentials });
-			if (isFailure(res)) {
+		const onCredentialsValidAction = async (
+			credentials: PlatformCredentialsValidForm,
+		) => {
+			try {
+				await mutateAsync({ ...credentials });
+				notifySuccess("Credentials created");
+				router.refresh();
+				form.reset();
+			} catch (e) {
 				notifyError("Error during credentials creation, check server logs");
-				return;
 			}
-			notifySuccess("Credentials created");
-			router.refresh();
-			form.reset();
-		});
-	};
+		};
 
 	return (
 		<Form {...form}>

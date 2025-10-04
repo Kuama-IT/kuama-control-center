@@ -1,6 +1,6 @@
-import KEmployees from "@/modules/employees/components/k-employee-list";
 import type { Metadata } from "next";
 import { AuthenticatedPageWrapper } from "@/modules/auth/authenticated-page-wrapper";
+import Employees from "@/modules/employees/components/employee-list";
 
 export const metadata: Metadata = {
   title: "Employees | K1 App",
@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 async function Page() {
   return (
     <div className="max-w-(--breakpoint-lg) mx-auto pt-4">
-      <KEmployees />
+      <Employees />
     </div>
   );
 }

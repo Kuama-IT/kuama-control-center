@@ -102,8 +102,14 @@ export const clientsVats = pgTable(
 export const clients = pgTable("clients", {
   id: serial().primaryKey(),
   name: varchar({ length: 256 }).notNull(),
+});
+
+export const organizations = pgTable("organizations", {
+  id: serial().primaryKey(),
+  name: varchar({ length: 256 }).notNull(),
   avatarUrl: text(),
   youTrackRingId: varchar({ length: 256 }).unique(),
+  clientId: serial().references(() => clients.id),
 });
 
 // We can agree with the client to have a fixed daily rate for a project...

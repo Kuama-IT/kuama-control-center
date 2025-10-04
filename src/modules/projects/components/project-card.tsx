@@ -2,14 +2,12 @@ import { CSSProperties, Suspense } from "react";
 import Link from "next/link";
 import { routes } from "@/modules/ui/routes";
 import { HiArrowSmRight } from "react-icons/hi";
-import KClientSpentTime from "@/modules/clients/components/client-spent-time";
+import ClientSpentTime from "@/modules/clients/components/client-spent-time";
 import { ProjectRead } from "@/modules/projects/schemas/projects.read.schema";
-import { ClientRead as KClientRead } from "@/modules/clients/schemas/clients-schemas";
 
+type MinimalClient = { id: number; name: string };
 type Props = {
-  project: ProjectRead & {
-    client: KClientRead;
-  };
+  project: ProjectRead & { client: MinimalClient };
   index?: number;
 };
 
@@ -34,7 +32,7 @@ export const ProjectCard = ({ project, index = 0 }: Props) => {
               <Suspense>
                 <div className="absolute inset-0 opacity-50 pointer-events-none">
                   {/* todo ProjectReportedSpentTimeGraph */}
-                  <KClientSpentTime
+                  <ClientSpentTime
                     className="text-sm"
                     date={new Date()}
                     projectIds={[project.id]}
