@@ -39,7 +39,7 @@ const kClientGetTasksAndSpentTimesByProjects = async ({
 
       const monthSpentTime = queryResult.reduce(
         (acc, task) => {
-          const taskSpentTime = task.kSpentTimes.reduce(
+          const taskSpentTime = task.spentTimes.reduce(
             (acc, spentTime) => {
               if (!spentTime.duration) {
                 return acc;

@@ -1,9 +1,9 @@
 "use server";
 import { db } from "@/drizzle/drizzle-db";
 import {
-  kAbsenceDays,
-  kEmployees,
-  kPresenceDays,
+  absenceDays,
+  employees,
+  presenceDays,
   teams,
 } from "@/drizzle/schema";
 import { eq } from "drizzle-orm";
@@ -11,10 +11,10 @@ import { handleServerErrors } from "@/utils/server-action-utils";
 
 async function deleteKEmployee(id: number) {
   await db.transaction(async (trx) => {
-    await trx.delete(kPresenceDays).where(eq(kPresenceDays.employeeId, id));
-    await trx.delete(kAbsenceDays).where(eq(kAbsenceDays.employeeId, id));
+    await trx.delete(presenceDays).where(eq(presenceDays.employeeId, id));
+    await trx.delete(absenceDays).where(eq(absenceDays.employeeId, id));
     await trx.delete(teams).where(eq(teams.employeeId, id));
-    await trx.delete(kEmployees).where(eq(kEmployees.id, id));
+    await trx.delete(employees).where(eq(employees.id, id));
   });
 }
 

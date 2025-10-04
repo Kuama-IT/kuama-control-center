@@ -1,7 +1,7 @@
 "use server";
 import {
-  kPlatformCredentials,
-  kPlatformCredentialsToEmployeesAndProjects,
+  platformCredentials,
+  platformCredentialsToEmployeesAndProjects,
 } from "@/drizzle/schema";
 import { db } from "@/drizzle/drizzle-db";
 import { eq } from "drizzle-orm";
@@ -14,17 +14,17 @@ const handled = handleServerErrors(async (credentialsId: number) => {
     throw new Error("Only admin is allowed to invoke this action");
   }
   await db
-    .delete(kPlatformCredentialsToEmployeesAndProjects)
+    .delete(platformCredentialsToEmployeesAndProjects)
     .where(
       eq(
-        kPlatformCredentialsToEmployeesAndProjects.platformCredentialsId,
+        platformCredentialsToEmployeesAndProjects.platformCredentialsId,
         credentialsId,
       ),
     );
 
   await db
-    .delete(kPlatformCredentials)
-    .where(eq(kPlatformCredentials.id, credentialsId));
+    .delete(platformCredentials)
+    .where(eq(platformCredentials.id, credentialsId));
 });
 
 export default handled;

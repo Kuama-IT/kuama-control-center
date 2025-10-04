@@ -1,7 +1,7 @@
 "use server";
 import { Client } from "@fattureincloud/fattureincloud-ts-sdk/src/models/client";
 import { db } from "@/drizzle/drizzle-db";
-import { kClientsVats, kVats } from "@/drizzle/schema";
+import { clientsVats, vats } from "@/drizzle/schema";
 import { handleServerErrors } from "@/utils/server-action-utils";
 import { fattureInCloudClientSchema } from "@/modules/fatture-in-cloud/schemas/fatture-in-cloud-schemas";
 import { firstOrThrow } from "@/utils/array-utils";
@@ -15,25 +15,25 @@ async function associateFattureInCloudClientAction({
 }) {
   const parsed = fattureInCloudClientSchema.parse(fattureInCloudClient);
 
-  const data: typeof kVats.$inferInsert = {
+  const data: typeof vats.$inferInsert = {
     vat: parsed.vat_number,
     companyName: parsed.name,
     fattureInCloudId: parsed.id.toString(),
   };
   const vatRecords = await db
-    .insert(kVats)
+    .insert(vats)
     .values(data)
     .onConflictDoUpdate({
-      target: kVats.vat,
+      target: vats.vat,
       set: { companyName: parsed.name, fattureInCloudId: parsed.id.toString() },
     })
-    .returning({ vatId: kVats.id });
+    .returning({ vatId: vats.id });
   const { vatId } = firstOrThrow(vatRecords);
-  const relation: typeof kClientsVats.$inferInsert = {
+  const relation: typeof clientsVats.$inferInsert = {
     clientId: kClientId,
     vatId,
   };
-  await db.insert(kClientsVats).values(relation);
+  await db.insert(clientsVats).values(relation);
 }
 
 const handled = handleServerErrors(associateFattureInCloudClientAction);

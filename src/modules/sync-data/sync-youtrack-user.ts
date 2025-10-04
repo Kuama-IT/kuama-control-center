@@ -1,6 +1,6 @@
 import { ReducedUser } from "@/modules/you-track/schemas/youtrack-schemas";
 import { db } from "@/drizzle/drizzle-db";
-import { kSpentTimes } from "@/drizzle/schema";
+import { spentTimes } from "@/drizzle/schema";
 import { youtrackApiClient } from "@/modules/you-track/youtrack-api-client";
 import { format } from "date-fns";
 
@@ -74,7 +74,7 @@ export const syncYouTrackUser = async (
         throw new Error(`Task not found for work item ${workItem.id}`);
       }
 
-      const spentTimePayload: typeof kSpentTimes.$inferInsert = {
+      const spentTimePayload: typeof spentTimes.$inferInsert = {
         duration: `${workItem.duration.minutes} minutes`,
         date: format(new Date(workItem.date), "yyyy-MM-dd"),
         taskId: task?.id,
@@ -82,8 +82,8 @@ export const syncYouTrackUser = async (
         platform: "youtrack",
       };
 
-      await tx.insert(kSpentTimes).values(spentTimePayload).onConflictDoUpdate({
-        target: kSpentTimes.externalTrackerId,
+      await tx.insert(spentTimes).values(spentTimePayload).onConflictDoUpdate({
+        target: spentTimes.externalTrackerId,
         set: spentTimePayload,
       });
     }

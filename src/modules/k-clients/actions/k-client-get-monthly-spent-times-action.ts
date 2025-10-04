@@ -29,7 +29,7 @@ const kClientGetMonthlySpentTimesAction = async (
         return [];
       }
 
-      const allSpentTimes = queryResult.map((it) => it.kSpentTimes).flat();
+      const allSpentTimes = queryResult.map((it) => it.spentTimes).flat();
       const reduced: Map<string, number> = allSpentTimes.reduce<
         Map<string, number>
       >((acc, spentTime) => {

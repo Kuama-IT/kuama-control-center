@@ -4,7 +4,7 @@ import {
   kPlatformCredentialsFormSchema,
   KPlatformCredentialsValidForm,
   KSupportedPlatforms,
-} from "@/modules/k-platform-credentials/schemas/k-platform-credentials-schemas";
+} from "@/modules/k-platform-credentials/schemas/k-platform-credentials.schemas";
 import { Button } from "@/components/ui/button";
 import {
   Select,

@@ -1,5 +1,5 @@
 import { db } from "@/drizzle/drizzle-db";
-import { kAbsenceDays, kAbsenceReasons, kEmployees } from "@/drizzle/schema";
+import { absenceDays, absenceReasons, employees } from "@/drizzle/schema";
 import { and, eq, gte, lte } from "drizzle-orm";
 import { format } from "date-fns";
 
@@ -11,18 +11,18 @@ export type ListAbsenceDaysParams = {
 async function selectAbsenceDays({ from, to }: ListAbsenceDaysParams) {
   return db
     .select()
-    .from(kAbsenceDays)
-    .leftJoin(kEmployees, eq(kAbsenceDays.employeeId, kEmployees.id))
+    .from(absenceDays)
+    .leftJoin(employees, eq(absenceDays.employeeId, employees.id))
     .where(
       and(
-        gte(kAbsenceDays.date, format(from, "yyyy-MM-dd")),
-        lte(kAbsenceDays.date, format(to, "yyyy-MM-dd")),
+        gte(absenceDays.date, format(from, "yyyy-MM-dd")),
+        lte(absenceDays.date, format(to, "yyyy-MM-dd")),
       ),
     );
 }
 
 async function selectAbsenceReasons() {
-  return db.select().from(kAbsenceReasons);
+  return db.select().from(absenceReasons);
 }
 
 export const timesheetsAbsenceDb = {

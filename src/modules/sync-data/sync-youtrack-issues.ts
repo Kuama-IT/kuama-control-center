@@ -3,7 +3,7 @@ import {
   YouTrackIssue,
 } from "@/modules/you-track/schemas/youtrack-schemas";
 import { db } from "@/drizzle/drizzle-db";
-import { kTasks, teams } from "@/drizzle/schema";
+import { tasks, teams } from "@/drizzle/schema";
 
 import { format } from "date-fns";
 import { ProjectRead } from "@/modules/projects/schemas/projects.read.schema";
@@ -45,7 +45,7 @@ export const syncYouTrackIssuesFromWorkItems = async (
   }
 
   const issues = Array.from(workItemsIssuesMap.values());
-  const tasks: SyncYouTrackIssuesFromWorkItemsResult = [];
+  const tasksData: SyncYouTrackIssuesFromWorkItemsResult = [];
 
   console.log(`syncing teams`);
 
@@ -74,7 +74,7 @@ export const syncYouTrackIssuesFromWorkItems = async (
         throw new Error(`Project not found for issue ${issue.id}`);
       }
 
-      const taskPayload: typeof kTasks.$inferInsert = {
+      const taskPayload: typeof tasks.$inferInsert = {
         name: issue.idReadable,
         description: issue.summary,
         externalTrackerId: issue.id,
@@ -85,20 +85,20 @@ export const syncYouTrackIssuesFromWorkItems = async (
       };
 
       const res = await tx
-        .insert(kTasks)
+        .insert(tasks)
         .values(taskPayload)
         .onConflictDoUpdate({
-          target: kTasks.externalTrackerId,
+          target: tasks.externalTrackerId,
           set: taskPayload,
         })
-        .returning({ taskId: kTasks.id });
+        .returning({ taskId: tasks.id });
 
       if (res.length != 1) {
         throw new Error(`Could not upsert task ${issue.id}`);
       }
-      tasks.push({ id: res[0].taskId, youTrackId: issue.id });
+      tasksData.push({ id: res[0].taskId, youTrackId: issue.id });
     }
   });
 
-  return tasks;
+  return tasksData;
 };

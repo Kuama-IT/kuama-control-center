@@ -3,7 +3,7 @@ import { kPlatformCredentialsServer } from "@/modules/k-platform-credentials/k-p
 import { EasyRedmineApiClient } from "@/modules/easyredmine/easyredmine-api-client";
 import { handleServerErrors, isFailure } from "@/utils/server-action-utils";
 import { db } from "@/drizzle/drizzle-db";
-import { kSpentTimes, kTasks } from "@/drizzle/schema";
+import { spentTimes, tasks } from "@/drizzle/schema";
 import { format } from "date-fns";
 import { firstOrThrow } from "@/utils/array-utils";
 
@@ -34,10 +34,10 @@ const action = async (
       credentials.persistentToken
     );
 
-    const spentTimes = await client.getSpentTimes(range);
+    const spentTimesResult = await client.getSpentTimes(range);
     await db.transaction(async (tx) => {
-      for (const spentTime of spentTimes.timesSpent) {
-        const taskPayload: typeof kTasks.$inferInsert = {
+      for (const spentTime of spentTimesResult.timesSpent) {
+        const taskPayload: typeof tasks.$inferInsert = {
           name: spentTime.task.subject,
           description: spentTime.task.subject,
           externalTrackerId: spentTime.task.id,
@@ -48,13 +48,13 @@ const action = async (
         };
 
         const res = await tx
-          .insert(kTasks)
+          .insert(tasks)
           .values(taskPayload)
           .onConflictDoUpdate({
-            target: kTasks.externalTrackerId,
+            target: tasks.externalTrackerId,
             set: taskPayload,
           })
-          .returning({ taskId: kTasks.id });
+          .returning({ taskId: tasks.id });
 
         if (res.length != 1) {
           throw new Error(`Could not upsert task ${spentTime.task.id}`);
@@ -65,7 +65,7 @@ const action = async (
         console.log(
           `spending time for task ${spentTime.task.subject}: ${spentTime.spentTime}`
         );
-        const spentTimePayload: typeof kSpentTimes.$inferInsert = {
+        const spentTimePayload: typeof spentTimes.$inferInsert = {
           duration: `${spentTime.spentTime} hour`,
           date: format(new Date(spentTime.date), "yyyy-MM-dd"),
           taskId: taskId,
@@ -74,10 +74,10 @@ const action = async (
         };
 
         await tx
-          .insert(kSpentTimes)
+          .insert(spentTimes)
           .values(spentTimePayload)
           .onConflictDoUpdate({
-            target: kSpentTimes.externalTrackerId,
+            target: spentTimes.externalTrackerId,
             set: spentTimePayload,
           });
       }

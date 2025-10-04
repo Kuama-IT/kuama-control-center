@@ -1,8 +1,8 @@
 import { db } from "@/drizzle/drizzle-db";
-import { kClosures } from "@/drizzle/schema";
+import { closures } from "@/drizzle/schema";
 
 async function selectClosures() {
-  return db.select().from(kClosures);
+  return db.select().from(closures);
 }
 
 export const timesheetsClosuresDb = {

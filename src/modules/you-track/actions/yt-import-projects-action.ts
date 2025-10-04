@@ -2,12 +2,12 @@
 import { db } from "@/drizzle/drizzle-db";
 import { handleServerErrors } from "@/utils/server-action-utils";
 import { youtrackApiClient } from "@/modules/you-track/youtrack-api-client";
-import { kClients, projects as projectsTable } from "@/drizzle/schema";
+import { clients, projects as projectsTable } from "@/drizzle/schema";
 import { count } from "drizzle-orm";
 import { firstOrThrow } from "@/utils/array-utils";
 
 const handled = handleServerErrors(async () => {
-  const clients = await db.select().from(kClients);
+  const clientsResult = await db.select().from(clients);
 
   const projects = await youtrackApiClient.getProjects();
   const organizations = await youtrackApiClient.getOrganizations();
@@ -24,7 +24,7 @@ const handled = handleServerErrors(async () => {
       );
     }
 
-    const client = clients.find(
+    const client = clientsResult.find(
       (it) => it.youTrackRingId === organization.ringId
     );
     if (!client && organization.name.toLowerCase().includes("kuama")) {

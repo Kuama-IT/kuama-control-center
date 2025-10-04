@@ -1,7 +1,7 @@
 "use server";
 import { db } from "@/drizzle/drizzle-db";
 import { and, eq, gte, lte } from "drizzle-orm";
-import { kClients, kSpentTimes } from "@/drizzle/schema";
+import { clients, spentTimes } from "@/drizzle/schema";
 import { endOfMonth, format, startOfMonth } from "date-fns";
 import { handleServerErrors } from "@/utils/server-action-utils";
 
@@ -12,8 +12,8 @@ const kClientGetOneAction = async ({
   id: string;
   date?: Date;
 }) => {
-  const queryResult = await db.query.kClients.findFirst({
-    where: eq(kClients.id, parseInt(id)),
+  const queryResult = await db.query.clients.findFirst({
+    where: eq(clients.id, parseInt(id)),
     with: {
       projects: {
         with: {
@@ -23,15 +23,15 @@ const kClientGetOneAction = async ({
             },
           },
           projectMedias: true,
-          kTasks: {
+          tasks: {
             with: {
-              kSpentTimes: {
+              spentTimes: {
                 where: and(
                   gte(
-                    kSpentTimes.date,
+                    spentTimes.date,
                     format(startOfMonth(date), "yyyy-MM-dd")
                   ),
-                  lte(kSpentTimes.date, format(endOfMonth(date), "yyyy-MM-dd"))
+                  lte(spentTimes.date, format(endOfMonth(date), "yyyy-MM-dd"))
                 ),
               },
             },
@@ -46,7 +46,7 @@ const kClientGetOneAction = async ({
   }
 
   const allTimeTasksCount = queryResult?.projects.reduce(
-    (acc, project) => acc + project.kTasks.length,
+    (acc, project) => acc + project.tasks.length,
     0
   );
   const projects = queryResult?.projects.map((project) => ({

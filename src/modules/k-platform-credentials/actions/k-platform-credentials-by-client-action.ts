@@ -12,9 +12,9 @@ const handled = handleServerErrors(async (clientId: number) => {
     .from(projectsTable)
     .where(eq(projectsTable.clientId, clientId));
 
-  return await db.query.kPlatformCredentials.findMany({
+  return await db.query.platformCredentials.findMany({
     with: {
-      kPlatformCredentialsToEmployeesAndProjects: {
+      platformCredentialsToEmployeesAndProjects: {
         where: (records, { inArray }) => {
           return inArray(
             records.projectId,

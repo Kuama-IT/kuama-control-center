@@ -1,10 +1,10 @@
 import { db } from "@/drizzle/drizzle-db";
-import { kEmployees, pubblicaWebPayrolls } from "@/drizzle/schema";
+import { employees, pubblicaWebPayrolls } from "@/drizzle/schema";
 import { desc, eq } from "drizzle-orm";
 import { parse, differenceInYears, isValid } from "date-fns";
 
 export type EmployeeWithPayrolls = Omit<
-  typeof kEmployees.$inferSelect,
+  typeof employees.$inferSelect,
   "birthdate" | "hiredOn"
 > & {
   birthdate: Date | null;
@@ -17,12 +17,12 @@ export type EmployeeWithPayrolls = Omit<
 
 export const employeesService = {
   async allWithPayrolls() {
-    const employees = await db.select().from(kEmployees);
+    const employeesResult = await db.select().from(employees);
 
     const today = new Date();
 
     const data = await Promise.all(
-      employees.map(async (employee) => {
+      employeesResult.map(async (employee) => {
         const { birthdate: rawBirthdate, hiredOn: rawHiredOn, ...rest } = employee;
 
         const payrolls = employee.fullName

@@ -1,5 +1,5 @@
 import { db } from "@/drizzle/drizzle-db";
-import { kInvoices } from "@/drizzle/schema";
+import { invoices } from "@/drizzle/schema";
 import { sum } from "drizzle-orm";
 import { firstOrThrow } from "@/utils/array-utils";
 import { handleServerErrors } from "@/utils/server-action-utils";
@@ -11,8 +11,8 @@ async function kClientGetOverallInvoicedAmount() {
     throw new Error("Only admin is allowed to invoke this action");
   }
   const amounts = await db
-    .select({ value: sum(kInvoices.amountGross) })
-    .from(kInvoices);
+    .select({ value: sum(invoices.amountGross) })
+    .from(invoices);
   const amount = firstOrThrow(amounts);
 
   if (!amount.value) {

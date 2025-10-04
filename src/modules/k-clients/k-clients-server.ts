@@ -19,7 +19,7 @@ export type ProjectWithTeam = {
 export type KClientListItem = KClientRead & {
   projectsCount: number;
   employeesWorkingForClientCount: number;
-  kVats: Array<KVatRead>;
+  vats: Array<KVatRead>;
   projects: ProjectWithTeam[];
 };
 

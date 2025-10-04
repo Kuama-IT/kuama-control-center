@@ -1,6 +1,6 @@
 import { EasyRedmineApiClient } from "@/modules/easyredmine/easyredmine-api-client";
 import { handleServerErrors } from "@/utils/server-action-utils";
-import { KPlatformCredentialsRead } from "@/modules/k-platform-credentials/schemas/k-platform-credentials-schemas";
+import { KPlatformCredentialsRead } from "@/modules/k-platform-credentials/schemas/k-platform-credentials.schemas";
 
 async function easyRedmineGetSpentTimes({
   credentials,

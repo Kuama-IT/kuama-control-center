@@ -1,14 +1,14 @@
 "use server";
 import { fattureInCloudApiClient } from "@/modules/fatture-in-cloud/fatture-in-cloud-api-client";
 import { db } from "@/drizzle/drizzle-db";
-import { kInvoices, kVats } from "@/drizzle/schema";
+import { invoices, vats } from "@/drizzle/schema";
 import { eq, sql } from "drizzle-orm";
 import { handleServerErrors } from "@/utils/server-action-utils";
 import { firstOrThrow } from "@/utils/array-utils";
 import type { IssuedDocument } from "@fattureincloud/fattureincloud-ts-sdk";
 
 const BATCH_SIZE = 100;
-type KInvoiceInsert = typeof kInvoices.$inferInsert;
+type KInvoiceInsert = typeof invoices.$inferInsert;
 
 const handled = handleServerErrors(async () => {
   // const fattureInCloudInvoices =
@@ -37,22 +37,22 @@ const handled = handleServerErrors(async () => {
   //     )
   //     SELECT vat_list.vat
   //     FROM vat_list
-  //     LEFT JOIN ${kVats} ON vat_list.vat = ${kVats}.vat
-  //     WHERE ${kVats}.vat IS NULL;
+  //     LEFT JOIN ${vats} ON vat_list.vat = ${vats}.vat
+  //     WHERE ${vats}.vat IS NULL;
   //   `
   // );
 
   // const missingVats: string[] = missingVatsRows.map((row) => row.vat as string);
 
   // if (missingVats.length > 0) {
-  //   const values: (typeof kVats.$inferInsert)[] = [];
+  //   const values: (typeof vats.$inferInsert)[] = [];
   //   for (const vat of missingVats) {
   //     const fattureInCloudInvoice = invoicesByVat.get(vat)?.at(0);
   //     if (!fattureInCloudInvoice) {
   //       continue;
   //     }
 
-  //     const value: typeof kVats.$inferInsert = {
+  //     const value: typeof vats.$inferInsert = {
   //       vat: fattureInCloudInvoice.entity?.vat_number ?? "",
   //       companyName: fattureInCloudInvoice.entity?.name ?? "UNKNOWN",
   //       fattureInCloudId: fattureInCloudInvoice.entity?.id?.toString(),
@@ -61,7 +61,7 @@ const handled = handleServerErrors(async () => {
   //   }
 
   //   await db.transaction(async (tx) => {
-  //     await tx.insert(kVats).values(values);
+  //     await tx.insert(vats).values(values);
   //   });
   // }
 
@@ -77,8 +77,8 @@ const handled = handleServerErrors(async () => {
   //         }
   //         const vatRecords = await db
   //           .select()
-  //           .from(kVats)
-  //           .where(eq(kVats.vat, vat));
+  //           .from(vats)
+  //           .where(eq(vats.vat, vat));
 
   //         const vatRecord = firstOrThrow(vatRecords);
 
@@ -97,7 +97,7 @@ const handled = handleServerErrors(async () => {
   //     );
 
   //     await tx
-  //       .insert(kInvoices)
+  //       .insert(invoices)
   //       .values(
   //         records.filter((record): record is KInvoiceInsert => record != null)
   //       )

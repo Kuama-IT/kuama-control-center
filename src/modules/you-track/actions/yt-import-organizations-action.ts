@@ -2,14 +2,14 @@
 import { db } from "@/drizzle/drizzle-db";
 import { handleServerErrors } from "@/utils/server-action-utils";
 import { youtrackApiClient } from "@/modules/you-track/youtrack-api-client";
-import { kClients } from "@/drizzle/schema";
+import { clients } from "@/drizzle/schema";
 import { prefixWithYouTrackAvatarBaseUrl } from "@/modules/you-track/youtrack-utils";
 import { count } from "drizzle-orm";
 import { firstOrThrow } from "@/utils/array-utils";
 
 const handled = handleServerErrors(async () => {
   const organizations = await youtrackApiClient.getOrganizations();
-  const payload: (typeof kClients.$inferInsert)[] = organizations
+  const payload: (typeof clients.$inferInsert)[] = organizations
     .filter((it) => !it.name.toLowerCase().includes("kuama"))
     .map((organization) => ({
       name: organization.name,
@@ -18,11 +18,11 @@ const handled = handleServerErrors(async () => {
     }));
 
   await db.transaction(async (tx) => {
-    await tx.delete(kClients);
-    await tx.insert(kClients).values(payload);
+    await tx.delete(clients);
+    await tx.insert(clients).values(payload);
   });
 
-  const query = await db.select({ count: count() }).from(kClients);
+  const query = await db.select({ count: count() }).from(clients);
   const result = firstOrThrow(query);
 
   return { message: `Now you have ${result.count} clients` };

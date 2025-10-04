@@ -4,7 +4,7 @@ import { youtrackApiClient } from "@/modules/you-track/youtrack-api-client";
 import { db } from "@/drizzle/drizzle-db";
 import { eq } from "drizzle-orm";
 import {
-  kEmployees,
+  employees,
   projects as projectsTable,
   teams,
   lower,
@@ -38,10 +38,10 @@ const handled = handleServerErrors(async () => {
         }
         const employeeQuery = await tx
           .select()
-          .from(kEmployees)
+          .from(employees)
           .where(
             eq(
-              lower(kEmployees.email),
+              lower(employees.email),
               ytUser.profile.email?.email?.toLowerCase()
             )
           );

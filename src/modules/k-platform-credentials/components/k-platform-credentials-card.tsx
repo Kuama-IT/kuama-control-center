@@ -40,7 +40,7 @@ import { Separator } from "@/components/ui/separator";
 import { notifyError, notifySuccess } from "@/modules/ui/components/notify";
 import { CopyButton } from "@/modules/ui/components/copy-button";
 import { MdOutlineToken } from "react-icons/md";
-import { KPlatformCredentialsFullRead } from "@/modules/k-platform-credentials/schemas/k-platform-credentials-schemas";
+import { KPlatformCredentialsFullRead } from "@/modules/k-platform-credentials/schemas/k-platform-credentials.schemas";
 import { useDateRange } from "@/modules/ui/hooks/useDateRange";
 
 export const KPlatformCredentialsCard = ({

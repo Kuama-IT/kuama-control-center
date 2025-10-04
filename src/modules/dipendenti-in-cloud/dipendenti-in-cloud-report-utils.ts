@@ -1,10 +1,8 @@
 import { eachDayOfInterval, format, getDate, getDay, parseISO } from "date-fns";
 import { it } from "date-fns/locale";
-import { AbsenceDaysList } from "@/modules/timesheets/timesheets-absence.server";
-import { KEmployeesListAllActionResult } from "@/modules/k-employees/actions/k-employee-list-all-action";
+import type { AbsenceDaysList, AbsenceReasonList, ClosuresList } from "@/modules/timesheets/schemas";
+import { EmployeesListAllActionResult } from "@/modules/k-employees/actions/k-employee-list-all-action";
 import parsePostgresInterval from "postgres-interval";
-import { AbsenceReasonList } from "@/modules/timesheets/timesheets-absence.server";
-import type { ClosuresList } from "@/modules/timesheets/timesheets-closures.server";
 import { ChronoUnit, Duration } from "@js-joda/core";
 
 export type DipendentiInCloudReportProps = {
@@ -12,7 +10,7 @@ export type DipendentiInCloudReportProps = {
   to: Date;
   absences: AbsenceDaysList;
   uniqueAbsenceReasons: string[];
-  employees: KEmployeesListAllActionResult;
+  employees: EmployeesListAllActionResult;
   absenceReasons: AbsenceReasonList;
   closures: ClosuresList;
 };
@@ -156,7 +154,7 @@ export const getDataForReport = ({
   const rows: ReportRow[] = [];
 
   const absencesByEmployee = absences.reduce((acc, absence) => {
-    const employeeId = absence.k_employees?.id;
+    const employeeId = absence.employees?.id;
     if (!employeeId) {
       return acc;
     }
@@ -165,15 +163,15 @@ export const getDataForReport = ({
     }
 
     const { hours, minutes } = parsePostgresInterval(
-      absence.k_absence_days?.duration ?? "",
+      absence.absence_days?.duration ?? "",
     );
 
     acc.get(employeeId)?.push({
-      duration: absence.k_absence_days?.duration ?? "",
+      duration: absence.absence_days?.duration ?? "",
       hours,
       minutes,
-      reasonCode: absence.k_absence_days?.reasonCode ?? "",
-      date: absence.k_absence_days?.date ?? "",
+      reasonCode: absence.absence_days?.reasonCode ?? "",
+      date: absence.absence_days?.date ?? "",
     });
     return acc;
   }, new Map<number, { date: string; hours: number; minutes: number; duration: string; reasonCode: string }[]>());

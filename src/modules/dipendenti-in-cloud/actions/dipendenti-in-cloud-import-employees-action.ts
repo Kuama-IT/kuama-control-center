@@ -3,7 +3,7 @@
 import { handleServerErrors } from "@/utils/server-action-utils";
 import { dipendentiInCloudApiClient } from "@/modules/dipendenti-in-cloud/dipendenti-in-cloud-api-client";
 import { db } from "@/drizzle/drizzle-db";
-import { kEmployees, lower } from "@/drizzle/schema";
+import { employees, lower } from "@/drizzle/schema";
 import { count, eq } from "drizzle-orm";
 import { firstOrThrow } from "@/utils/array-utils";
 
@@ -14,11 +14,11 @@ const handled = handleServerErrors(async () => {
     for (const employee of dicEmployees) {
       const existingEmployee = await tx
         .select()
-        .from(kEmployees)
-        .where(eq(lower(kEmployees.email), employee.email.toLowerCase()));
+        .from(employees)
+        .where(eq(lower(employees.email), employee.email.toLowerCase()));
 
       if (existingEmployee.length === 0) {
-        await tx.insert(kEmployees).values({
+        await tx.insert(employees).values({
           dipendentiInCloudId: employee.id.toString(),
           birthdate: employee.birth_date,
           name: employee.first_name,
@@ -33,7 +33,7 @@ const handled = handleServerErrors(async () => {
         continue;
       }
       await tx
-        .update(kEmployees)
+        .update(employees)
         .set({
           dipendentiInCloudId: employee.id.toString(),
           birthdate: employee.birth_date,
@@ -45,11 +45,11 @@ const handled = handleServerErrors(async () => {
           nationalInsuranceNumber: employee.tax_code,
           phoneNumber: employee.phone_number,
         })
-        .where(eq(lower(kEmployees.email), employee.email.toLowerCase()));
+        .where(eq(lower(employees.email), employee.email.toLowerCase()));
     }
   });
 
-  const query = await db.select({ count: count() }).from(kEmployees);
+  const query = await db.select({ count: count() }).from(employees);
   const result = firstOrThrow(query);
 
   return {

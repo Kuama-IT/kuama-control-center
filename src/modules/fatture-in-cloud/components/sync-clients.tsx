@@ -14,8 +14,8 @@ export default async function SyncClients() {
   const notAssociatedFattureInCloudClients = fattureInCloudClients.filter(
     (fattureInCloudClient) => {
       return !kClients.some((kClient) => {
-        return kClient.kVats.some((kVat) => {
-          return kVat.vat === fattureInCloudClient.vat_number;
+        return kClient.vats.some(({ vat }) => {
+          return vat === fattureInCloudClient.vat_number;
         });
       });
     },

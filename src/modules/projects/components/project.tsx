@@ -24,7 +24,7 @@ export const Project = ({ project }: { project: ProjectReadExtended }) => {
           </div>
 
           <div className="px-4">
-            <p>{project.kTasks.length} tasks</p>
+            <p>{project.tasks.length} tasks</p>
           </div>
         </div>
       </div>

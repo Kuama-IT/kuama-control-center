@@ -1,40 +1,39 @@
 import { db } from "@/drizzle/drizzle-db";
 import {
-  kClients,
-  kClientsVats,
-  kEmployees,
+  clients,
+  clientsVats,
+  employees,
   projects as projectsTable,
   teams,
-  kVats,
+  vats,
 } from "@/drizzle/schema";
 import { asc, eq } from "drizzle-orm";
 import { KClientListItem } from "@/modules/k-clients/k-clients-server";
 import { handleServerErrors } from "@/utils/server-action-utils";
 import { unstable_cache } from "next/cache";
-import { kClientsListAllCacheTag } from "../k-clients-cache-tags";
 
 const readClientsWithDetails = async () =>
   db
     .select({
-      clientId: kClients.id,
-      clientName: kClients.name,
-      clientAvatarUrl: kClients.avatarUrl,
-      youTrackRingId: kClients.youTrackRingId,
-      vatId: kClientsVats.vatId,
-      vat: kVats,
+      clientId: clients.id,
+      clientName: clients.name,
+      clientAvatarUrl: clients.avatarUrl,
+      youTrackRingId: clients.youTrackRingId,
+      vatId: clientsVats.vatId,
+      vat: vats,
       projectId: projectsTable.id,
       projectName: projectsTable.name,
       teamEmployeeId: teams.employeeId,
-      employeeId: kEmployees.id,
-      employee: kEmployees,
+      employeeId: employees.id,
+      employee: employees,
     })
-    .from(kClients)
-    .leftJoin(kClientsVats, eq(kClients.id, kClientsVats.clientId))
-    .leftJoin(kVats, eq(kClientsVats.vatId, kVats.id))
-    .leftJoin(projectsTable, eq(kClients.id, projectsTable.clientId))
+    .from(clients)
+    .leftJoin(clientsVats, eq(clients.id, clientsVats.clientId))
+    .leftJoin(vats, eq(clientsVats.vatId, vats.id))
+    .leftJoin(projectsTable, eq(clients.id, projectsTable.clientId))
     .leftJoin(teams, eq(projectsTable.id, teams.projectId))
-    .leftJoin(kEmployees, eq(teams.employeeId, kEmployees.id))
-    .orderBy(asc(kClients.name));
+    .leftJoin(employees, eq(teams.employeeId, employees.id))
+    .orderBy(asc(clients.name));
 
 const clientsWithProjectsAndTeam = async () => {
   const data = await readClientsWithDetails();
@@ -47,7 +46,7 @@ const clientsWithProjectsAndTeam = async () => {
         id: row.clientId,
         name: row.clientName,
         avatarUrl: row.clientAvatarUrl,
-        kVats: [],
+        vats: [],
         projects: [],
         projectsCount: 0,
         employeesWorkingForClientCount: 0,
@@ -58,8 +57,8 @@ const clientsWithProjectsAndTeam = async () => {
     const client = clientsMap.get(row.clientId)!;
 
     // Add VATs
-    if (row.vatId && !client.kVats.some((vat) => vat.id === row.vatId)) {
-      client.kVats.push(row.vat!);
+    if (row.vatId && !client.vats.some((vat) => vat.id === row.vatId)) {
+      client.vats.push(row.vat!);
     }
 
     // Add Projects
@@ -95,22 +94,17 @@ const clientsWithProjectsAndTeam = async () => {
   return Array.from(clientsMap.values());
 };
 
-const kClientsListAllAction = async (): Promise<KClientListItem[]> => {
+const clientsListAllAction = async (): Promise<KClientListItem[]> => {
   const clients = await clientsWithProjectsAndTeam();
   return clients.filter(
     (client) => client.projectsCount > 0 || client.name === "Kuama"
   );
 };
 
-const cached = unstable_cache(kClientsListAllAction, [], {
-  revalidate: 60,
-  tags: [kClientsListAllCacheTag], // TODO Invalidate this tag when a client is created or deleted or imported
-});
-
 // TODO pass over user to the list: the query should filter only clients the the employee is working for or show all clients if the user is admin
-const handled = handleServerErrors(cached);
+const handled = handleServerErrors(clientsListAllAction);
 export default handled;
 
 export type KClientListAllAction = Awaited<
-  ReturnType<typeof kClientsListAllAction>
+  ReturnType<typeof clientsListAllAction>
 >;

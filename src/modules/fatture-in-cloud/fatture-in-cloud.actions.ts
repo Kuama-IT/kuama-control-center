@@ -1,5 +1,5 @@
 import { db } from "@/drizzle/drizzle-db";
-import { kInvoices } from "@/drizzle/schema";
+import { invoices } from "@/drizzle/schema";
 import { handleServerErrors } from "@/utils/server-action-utils";
 import { gte, lte, desc, and } from "drizzle-orm";
 import { fattureInCloudApiClient } from "./fatture-in-cloud-api-client";
@@ -27,20 +27,20 @@ export const handledGetFattureInCloudEmittedInvoicesGraphData =
     const endDateStr = endDate.toISOString().slice(0, 10);
 
     // fetch invoices for the last two years (by date)
-    const invoices = await db
+    const invoicesResult = await db
       .select()
-      .from(kInvoices)
+      .from(invoices)
       .where(
-        and(gte(kInvoices.date, startDateStr), lte(kInvoices.date, endDateStr))
+        and(gte(invoices.date, startDateStr), lte(invoices.date, endDateStr))
       )
-      .orderBy(desc(kInvoices.date));
+      .orderBy(desc(invoices.date));
 
     // aggregate by month
     const dataMap: Record<
       string,
       { month: string; currentYear: number; previousYear: number }
     > = {};
-    for (const invoice of invoices) {
+    for (const invoice of invoicesResult) {
       if (!invoice.date) {
         continue;
       }

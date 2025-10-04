@@ -8,10 +8,8 @@ import {
 import { KEmployeeAvatar } from "@/modules/k-employees/components/k-employee-avatar";
 import parsePostgresInterval from "postgres-interval";
 import { Title } from "@/modules/ui/components/title";
-import {
-  timesheetsAbsenceServer,
-  type AbsenceDaysList,
-} from "@/modules/timesheets/timesheets-absence.server";
+import { timesheetsAbsenceServer } from "@/modules/timesheets/timesheets-absence.server";
+import type { AbsenceDaysList } from "@/modules/timesheets/schemas";
 
 const getCurrentWeekDays = () => {
   const start = startOfWeek(new Date());
@@ -59,11 +57,11 @@ export default async function WeeklyAbsence() {
             <div className="flex flex-col gap-2">
               {absences
                 .filter((absenceEntry) => {
-                  const record = absenceEntry?.k_absence_days;
+                  const record = absenceEntry?.absence_days;
                   return record?.date === format(date, "yyyy-MM-dd");
                 })
                 .map((absenceEntry, index) => {
-                  const { k_absence_days: absence, k_employees: employee } =
+                  const { absence_days: absence, employees: employee } =
                     absenceEntry;
                   const { hours, minutes } = parsePostgresInterval(
                     absence?.duration ?? "",

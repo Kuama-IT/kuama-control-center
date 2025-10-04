@@ -1,6 +1,6 @@
 import { IssuedDocument } from "@fattureincloud/fattureincloud-ts-sdk";
 import { db } from "@/drizzle/drizzle-db";
-import { kInvoices, kVats } from "@/drizzle/schema";
+import { invoices, vats } from "@/drizzle/schema";
 import { eq, inArray, sql } from "drizzle-orm";
 import { firstOrThrow } from "@/utils/array-utils";
 
@@ -25,19 +25,19 @@ export const invoicesService = {
       invoicesByVat.get(vat)?.push(fattureInCloudInvoice);
     }
 
-    const vats = Array.from(invoicesByVat.keys())
+    const vatsValues = Array.from(invoicesByVat.keys())
       .map((vat) => `'${vat}'`)
       .join(", ");
     // ensure we have vats
     const missingVatsRows = await db.execute(
       sql`
       WITH vat_list AS (
-        SELECT unnest(ARRAY[${sql.raw(vats)}]) AS vat
+        SELECT unnest(ARRAY[${sql.raw(vatsValues)}]) AS vat
       )
       SELECT vat_list.vat
       FROM vat_list
-      LEFT JOIN ${kVats} ON vat_list.vat = ${kVats}.vat
-      WHERE ${kVats}.vat IS NULL;
+      LEFT JOIN ${vats} ON vat_list.vat = ${vats}.vat
+      WHERE ${vats}.vat IS NULL;
     `,
     );
 
@@ -46,14 +46,14 @@ export const invoicesService = {
     );
 
     if (missingVats.length > 0) {
-      const values: (typeof kVats.$inferInsert)[] = [];
+      const values: (typeof vats.$inferInsert)[] = [];
       for (const vat of missingVats) {
         const fattureInCloudInvoice = invoicesByVat.get(vat)?.at(0);
         if (!fattureInCloudInvoice) {
           continue;
         }
 
-        const value: typeof kVats.$inferInsert = {
+        const value: typeof vats.$inferInsert = {
           vat: fattureInCloudInvoice.entity?.vat_number ?? "",
           companyName: fattureInCloudInvoice.entity?.name ?? "UNKNOWN",
           fattureInCloudId: fattureInCloudInvoice.entity?.id?.toString(),
@@ -62,7 +62,7 @@ export const invoicesService = {
       }
 
       await db.transaction(async (tx) => {
-        await tx.insert(kVats).values(values);
+        await tx.insert(vats).values(values);
       });
     }
 
@@ -70,10 +70,10 @@ export const invoicesService = {
     return await db.transaction(async (tx) => {
       const existingInvoices = await tx
         .select()
-        .from(kInvoices)
+        .from(invoices)
         .where(
           inArray(
-            kInvoices.externalId,
+            invoices.externalId,
             issuedDocuments.map((doc) => doc.id?.toString() || ""),
           ),
         );
@@ -87,7 +87,7 @@ export const invoicesService = {
       if (newInvoices.length === 0) {
         return { success: true, message: "No new invoices to create" };
       }
-      const insertValues: (typeof kInvoices.$inferInsert)[] = [];
+      const insertValues: (typeof invoices.$inferInsert)[] = [];
       for (const fattureInCloudInvoice of newInvoices) {
         const vat = fattureInCloudInvoice.entity?.vat_number;
         if (!vat) {
@@ -97,13 +97,13 @@ export const invoicesService = {
           );
         }
         const vatRecord = await firstOrThrow(
-          await tx.select().from(kVats).where(eq(kVats.vat, vat)),
+          await tx.select().from(vats).where(eq(vats.vat, vat)),
         );
 
         if (!fattureInCloudInvoice.payments_list?.[0]?.due_date) {
           throw new Error("Invoice due date is missing");
         }
-        const record: typeof kInvoices.$inferInsert = {
+        const record: typeof invoices.$inferInsert = {
           vat: vatRecord.id,
           subject: fattureInCloudInvoice.subject ?? "UNKNOWN",
           amountNet: fattureInCloudInvoice.amount_net ?? 0,
@@ -118,7 +118,7 @@ export const invoicesService = {
         insertValues.push(record);
       }
 
-      await tx.insert(kInvoices).values(insertValues);
+      await tx.insert(invoices).values(insertValues);
 
       return { success: true, message: "Invoices created successfully" };
     });

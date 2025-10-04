@@ -1,15 +1,15 @@
 "use server";
 import { db } from "@/drizzle/drizzle-db";
-import { kEmployees, projects as projectsTable } from "@/drizzle/schema";
+import { employees, projects as projectsTable } from "@/drizzle/schema";
 import { inArray } from "drizzle-orm";
 import { handleServerErrors } from "@/utils/server-action-utils";
 import { firstOrThrow } from "@/utils/array-utils";
-import { KPlatformCredentialsFullRead } from "@/modules/k-platform-credentials/schemas/k-platform-credentials-schemas";
+import { KPlatformCredentialsFullRead } from "@/modules/k-platform-credentials/schemas/k-platform-credentials.schemas";
 
-const listAllKPlatformCredentials = async () => {
-  const res = await db.query.kPlatformCredentials.findMany({
+const listAllPlatformCredentials = async () => {
+  const res = await db.query.platformCredentials.findMany({
     with: {
-      kPlatformCredentialsToEmployeesAndProjects: true,
+      platformCredentialsToEmployeesAndProjects: true,
     },
   });
 
@@ -17,8 +17,8 @@ const listAllKPlatformCredentials = async () => {
   const employeeIds = new Set<number>();
   const projectIds = new Set<number>();
 
-  res.forEach(({ kPlatformCredentialsToEmployeesAndProjects }) => {
-    kPlatformCredentialsToEmployeesAndProjects.forEach(
+  res.forEach(({ platformCredentialsToEmployeesAndProjects }) => {
+    platformCredentialsToEmployeesAndProjects.forEach(
       ({ employeeId, projectId }) => {
         if (employeeId) employeeIds.add(employeeId);
         if (projectId) projectIds.add(projectId);
@@ -27,12 +27,12 @@ const listAllKPlatformCredentials = async () => {
   });
 
   // Fetch all employees and projects in batch
-  const employees =
+  const employeesResult =
     employeeIds.size > 0
       ? await db
           .select()
-          .from(kEmployees)
-          .where(inArray(kEmployees.id, Array.from(employeeIds)))
+          .from(employees)
+          .where(inArray(employees.id, Array.from(employeeIds)))
       : [];
 
   const projectsResult =
@@ -44,18 +44,18 @@ const listAllKPlatformCredentials = async () => {
       : [];
 
   // Create lookup maps
-  const employeeMap = new Map(employees.map((emp) => [emp.id, emp]));
+  const employeeMap = new Map(employeesResult.map((emp) => [emp.id, emp]));
   const projectMap = new Map(projectsResult.map((proj) => [proj.id, proj]));
 
   return await Promise.all(
     res.map(
-      async ({ kPlatformCredentialsToEmployeesAndProjects, ...credential }) => {
+      async ({ platformCredentialsToEmployeesAndProjects, ...credential }) => {
         let credentialEnhanced: KPlatformCredentialsFullRead = {
           ...credential,
         };
-        if (kPlatformCredentialsToEmployeesAndProjects.length > 0) {
+        if (platformCredentialsToEmployeesAndProjects.length > 0) {
           const relations = firstOrThrow(
-            kPlatformCredentialsToEmployeesAndProjects
+            platformCredentialsToEmployeesAndProjects
           );
 
           const project = projectMap.get(relations.projectId);
@@ -80,6 +80,6 @@ const listAllKPlatformCredentials = async () => {
   );
 };
 
-const handled = handleServerErrors(listAllKPlatformCredentials);
+const handled = handleServerErrors(listAllPlatformCredentials);
 
 export default handled;

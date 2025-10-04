@@ -37,7 +37,7 @@ export const ClientsSelector = ({ kClients, fattureInCloudClients }: Props) => {
                 onClick={() => setKClientId(client.id)}
               >
                 <p className="font-bold text-sm">{client.name}</p>
-                {client.kVats.map(({ vat, id }) => (
+                {client.vats.map(({ vat, id }) => (
                   <p key={id} className="font-mono text-sm">
                     {vat}
                   </p>

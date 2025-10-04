@@ -1,9 +1,9 @@
 "use server";
 import {
-  kClients,
-  kEmployees,
-  kPlatformCredentials,
-  kPlatformCredentialsToEmployeesAndProjects,
+  clients,
+  employees,
+  platformCredentials,
+  platformCredentialsToEmployeesAndProjects,
 } from "@/drizzle/schema";
 import { db } from "@/drizzle/drizzle-db";
 import { handleServerErrors } from "@/utils/server-action-utils";
@@ -11,7 +11,7 @@ import { firstOrThrow } from "@/utils/array-utils";
 import {
   kPlatformCredentialsInsertSchema,
   KPlatformCredentialsValidForm,
-} from "@/modules/k-platform-credentials/schemas/k-platform-credentials-schemas";
+} from "@/modules/k-platform-credentials/schemas/k-platform-credentials.schemas";
 import { eq } from "drizzle-orm";
 
 const handled = handleServerErrors(
@@ -21,15 +21,15 @@ const handled = handleServerErrors(
 
     await db.transaction(async (tx) => {
       const results = await tx
-        .insert(kPlatformCredentials)
+        .insert(platformCredentials)
         .values(parsedCredentials)
-        .returning({ id: kPlatformCredentials.id });
+        .returning({ id: platformCredentials.id });
       const result = firstOrThrow(results);
       if (parsedCredentials.clientId && parsedCredentials.employeeId) {
         const client = await tx
           .select()
-          .from(kClients)
-          .where(eq(kClients.id, parsedCredentials.clientId))
+          .from(clients)
+          .where(eq(clients.id, parsedCredentials.clientId))
           .limit(1);
         if (client.length === 0) {
           throw new Error(
@@ -39,8 +39,8 @@ const handled = handleServerErrors(
 
         const employee = await tx
           .select()
-          .from(kEmployees)
-          .where(eq(kEmployees.id, parsedCredentials.employeeId))
+          .from(employees)
+          .where(eq(employees.id, parsedCredentials.employeeId))
           .limit(1);
         if (employee.length === 0) {
           throw new Error(
@@ -48,7 +48,7 @@ const handled = handleServerErrors(
           );
         }
 
-        await tx.insert(kPlatformCredentialsToEmployeesAndProjects).values({
+        await tx.insert(platformCredentialsToEmployeesAndProjects).values({
           platformCredentialsId: result.id,
           employeeId: parsedCredentials.employeeId,
           projectId: parsedCredentials.projectId,

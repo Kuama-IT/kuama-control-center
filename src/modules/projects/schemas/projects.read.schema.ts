@@ -12,7 +12,7 @@ export const projectReadSchema = z.object({
   endDate: z.string().nullable(),
 });
 export type ProjectRead = z.infer<typeof projectReadSchema>;
-export type ProjectReadExtended = ProjectRead & { kTasks: KTaskRead[] } & {
+export type ProjectReadExtended = ProjectRead & { tasks: KTaskRead[] } & {
   teams: TeamWithEmployeeRead[];
   projectMedias: ProjectMediaRead[];
 };

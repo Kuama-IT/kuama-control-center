@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { KSupportedPlatforms } from "@/modules/k-platform-credentials/schemas/k-platform-credentials-schemas";
+import { KSupportedPlatforms } from "@/modules/k-platform-credentials/schemas/k-platform-credentials.schemas";
 
 export const kTaskReadSchema = z.object({
   id: z.number(),
