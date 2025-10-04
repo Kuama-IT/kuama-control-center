@@ -5,7 +5,7 @@ import {
   isToday,
   startOfWeek,
 } from "date-fns";
-import { KEmployeeAvatar } from "@/modules/k-employees/components/k-employee-avatar";
+import { KEmployeeAvatar } from "@/modules/employees/components/k-employee-avatar";
 import parsePostgresInterval from "postgres-interval";
 import { Title } from "@/modules/ui/components/title";
 import { timesheetsAbsenceServer } from "@/modules/timesheets/timesheets-absence.server";

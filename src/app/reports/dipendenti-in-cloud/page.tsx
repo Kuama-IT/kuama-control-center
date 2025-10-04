@@ -1,5 +1,5 @@
 import DipendentiInCloudReport from "@/modules/dipendenti-in-cloud/components/dipendenti-in-cloud-report";
-import { kEmployeesServer } from "@/modules/k-employees/k-employee-server";
+import { employeesServer } from "@/modules/employees/employees.server";
 import { isFailure } from "@/utils/server-action-utils";
 import { timesheetsAbsenceServer } from "@/modules/timesheets/timesheets-absence.server";
 import type { AbsenceDaysList, AbsenceReasonList } from "@/modules/timesheets/schemas";
@@ -37,7 +37,7 @@ export default async function Page({ searchParams }: PageParams) {
     return <ErrorMessage failure={result} />;
   }
 
-  const employees = await kEmployeesServer.listAll();
+  const employees = await employeesServer.listAll();
 
   if (isFailure(employees)) {
     return <ErrorMessage failure={employees} />;

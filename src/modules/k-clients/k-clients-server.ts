@@ -4,7 +4,7 @@ import kClientGetTasksAndSpentTimesByProjects from "@/modules/k-clients/actions/
 import kClientGetMonthlySpentTimesAction from "@/modules/k-clients/actions/k-client-get-monthly-spent-times-action";
 import kClientGetTotalInvoicedAmount from "@/modules/k-clients/actions/k-client-get-total-invoiced-amount";
 import kClientGetOverallInvoicedAmount from "@/modules/k-clients/actions/k-client-get-overall-invoiced-amount";
-import { KEmployeesRead } from "@/modules/k-employees/schemas/k-employees-schemas";
+import { KEmployeesRead } from "@/modules/employees/schemas/employees-schemas";
 import {
   KClientRead,
   KVatRead,

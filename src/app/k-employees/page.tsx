@@ -1,4 +1,4 @@
-import KEmployees from "@/modules/k-employees/components/k-employee-list";
+import KEmployees from "@/modules/employees/components/k-employee-list";
 import type { Metadata } from "next";
 import { AuthenticatedPageWrapper } from "@/modules/auth/authenticated-page-wrapper";
 

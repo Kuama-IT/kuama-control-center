@@ -1,7 +1,7 @@
 import { eachDayOfInterval, format, getDate, getDay, parseISO } from "date-fns";
 import { it } from "date-fns/locale";
 import type { AbsenceDaysList, AbsenceReasonList, ClosuresList } from "@/modules/timesheets/schemas";
-import { EmployeesListAllActionResult } from "@/modules/k-employees/actions/k-employee-list-all-action";
+import { EmployeesListAllActionResult } from "@/modules/employees/employees.actions";
 import parsePostgresInterval from "postgres-interval";
 import { ChronoUnit, Duration } from "@js-joda/core";
 

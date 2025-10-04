@@ -1,8 +1,22 @@
-import { EmployeesWithPayrolls } from "@/modules/k-employees/components/employees-with-payrolls";
-import { employeesService } from "@/modules/k-employees/employees.service";
+import KEmployees from "@/modules/employees/components/k-employee-list";
+import type { Metadata } from "next";
+import { AuthenticatedPageWrapper } from "@/modules/auth/authenticated-page-wrapper";
 
-export default async function Page() {
-  const data = await employeesService.allWithPayrolls();
+export const metadata: Metadata = {
+  title: "Employees | K1 App",
+  description: "Employees | Kuama Control Center",
+};
 
-  return <EmployeesWithPayrolls employees={data} />;
+async function Page() {
+  return (
+    <div className="max-w-(--breakpoint-lg) mx-auto pt-4">
+      <KEmployees />
+    </div>
+  );
 }
+
+export default async function () {
+  return await AuthenticatedPageWrapper(Page);
+}
+
+export const dynamic = "force-dynamic"; // opt-out of static rendering

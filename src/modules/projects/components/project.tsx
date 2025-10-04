@@ -1,8 +1,8 @@
 import { Suspense } from "react";
-import KClientSpentTime from "@/modules/k-clients/components/k-client-spent-time";
+import KClientSpentTime from "@/modules/clients/components/client-spent-time";
 import { AddImageToProject } from "@/modules/projects/components/project-upload-images-button";
 import { ProjectSlider } from "@/modules/projects/components/project-slider";
-import { KEmployeeAvatar } from "@/modules/k-employees/components/k-employee-avatar";
+import { KEmployeeAvatar } from "@/modules/employees/components/k-employee-avatar";
 import { ProjectReadExtended } from "@/modules/projects/schemas/projects.read.schema";
 
 export const Project = ({ project }: { project: ProjectReadExtended }) => {

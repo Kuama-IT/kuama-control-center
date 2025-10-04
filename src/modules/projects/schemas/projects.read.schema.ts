@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { KTaskRead } from "@/modules/k-tasks/schemas/k-tasks-schemas";
-import { KEmployeesRead } from "@/modules/k-employees/schemas/k-employees-schemas";
+import { KEmployeesRead } from "@/modules/employees/schemas/employees-schemas";
 
 export const projectReadSchema = z.object({
   id: z.number(),

@@ -1,5 +1,4 @@
 import { kPlatformCredentialsServer } from "@/modules/k-platform-credentials/k-platform-credentials-server";
-import easyRedmineGetSpentTimes from "@/modules/easyredmine/actions/easyredmine-get-spent-times";
 import {
   Table,
   TableBody,
@@ -13,6 +12,7 @@ import Link from "next/link";
 import { format } from "date-fns";
 import { isFailure } from "@/utils/server-action-utils";
 import { ErrorMessage } from "@/modules/ui/components/error-message";
+import { easyRedmineGetSpentTimes } from "../easyredmine.actions";
 
 export default async function EasyredmineReport({
   credentialsId,

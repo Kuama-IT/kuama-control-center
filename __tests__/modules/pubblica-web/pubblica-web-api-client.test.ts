@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest";
 import { PubblicaWebApi } from "@/modules/pubblica-web/pubblica-web-api-client";
 import { serverEnv } from "@/env/server-env";
-import { kEmployeesServer } from "@/modules/k-employees/k-employee-server";
+import { employeesServer } from "@/modules/employees/employees.server";
 import { isFailure } from "@/utils/server-action-utils";
 import * as fs from "node:fs";
 
@@ -32,7 +32,7 @@ describe("pubblica-web-api", () => {
   //
   // test("it fetches all payslips for a given employee", async () => {
   //   const id = 125;
-  //   const employees = await kEmployeesServer.listAll();
+  //   const employees = await employeesServer.listAll();
   //   if (isFailure(employees)) {
   //     return;
   //   }

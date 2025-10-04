@@ -2,9 +2,9 @@ import { CSSProperties, Suspense } from "react";
 import Link from "next/link";
 import { routes } from "@/modules/ui/routes";
 import { HiArrowSmRight } from "react-icons/hi";
-import KClientSpentTime from "@/modules/k-clients/components/k-client-spent-time";
+import KClientSpentTime from "@/modules/clients/components/client-spent-time";
 import { ProjectRead } from "@/modules/projects/schemas/projects.read.schema";
-import { KClientRead } from "@/modules/k-clients/schemas/k-clients-schemas";
+import { ClientRead as KClientRead } from "@/modules/clients/schemas/clients-schemas";
 
 type Props = {
   project: ProjectRead & {

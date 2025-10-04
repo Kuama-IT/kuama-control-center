@@ -12,9 +12,3 @@ export const getUnlimitedAccessToken = handleServerErrors(
 export const manageAccessTokenUsage = handleServerErrors(
   accessTokensServer.manage
 );
-
-export type {
-  AccessTokenCreateResult as CreateAccessTokenResult,
-  AccessTokenDeleteResult as DeleteAccessTokenResult,
-  AccessTokenListResult as ListAccessTokensResult,
-} from "./schemas/access-token.schema";
