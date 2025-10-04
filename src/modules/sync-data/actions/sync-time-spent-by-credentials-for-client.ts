@@ -1,5 +1,5 @@
 "use server";
-import { kPlatformCredentialsServer } from "@/modules/k-platform-credentials/k-platform-credentials-server";
+import { platformCredentialsServer } from "@/modules/platform-credentials/platform-credentials.server";
 import { EasyRedmineApiClient } from "@/modules/easyredmine/easyredmine-api-client";
 import { handleServerErrors, isFailure } from "@/utils/server-action-utils";
 import { db } from "@/drizzle/drizzle-db";
@@ -12,7 +12,7 @@ const action = async (
   range: { from: Date; to: Date }
 ) => {
   // TODO complete (we're missing jira)
-  const credentials = await kPlatformCredentialsServer.byId(credentialId);
+  const credentials = await platformCredentialsServer.byId(credentialId);
 
   if (isFailure(credentials)) {
     throw new Error(JSON.parse(credentials.message));

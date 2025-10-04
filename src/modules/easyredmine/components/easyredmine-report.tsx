@@ -1,4 +1,4 @@
-import { kPlatformCredentialsServer } from "@/modules/k-platform-credentials/k-platform-credentials-server";
+import { platformCredentialsServer } from "@/modules/platform-credentials/platform-credentials.server";
 import {
   Table,
   TableBody,
@@ -23,7 +23,7 @@ export default async function EasyredmineReport({
   from: Date;
   to: Date;
 }) {
-  const credentials = await kPlatformCredentialsServer.byId(
+  const credentials = await platformCredentialsServer.byId(
     Number(credentialsId),
   );
   if (isFailure(credentials)) {

@@ -6,7 +6,7 @@ import SyncFattureInCloud from "@/modules/fatture-in-cloud/components/sync-fattu
 import { SyncYoutrack } from "@/modules/settings/components/sync-youtrack";
 import SyncPubblicaWeb from "@/modules/pubblica-web/components/sync-pubblica-web";
 import AccessTokenManagement from "@/modules/access-tokens/components/access-token-management";
-import KPlatformCredentialsList from "@/modules/k-platform-credentials/components/k-platform-credentials-list";
+import KPlatformCredentialsList from "@/modules/platform-credentials/components/platform-credentials-list";
 import { BackButton } from "@/modules/ui/components/back-button";
 import { AuthenticatedPageWrapper } from "@/modules/auth/authenticated-page-wrapper";
 

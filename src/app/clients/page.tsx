@@ -1,4 +1,4 @@
-import KClientsList from "@/modules/k-clients/components/k-clients-list";
+import KClientsList from "@/modules/clients/components/clients-list";
 import type { Metadata } from "next";
 import { AuthenticatedPageWrapper } from "@/modules/auth/authenticated-page-wrapper";
 

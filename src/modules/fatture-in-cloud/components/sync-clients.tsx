@@ -1,12 +1,12 @@
 import { fattureInCloudApiClient } from "@/modules/fatture-in-cloud/fatture-in-cloud-api-client";
-import { kClientsServer } from "@/modules/k-clients/k-clients-server";
+import { clientsServer } from "@/modules/clients/clients.server";
 import { ClientsSelector } from "./clients-selector";
 import { isFailure } from "@/utils/server-action-utils";
 import { ErrorMessage } from "@/modules/ui/components/error-message";
 
 export default async function SyncClients() {
   const fattureInCloudClients = await fattureInCloudApiClient.getClients();
-  const kClients = await kClientsServer.listAll();
+  const kClients = await clientsServer.listAll();
   if (isFailure(kClients)) {
     return <ErrorMessage failure={kClients} />;
   }

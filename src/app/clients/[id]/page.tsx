@@ -1,4 +1,4 @@
-import KClientDetail from "@/modules/k-clients/components/k-client-detail";
+import KClientDetail from "@/modules/clients/components/client-detail";
 import { AuthenticatedPageWrapper } from "@/modules/auth/authenticated-page-wrapper";
 import { PageParams } from "@/modules/routing/schemas/routing-schemas";
 import { z } from "zod";

@@ -1,18 +1,18 @@
 import { HiArrowSmRight } from "react-icons/hi";
 import Image from "next/image";
-import { KClientListItem } from "@/modules/k-clients/k-clients-server";
+import type { ClientListItem } from "@/modules/clients/clients.server";
 import Link from "next/link";
 import { CSSProperties, Suspense } from "react";
-import KClientReportedSpentTimeGraph from "@/modules/k-clients/components/k-client-reported-spent-time-graph";
+import ClientReportedSpentTimeGraph from "@/modules/clients/components/client-reported-spent-time-graph";
 import { routes } from "@/modules/ui/routes";
-import KClientInvoicedAmount from "@/modules/k-clients/components/k-client-invoiced-amount";
+import ClientInvoicedAmount from "@/modules/clients/components/client-invoiced-amount";
 import { auth } from "@/modules/auth/auth";
 
 type Props = {
-  client: KClientListItem;
+  client: ClientListItem;
   index?: number;
 };
-export const KClientCard = async ({ client, index = 0 }: Props) => {
+export default async function ClientCard({ client, index = 0 }: Props) {
   const style = {
     "--animation-duration": `${0.3 + index}s`,
   } as CSSProperties;
@@ -26,17 +26,12 @@ export const KClientCard = async ({ client, index = 0 }: Props) => {
         >
           <Suspense>
             <div className="absolute inset-0 opacity-50 pointer-events-none">
-              <KClientReportedSpentTimeGraph clientId={client.id} />
+              <ClientReportedSpentTimeGraph clientId={client.id} />
             </div>
           </Suspense>
           <div className="flex gap-4 items-center">
             <div className="rounded-full w-[50px] h-[50px] relative overflow-hidden bg-white flex items-center justify-center">
-              <Image
-                src={client.avatarUrl!}
-                alt={client.name!}
-                height={100}
-                width={100}
-              />
+              <Image src={client.avatarUrl!} alt={client.name!} height={100} width={100} />
             </div>
             <h2 className="text-xl">{client.name}</h2>
           </div>
@@ -44,7 +39,7 @@ export const KClientCard = async ({ client, index = 0 }: Props) => {
           <p>{client.employeesWorkingForClientCount} employees involved</p>
           {session?.user?.isAdmin && (
             <Suspense>
-              <KClientInvoicedAmount clientId={client.id} />
+              <ClientInvoicedAmount clientId={client.id} />
             </Suspense>
           )}
         </div>
@@ -52,4 +47,4 @@ export const KClientCard = async ({ client, index = 0 }: Props) => {
       </div>
     </Link>
   );
-};
+}

@@ -1,5 +1,5 @@
 "use client";
-import type { KClientListAllAction } from "@/modules/k-clients/actions/k-client-list-all-action";
+import type { ClientListItem } from "@/modules/clients/clients.server";
 import { Client } from "@fattureincloud/fattureincloud-ts-sdk/src/models/client";
 import { useState, useTransition } from "react";
 import { cn } from "@/lib/utils";
@@ -10,7 +10,7 @@ import { isFailure } from "@/utils/server-action-utils";
 import { notifyError, notifySuccess } from "@/modules/ui/components/notify";
 
 type Props = {
-  kClients: KClientListAllAction;
+  kClients: ClientListItem[];
   fattureInCloudClients: Array<Client>;
 };
 export const ClientsSelector = ({ kClients, fattureInCloudClients }: Props) => {

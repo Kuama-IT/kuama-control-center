@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { KTaskRead } from "@/modules/k-tasks/schemas/k-tasks-schemas";
+import { TaskRead as KTaskRead } from "@/modules/tasks/schemas/tasks-schemas";
 import { KEmployeesRead } from "@/modules/employees/schemas/employees-schemas";
 
 export const projectReadSchema = z.object({
