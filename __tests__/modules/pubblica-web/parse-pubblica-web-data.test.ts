@@ -37,14 +37,6 @@ describe("parse pubblica web data", () => {
     expect(fullName).toBe("BALDAN GIANMARIA");
   });
 
-  test("it extrapolate fullname from raw string", () => {
-    const rawContent =
-      "BLDGMR98L18D442D                                  17         BALDAN GIANMARIA";
-    const fullName =
-      pubblicaWebUtils.tryParseFullNameFromOddContent(rawContent);
-    expect(fullName).toBe("BALDAN GIANMARIA");
-  });
-
   test("it downloads monthly balance by year and month", async () => {
     await client.authenticate();
     const balance = await client.fetchMonthlyBalance(2022, 7);
@@ -115,5 +107,31 @@ describe("parse pubblica web data", () => {
     employeeCosts.forEach((e) => {
       expect(e.businessCost).toBeCloseTo(e.gross + e.oneri, 2);
     });
+  });
+  test("correctly parses payroll data", async () => {
+    const samplePath = __dirname + "/Cedolino-2022-08-0000.pdf";
+    const pdfBytes = fs.readFileSync(samplePath);
+
+    const payrolls = await pubblicaWebUtils.parseMultiPageSalaries(
+      new Uint8Array(pdfBytes).buffer
+    );
+    for (const res of payrolls) {
+      console.log(res);
+      expect(res.gross).toBeGreaterThan(0);
+      expect(res.net).toBeGreaterThan(0);
+      expect(
+        typeof res.fullName === "string" && res.fullName.length
+      ).toBeTruthy();
+      expect(res.cf.length).toBe(16);
+      expect(
+        new Date().getFullYear() - res.birthDate.getFullYear()
+      ).toBeGreaterThan(18);
+      expect(res.hireDate.getFullYear()).toBeGreaterThan(2000);
+      expect(res.permissionsHoursBalance).toBeGreaterThanOrEqual(0);
+      expect(res.holidaysHoursBalance).toBeGreaterThanOrEqual(0);
+      expect(res.rolHoursBalance).toBeGreaterThanOrEqual(0);
+      expect(res.workedDays).toBeGreaterThanOrEqual(0);
+      expect(res.workedHours).toBeGreaterThanOrEqual(0);
+    }
   });
 });

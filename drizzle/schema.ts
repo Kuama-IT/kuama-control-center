@@ -1,6 +1,7 @@
 import {
   AnyPgColumn,
   boolean,
+  customType,
   date,
   foreignKey,
   integer,
@@ -273,20 +274,48 @@ export const accessTokens = pgTable("access_tokens", {
   usageCount: integer().default(0),
 });
 
+const bytea = customType<{
+  data: Buffer;
+  default: false;
+}>({
+  dataType() {
+    return "bytea";
+  },
+});
+
+export const pubblicaWebPayrollSourceFiles = pgTable(
+  "pubblica_web_payroll_source_files",
+  {
+    id: serial().primaryKey(),
+    year: integer().notNull(),
+    month: integer().notNull(),
+    fileBuffer: bytea(),
+    createdAt: timestamp().notNull().defaultNow(),
+  }
+);
+
 export const pubblicaWebPayrolls = pgTable(
   "pubblica_web_payrolls",
   {
     id: serial().primaryKey(),
-    employeeName: varchar({ length: 256 }).notNull(),
+    fullName: varchar({ length: 256 }).notNull(),
     year: integer().notNull(),
     month: integer().notNull(),
-    birthDate: varchar({ length: 10 }),
+    birthDate: varchar({ length: 24 }), // iso date string
+    hireDate: varchar({ length: 24 }), // iso date string
+    cf: varchar({ length: 16 }),
     createdAt: timestamp().notNull().defaultNow(),
     net: real().notNull(),
     gross: real().notNull(),
-    payrollFileBase64: text(),
+    workedDays: real().notNull().default(0),
+    workedHours: real().notNull().default(0),
+    permissionsHoursBalance: real().notNull().default(0),
+    holidaysHoursBalance: real().notNull().default(0),
+    rolHoursBalance: real().notNull().default(0),
+    payrollBuffer: bytea(),
+    sourceFileId: serial().references(() => pubblicaWebPayrollSourceFiles.id),
   },
-  (t) => [unique("employeeName_year_month").on(t.employeeName, t.year, t.month)]
+  (t) => [unique("fullName_year_month").on(t.fullName, t.year, t.month)]
 );
 export const pubblicaWebMonthlyBalances = pgTable(
   "pubblica_web_monthly_balances",
@@ -300,7 +329,6 @@ export const pubblicaWebMonthlyBalances = pgTable(
   },
   (t) => [unique("year_month").on(t.year, t.month)]
 );
-
 
 export const cashFlowCategoryType = pgEnum("cash_flow_category_type", [
   "income",
