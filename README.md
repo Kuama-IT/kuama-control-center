@@ -44,6 +44,8 @@ LOW Switch prettier with biome
 LOW drop the "k" prefix
 LOW evaluate if it's the case to unify payrolls and pubblica payrolls
 
+ 
+- Payrolls and multi‑source orchestration: `docs/orchestration/payrolls-and-syncs.md`
 ## DONE
 
 while parsing payrolls can be "handy", we need to parse the "bilancino" to retrieve the total
