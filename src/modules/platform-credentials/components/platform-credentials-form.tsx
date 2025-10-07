@@ -30,7 +30,7 @@ import { createAction } from "../platform-credentials.actions";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { notifyError, notifySuccess } from "@/modules/ui/components/notify";
-import { useServerActionMutation } from "@/modules/ui/hooks/useServerActionMutation";
+import { useServerActionMutation } from "@/modules/ui/hooks/use-server-action-mutation";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {

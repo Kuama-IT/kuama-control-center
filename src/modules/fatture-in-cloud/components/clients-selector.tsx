@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import associateFattureInCloudClientAction from "@/modules/sync-data/actions/associate-fatture-in-cloud-client-action";
 import { useRouter } from "next/navigation";
 import { notifyError, notifySuccess } from "@/modules/ui/components/notify";
-import { useServerActionMutation } from "@/modules/ui/hooks/useServerActionMutation";
+import { useServerActionMutation } from "@/modules/ui/hooks/use-server-action-mutation";
 
 type Props = {
   clients: ClientListItem[];

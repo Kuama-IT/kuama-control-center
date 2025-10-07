@@ -16,7 +16,7 @@ import { deleteAction as deleteEmployee, type EmployeeByIdActionResult } from "@
 import { useRouter } from "next/navigation";
 import { FaSync } from "react-icons/fa";
 import { notifyError, notifySuccess } from "@/modules/ui/components/notify";
-import { useServerActionMutation } from "@/modules/ui/hooks/useServerActionMutation";
+import { useServerActionMutation } from "@/modules/ui/hooks/use-server-action-mutation";
 
 export const EmployeeDangerZone = ({ employee }: { employee: EmployeeByIdActionResult }) => {
 	const { mutateAsync, isPending } = useServerActionMutation(deleteEmployee);

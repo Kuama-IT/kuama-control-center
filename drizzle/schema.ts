@@ -131,13 +131,17 @@ export const projectMonthlyRates = pgTable("project_monthly_rates", {
 // Used to keep an eye if company is loosing money on a project
 export const payrolls = pgTable("payrolls", {
   id: serial().primaryKey(),
-  employeeId: serial().references(() => employees.id),
   net: real().notNull(),
   gross: real().notNull(),
   date: date().notNull(),
   payrollNumber: integer().notNull().default(0), // 1, 2, 3...13 (or 14 if we move to commercial sector)
   url: varchar({ length: 1500 }).notNull(),
-  dipendentiInCloudPayrollId: varchar({ length: 256 }).unique(),
+  createdAt: timestamp().notNull().defaultNow(),
+  workedDays: real().notNull().default(0),
+  workedHours: real().notNull().default(0),
+  permissionsHoursBalance: real().notNull().default(0),
+  holidaysHoursBalance: real().notNull().default(0),
+  rolHoursBalance: real().notNull().default(0),
 });
 
 export const employees = pgTable("employees", {
@@ -283,19 +287,20 @@ const bytea = customType<{
   },
 });
 
-export const pubblicaWebPayrollSourceFiles = pgTable(
-  "pubblica_web_payroll_source_files",
+export const pubblicaWebPayslipSourceFiles = pgTable(
+  "pubblica_web_payslip_source_files",
   {
     id: serial().primaryKey(),
     year: integer().notNull(),
     month: integer().notNull(),
     fileBuffer: bytea(),
+    importedAt: timestamp(),
     createdAt: timestamp().notNull().defaultNow(),
   }
 );
 
-export const pubblicaWebPayrolls = pgTable(
-  "pubblica_web_payrolls",
+export const pubblicaWebPayslips = pgTable(
+  "pubblica_web_payslips",
   {
     id: serial().primaryKey(),
     fullName: varchar({ length: 256 }).notNull(),
@@ -312,8 +317,8 @@ export const pubblicaWebPayrolls = pgTable(
     permissionsHoursBalance: real().notNull().default(0),
     holidaysHoursBalance: real().notNull().default(0),
     rolHoursBalance: real().notNull().default(0),
-    payrollBuffer: bytea(),
-    sourceFileId: serial().references(() => pubblicaWebPayrollSourceFiles.id),
+    payslipBuffer: bytea(),
+    sourceFileId: serial().references(() => pubblicaWebPayslipSourceFiles.id),
   },
   (t) => [unique("fullName_year_month").on(t.fullName, t.year, t.month)]
 );
@@ -325,7 +330,7 @@ export const pubblicaWebMonthlyBalances = pgTable(
     month: integer().notNull(),
     createdAt: timestamp().notNull().defaultNow(),
     total: real().notNull(),
-    fileBase64: text(),
+    fileBuffer: bytea(),
   },
   (t) => [unique("year_month").on(t.year, t.month)]
 );
