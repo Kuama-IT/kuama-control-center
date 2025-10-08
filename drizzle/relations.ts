@@ -4,7 +4,7 @@ import {
   teams,
   projects,
   projectMedias,
-  payrolls,
+  payslips,
   tasks,
   spentTimes,
   clients,
@@ -13,7 +13,6 @@ import {
   invoices,
   platformCredentialsToEmployeesAndProjects,
   platformCredentials,
-  employeeEstimatedCosts,
   invoiceProjects,
   presenceDays,
   projectDailyRates,
@@ -34,13 +33,12 @@ export const teamRelations = relations(teams, ({ one }) => ({
 
 export const employeesRelations = relations(employees, ({ many }) => ({
   teams: many(teams),
-  payrolls: many(payrolls),
+  payslips: many(payslips),
   tasks: many(tasks),
   absenceDays: many(absenceDays),
   platformCredentialsToEmployeesAndProjects: many(
     platformCredentialsToEmployeesAndProjects
   ),
-  employeeEstimatedCosts: many(employeeEstimatedCosts),
   presenceDays: many(presenceDays),
   projectDailyRates: many(projectDailyRates),
 }));
@@ -68,9 +66,9 @@ export const projectMediaRelations = relations(projectMedias, ({ one }) => ({
   }),
 }));
 
-export const payrollsRelations = relations(payrolls, ({ one }) => ({
-  kEmployee: one(employees, {
-    fields: [payrolls.employeeId],
+export const payslipsRelations = relations(payslips, ({ one }) => ({
+  employee: one(employees, {
+    fields: [payslips.employeeId],
     references: [employees.id],
   }),
 }));
@@ -127,9 +125,7 @@ export const platformCredentialsToEmployeesAndProjectsRelations = relations(
       references: [employees.id],
     }),
     kPlatformCredential: one(platformCredentials, {
-      fields: [
-        platformCredentialsToEmployeesAndProjects.platformCredentialsId,
-      ],
+      fields: [platformCredentialsToEmployeesAndProjects.platformCredentialsId],
       references: [platformCredentials.id],
     }),
     project: one(projects, {
@@ -148,15 +144,7 @@ export const platformCredentialsRelations = relations(
   })
 );
 
-export const employeeEstimatedCostsRelations = relations(
-  employeeEstimatedCosts,
-  ({ one }) => ({
-    kEmployee: one(employees, {
-      fields: [employeeEstimatedCosts.employeeId],
-      references: [employees.id],
-    }),
-  })
-);
+// employeeEstimatedCosts table removed in schema refactor; relations deleted.
 
 export const invoiceProjectsRelations = relations(
   invoiceProjects,

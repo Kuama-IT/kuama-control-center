@@ -12,7 +12,7 @@ export function PubblicaWebCollapsiblePayslips({
     gross: number;
     month: number;
     year: number;
-    employeeName: string;
+    fullName: string;
     birthDate: string | null;
   }[];
 }) {
@@ -20,10 +20,10 @@ export function PubblicaWebCollapsiblePayslips({
   // Group payslips by employee name
   const payslipsByEmployee: Record<string, typeof payslips> = {};
   for (const payslip of payslips) {
-    if (!payslipsByEmployee[payslip.employeeName]) {
-      payslipsByEmployee[payslip.employeeName] = [];
+    if (!payslipsByEmployee[payslip.fullName]) {
+      payslipsByEmployee[payslip.fullName] = [];
     }
-    payslipsByEmployee[payslip.employeeName].push(payslip);
+    payslipsByEmployee[payslip.fullName].push(payslip);
   }
   return (
     <div className="col-span-2">

@@ -14,7 +14,7 @@ export function PubblicaWebCollapsiblePayslipList({
     gross: number;
     month: number;
     year: number;
-    employeeName: string;
+    fullName: string;
     birthDate: string | null;
   }[];
 }) {
@@ -46,7 +46,7 @@ export function PubblicaWebCollapsiblePayslipList({
         {payslips.map((payslip, idx) => (
           <li key={idx} className="pl-6 py-1 text-sm">
             {payslip.year}/{String(payslip.month).padStart(2, "0")} -{" "}
-            {payslip.employeeName} - Net: {payslip.net} € - Gross:{" "}
+            {payslip.fullName} - Net: {payslip.net} € - Gross:{" "}
             {payslip.gross} € - Birthdate: {payslip.birthDate}
           </li>
         ))}

@@ -1,5 +1,5 @@
 import { db } from "@/drizzle/drizzle-db";
-import { employees, pubblicaWebPayrolls } from "@/drizzle/schema";
+import { employees, pubblicaWebPayslips } from "@/drizzle/schema";
 import { desc, eq } from "drizzle-orm";
 import { parse, differenceInYears, isValid } from "date-fns";
 
@@ -9,7 +9,7 @@ export type EmployeeWithPayrolls = Omit<
 > & {
   birthdate: Date | null;
   hiredOn: Date | null;
-  payrolls: Array<typeof pubblicaWebPayrolls.$inferSelect>;
+  payrolls: Array<typeof pubblicaWebPayslips.$inferSelect>;
   age: number | null;
   averagePayroll: number;
   yearsWithCompany: number | null;
@@ -23,21 +23,25 @@ export const employeesService = {
 
     const data = await Promise.all(
       employeesResult.map(async (employee) => {
-        const { birthdate: rawBirthdate, hiredOn: rawHiredOn, ...rest } = employee;
+        const {
+          birthdate: rawBirthdate,
+          hiredOn: rawHiredOn,
+          ...rest
+        } = employee;
 
         const payrolls = employee.fullName
           ? await db
               .select()
-              .from(pubblicaWebPayrolls)
+              .from(pubblicaWebPayslips)
               .where(
                 eq(
-                  pubblicaWebPayrolls.employeeName,
+                  pubblicaWebPayslips.fullName,
                   employee.fullName.toUpperCase()
                 )
               )
               .orderBy(
-                desc(pubblicaWebPayrolls.year),
-                desc(pubblicaWebPayrolls.month)
+                desc(pubblicaWebPayslips.year),
+                desc(pubblicaWebPayslips.month)
               )
           : [];
 
@@ -48,7 +52,9 @@ export const employeesService = {
         const age = calculateAge(birthdate, today);
         const averagePayroll = calculateAveragePayroll(payrolls);
         const hiredOn = toDate(rawHiredOn);
-        const yearsWithCompany = hiredOn ? differenceInYears(today, hiredOn) : null;
+        const yearsWithCompany = hiredOn
+          ? differenceInYears(today, hiredOn)
+          : null;
 
         return {
           ...rest,
@@ -66,7 +72,10 @@ export const employeesService = {
   },
 };
 
-const calculateAge = (birthdate: Date | null, referenceDate: Date): number | null => {
+const calculateAge = (
+  birthdate: Date | null,
+  referenceDate: Date
+): number | null => {
   if (!birthdate || !isValid(birthdate)) return null;
   try {
     return differenceInYears(referenceDate, birthdate);
@@ -76,15 +85,15 @@ const calculateAge = (birthdate: Date | null, referenceDate: Date): number | nul
   }
 };
 
-const calculateAveragePayroll = (
-  payrolls: Array<{ net: number }>
-): number => {
+const calculateAveragePayroll = (payrolls: Array<{ net: number }>): number => {
   if (payrolls.length === 0) return 0;
   const total = payrolls.reduce((sum, payroll) => sum + payroll.net, 0);
   return total / payrolls.length;
 };
 
-const parsePayrollBirthdate = (birthdate: string | null | undefined): Date | null => {
+const parsePayrollBirthdate = (
+  birthdate: string | null | undefined
+): Date | null => {
   if (!birthdate) return null;
 
   const parsed = parse(birthdate, "dd/MM/yyyy", new Date());

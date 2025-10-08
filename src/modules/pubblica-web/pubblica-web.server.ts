@@ -3,12 +3,14 @@ import { PubblicaWebApi } from "./pubblica-web-api-client";
 import { pubblicaWebUtils } from "./pubblica-web.utils";
 import { db } from "@/drizzle/drizzle-db";
 import {
+  documents,
   pubblicaWebMonthlyBalances,
   pubblicaWebPayslips,
   pubblicaWebPayslipSourceFiles,
 } from "@/drizzle/schema";
 import { CreatePubblicaWebMonthlyBalanceDto } from "./schemas/pubblica-web.create.schema";
 import { eq, desc, isNull } from "drizzle-orm";
+import { createHash } from "crypto";
 
 export const pubblicaWebServer = {
   async storeMonthlyBalanceByYearAndMonth({
@@ -32,11 +34,24 @@ export const pubblicaWebServer = {
     const parsedMonthlyBalance =
       await pubblicaWebUtils.parseSalaryMonthlyBalance(buffer);
 
+    const content = Buffer.from(monthlyBalance.bytes);
+    const doc = await db
+      .insert(documents)
+      .values({
+        content,
+        sizeInBytes: content.byteLength,
+        sha256: createHash("sha256").update(content).digest("hex"),
+        mime: monthlyBalance.mimeType,
+        fileName: monthlyBalance.name,
+        extension: monthlyBalance.name.split(".").pop(),
+      })
+      .returning();
+
     await db.insert(pubblicaWebMonthlyBalances).values({
       year,
       month,
       total: parsedMonthlyBalance.totalBusinessCost,
-      fileBuffer: Buffer.from(monthlyBalance.bytes),
+      documentId: doc[0].id,
     });
   },
   async storeCurrentMonthMonthlyBalance() {
@@ -98,12 +113,25 @@ export const pubblicaWebServer = {
 
     console.log(`Fetched payslips for ${year}-${month}: ${payslips.name}`);
 
+    const content = Buffer.from(payslips.bytes);
+    const doc = await db
+      .insert(documents)
+      .values({
+        content,
+        sizeInBytes: content.byteLength,
+        sha256: createHash("sha256").update(content).digest("hex"),
+        mime: payslips.mimeType,
+        fileName: payslips.name,
+        extension: payslips.name.split(".").pop(),
+      })
+      .returning();
+
     const result = await db
       .insert(pubblicaWebPayslipSourceFiles)
       .values({
         year,
         month,
-        fileBuffer: Buffer.from(payslips.bytes),
+        documentId: doc[0].id,
         importedAt: null,
       })
       .returning();
@@ -124,7 +152,7 @@ export const pubblicaWebServer = {
     const sourceFileResult = await db
       .select({
         id: pubblicaWebPayslipSourceFiles.id,
-        fileBuffer: pubblicaWebPayslipSourceFiles.fileBuffer,
+        documentId: pubblicaWebPayslipSourceFiles.documentId,
         year: pubblicaWebPayslipSourceFiles.year,
         month: pubblicaWebPayslipSourceFiles.month,
       })
@@ -132,16 +160,18 @@ export const pubblicaWebServer = {
       .where(eq(pubblicaWebPayslipSourceFiles.id, sourceFileId))
       .limit(1);
 
-    if (
-      !sourceFileResult ||
-      sourceFileResult.length === 0 ||
-      sourceFileResult[0].fileBuffer === null
-    ) {
+    if (!sourceFileResult || sourceFileResult.length === 0) {
       throw new Error(`Source file with ID ${sourceFileId} not found`);
     }
-
-    const payslipsBuffer = new Uint8Array(sourceFileResult[0].fileBuffer)
-      .buffer;
+    const sourceDoc = await db
+      .select({ content: documents.content })
+      .from(documents)
+      .where(eq(documents.id, sourceFileResult[0].documentId!))
+      .limit(1);
+    if (!sourceDoc.length) {
+      throw new Error("Document not found for source file");
+    }
+    const payslipsBuffer = new Uint8Array(sourceDoc[0].content).buffer;
 
     const parsedPayslips =
       await pubblicaWebUtils.parseMultiPageSalaries(payslipsBuffer);
@@ -151,8 +181,8 @@ export const pubblicaWebServer = {
       month: sourceFileResult[0].month,
       fullName: payslip.fullName,
       cf: payslip.cf,
-      birthDate: payslip.birthDate.toISOString(),
-      hireDate: payslip.hireDate.toISOString(),
+      birthDate: `${String(payslip.birthDate.getDate()).padStart(2, "0")}/${String(payslip.birthDate.getMonth() + 1).padStart(2, "0")}/${payslip.birthDate.getFullYear()}`,
+      hireDate: `${String(payslip.hireDate.getDate()).padStart(2, "0")}/${String(payslip.hireDate.getMonth() + 1).padStart(2, "0")}/${payslip.hireDate.getFullYear()}`,
       gross: payslip.gross,
       net: payslip.net,
       workedDays: payslip.workedDays,

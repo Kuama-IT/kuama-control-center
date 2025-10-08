@@ -6,10 +6,17 @@ import { handleServerErrors } from "@/utils/server-action-utils";
 import { db } from "@/drizzle/drizzle-db";
 import {
   pubblicaWebMonthlyBalances,
-  pubblicaWebPayrolls,
+  pubblicaWebPayslips,
 } from "@/drizzle/schema";
 import { desc, eq, or } from "drizzle-orm";
 import { pubblicaWebUtils } from "../pubblica-web.utils";
+
+const formatItalianDate = (d: Date): string => {
+  const day = String(d.getDate()).padStart(2, "0");
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const year = d.getFullYear();
+  return `${day}/${month}/${year}`;
+};
 
 export const handledSyncEmployeePayrolls = handleServerErrors(async function ({
   year,
@@ -18,8 +25,8 @@ export const handledSyncEmployeePayrolls = handleServerErrors(async function ({
 }) {
   // clear existing payrolls for the year
   await db
-    .delete(pubblicaWebPayrolls)
-    .where(eq(pubblicaWebPayrolls.year, parseInt(year)));
+    .delete(pubblicaWebPayslips)
+    .where(eq(pubblicaWebPayslips.year, parseInt(year)));
 
   const pubblicaWebClient = new PubblicaWebApi(
     serverEnv.pubblicaWebUsername,
@@ -90,27 +97,28 @@ const downloadAndUpsertEmployeePayrollsByYearAndMonth = async (
       `Saving payslip for ${salaryInfo.fullName} - ${year}/${month} - birthdate: ${salaryInfo.birthDate} - net: ${salaryInfo.net} - gross: ${salaryInfo.gross}`
     );
     await db
-      .insert(pubblicaWebPayrolls)
+      .insert(pubblicaWebPayslips)
       .values({
-        employeeName: salaryInfo.fullName,
+        fullName: salaryInfo.fullName,
         year: parseInt(year),
         month: month,
         net: salaryInfo.net,
         gross: salaryInfo.gross,
-        birthDate: salaryInfo.birthDate,
-        payrollFileBase64: salaryInfo.pageAsPdfBase64,
+        birthDate: formatItalianDate(salaryInfo.birthDate),
+        hireDate: formatItalianDate(salaryInfo.hireDate),
+        // documentId to be set when documents flow is implemented
       })
       .onConflictDoUpdate({
         target: [
-          pubblicaWebPayrolls.employeeName,
-          pubblicaWebPayrolls.year,
-          pubblicaWebPayrolls.month,
+          pubblicaWebPayslips.fullName,
+          pubblicaWebPayslips.year,
+          pubblicaWebPayslips.month,
         ],
         set: {
           net: salaryInfo.net,
           gross: salaryInfo.gross,
-          birthDate: salaryInfo.birthDate,
-          payrollFileBase64: salaryInfo.pageAsPdfBase64,
+          birthDate: formatItalianDate(salaryInfo.birthDate),
+          hireDate: formatItalianDate(salaryInfo.hireDate),
         },
       });
   }
@@ -143,10 +151,6 @@ export const handledSyncPayslipsMonthlyBalances = handleServerErrors(
         new Uint8Array(balanceDocuments.bytes).buffer
       );
 
-      const fileBase64 = Buffer.from(
-        new Uint8Array(balanceDocuments.bytes)
-      ).toString("base64");
-
       console.log(`Saving monthly balance for ${year}/${month}`);
       await db
         .insert(pubblicaWebMonthlyBalances)
@@ -154,7 +158,6 @@ export const handledSyncPayslipsMonthlyBalances = handleServerErrors(
           year: parseInt(year),
           month: month,
           total: balance.totalBusinessCost,
-          fileBase64,
         })
         .onConflictDoUpdate({
           target: [
@@ -163,7 +166,6 @@ export const handledSyncPayslipsMonthlyBalances = handleServerErrors(
           ],
           set: {
             total: balance.totalBusinessCost,
-            fileBase64,
           },
         });
     }
@@ -188,9 +190,9 @@ export const handledListRootFolders = handleServerErrors(async function () {
     // fetch associated payrolls
     const payrolls = await db
       .select()
-      .from(pubblicaWebPayrolls)
-      .where(eq(pubblicaWebPayrolls.year, parseInt(folder.text)))
-      .orderBy(desc(pubblicaWebPayrolls.year), desc(pubblicaWebPayrolls.month));
+      .from(pubblicaWebPayslips)
+      .where(eq(pubblicaWebPayslips.year, parseInt(folder.text)))
+      .orderBy(desc(pubblicaWebPayslips.year), desc(pubblicaWebPayslips.month));
 
     res.push({ ...folder, payrolls });
   }
@@ -206,14 +208,14 @@ export const handledGetPubblicaWebGraphData = handleServerErrors(
     // fetch payrolls for the last two years
     const payrolls = await db
       .select()
-      .from(pubblicaWebPayrolls)
+      .from(pubblicaWebPayslips)
       .where(
         or(
-          eq(pubblicaWebPayrolls.year, currentYear),
-          eq(pubblicaWebPayrolls.year, previousYear)
+          eq(pubblicaWebPayslips.year, currentYear),
+          eq(pubblicaWebPayslips.year, previousYear)
         )
       )
-      .orderBy(desc(pubblicaWebPayrolls.year), desc(pubblicaWebPayrolls.month));
+      .orderBy(desc(pubblicaWebPayslips.year), desc(pubblicaWebPayslips.month));
 
     // aggregate by month
     const dataMap: Record<
@@ -342,14 +344,14 @@ export const handledGetPubblicaWebEmployeesCostOverMonthsGraphData =
     // fetch payrolls for the year
     const payrolls = await db
       .select()
-      .from(pubblicaWebPayrolls)
+      .from(pubblicaWebPayslips)
       .where(
         or(
-          eq(pubblicaWebPayrolls.year, targetYear),
-          eq(pubblicaWebPayrolls.year, previousYear)
+          eq(pubblicaWebPayslips.year, targetYear),
+          eq(pubblicaWebPayslips.year, previousYear)
         )
       )
-      .orderBy(desc(pubblicaWebPayrolls.year), desc(pubblicaWebPayrolls.month));
+      .orderBy(desc(pubblicaWebPayslips.year), desc(pubblicaWebPayslips.month));
 
     //  fetch total costs for the year
     const totalCosts = await db
@@ -383,7 +385,7 @@ export const handledGetPubblicaWebEmployeesCostOverMonthsGraphData =
         )
         .map((it) => ({
           gross: it.gross,
-          fullName: it.employeeName,
+          fullName: it.fullName,
         }));
 
       const employeesCostsData = pubblicaWebUtils.computeEmployeesMonthlyCost(
