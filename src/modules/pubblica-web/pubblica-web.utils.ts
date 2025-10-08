@@ -49,7 +49,7 @@ const labelDefinitions: LabelDefinition[] = [
   {
     type: "text",
     label: "cognome nome",
-    gapY: 10,
+    gapY: 20,
     gapX: 10,
     negativeGapX: 2,
   },
@@ -101,7 +101,7 @@ const labelDefinitions: LabelDefinition[] = [
     label: "permessi / ex-festivita'",
     gapY: 20,
     gapX: 10,
-    negativeGapX: 5,
+    negativeGapX: 10,
     targetLabel: "saldo",
   },
   {
@@ -109,7 +109,7 @@ const labelDefinitions: LabelDefinition[] = [
     label: "ferie",
     gapY: 20,
     gapX: 10,
-    negativeGapX: 5,
+    negativeGapX: 10,
     targetLabel: "saldo",
   },
   {
@@ -156,9 +156,11 @@ export const pubblicaWebUtils = {
   },
 
   async parseMultiPageSalaries(
-    buffer: ArrayBufferLike
+    buffer: ArrayBufferLike,
   ): Promise<PayrollInfo[]> {
-    const { numPages, items } = await extractTextItems(buffer);
+    const dst = new ArrayBuffer(buffer.byteLength);
+    new Uint8Array(dst).set(new Uint8Array(buffer));
+    const { numPages, items } = await extractTextItems(dst);
 
     const payrolls: PayrollInfo[] = [];
     let pageIndex = 1;
@@ -176,19 +178,19 @@ export const pubblicaWebUtils = {
             textItem = findByTextNearestTo(
               definition.targetLabel,
               baseTextItem,
-              pageItems
+              pageItems,
             );
           }
 
           let relatedTextItem = findTextItemRelatedToTextItemLabel(
             textItem,
             pageItems,
-            definition
+            definition,
           );
 
           if (relatedTextItem.length !== 1) {
             throw new Error(
-              `Could not find correct set of columns for ${definition}`
+              `Could not find correct set of columns for ${definition}`,
             );
           }
 
@@ -202,7 +204,7 @@ export const pubblicaWebUtils = {
 
         const pageAsPdf = await pdfUtils.extractPageAsPdf(
           buffer,
-          pageIndex - 1
+          pageIndex - 1,
         );
 
         payrolls.push({
@@ -212,41 +214,41 @@ export const pubblicaWebUtils = {
           birthDate: parse(
             rawValues.find((r) => r.label === "data di nascita")?.value ?? "",
             "dd/MM/yyyy",
-            new Date()
+            new Date(),
           ),
           hireDate: parse(
             rawValues.find((r) => r.label === "data assunzione")?.value ?? "",
             "dd/MM/yyyy",
-            new Date()
+            new Date(),
           ),
           gross: parseItalianNumber(
             rawValues.find((r) => r.label === "retribuzione totale")?.value ??
-              "0"
+              "0",
           ),
           net: parseItalianNumber(
-            rawValues.find((r) => r.label === "netto")?.value ?? "0"
+            rawValues.find((r) => r.label === "netto")?.value ?? "0",
           ),
           workedDays: parseItalianNumber(
-            rawValues.find((r) => r.label === "gg. lavorati")?.value ?? "0"
+            rawValues.find((r) => r.label === "gg. lavorati")?.value ?? "0",
           ),
           workedHours: parseItalianNumber(
-            rawValues.find((r) => r.label === "ore lavorate")?.value ?? "0"
+            rawValues.find((r) => r.label === "ore lavorate")?.value ?? "0",
           ),
           permissionsHoursBalance: parseItalianNumber(
             rawValues.find((r) => r.label === "permessi / ex-festivita'")
-              ?.value ?? "0"
+              ?.value ?? "0",
           ),
           holidaysHoursBalance: parseItalianNumber(
-            rawValues.find((r) => r.label === "ferie")?.value ?? "0"
+            rawValues.find((r) => r.label === "ferie")?.value ?? "0",
           ),
           rolHoursBalance: parseItalianNumber(
-            rawValues.find((r) => r.label === "r.o.l.")?.value ?? "0"
+            rawValues.find((r) => r.label === "r.o.l.")?.value ?? "0",
           ),
           buffer: Buffer.from(pageAsPdf),
         });
       } catch (e) {
         // it's expected that some of the last pages may not be salaries
-        console.error(`Error parsing salary on page ${pageIndex}:`, e);
+        console.error(`Error parsing salary on page ${pageIndex}:`);
       }
       pageIndex++;
     }
@@ -255,7 +257,7 @@ export const pubblicaWebUtils = {
 
   computeEmployeesMonthlyCost(
     employeePayrolls: { gross: number; fullName: string }[],
-    totalBusinessCost: number
+    totalBusinessCost: number,
   ) {
     // Step 1: Calculate total gross
     const L_tot = employeePayrolls.reduce((sum, emp) => sum + emp.gross, 0);
@@ -334,7 +336,7 @@ function findByTextNearestTo(
   text: string,
   item: PdfTextItem,
   items: PdfTextItem[],
-  forceBelow: boolean = true
+  forceBelow: boolean = true,
 ) {
   const equalTextItems: PdfTextItem[] = [];
   for (const itemFromFullList of items) {
@@ -364,7 +366,7 @@ function findByTextNearestTo(
 
   if (nearestTextItem) {
     console.log(
-      `nearest item to ${item.str}(${item.x}, ${item.y}) is ${nearestTextItem.str}(${nearestTextItem.x}, ${nearestTextItem.y})`
+      `nearest item to ${item.str}(${item.x}, ${item.y}) is ${nearestTextItem.str}(${nearestTextItem.x}, ${nearestTextItem.y})`,
     );
     return nearestTextItem;
   }
@@ -375,19 +377,19 @@ function findByTextNearestTo(
 function findTextItemRelatedToTextItemLabel(
   item: PdfTextItem,
   items: PdfTextItem[],
-  labelDefinition: LabelDefinition
+  labelDefinition: LabelDefinition,
 ) {
   // fin out all items above
   const belowItems = items
     .filter((it) => it.page === item.page)
     .filter(
       (it) =>
-        it.y > item.y && it.y < item.y + item.height + labelDefinition.gapY
+        it.y > item.y && it.y < item.y + item.height + labelDefinition.gapY,
     )
     .filter(
       (it) =>
         it.x >= item.x - labelDefinition.negativeGapX &&
-        it.x < item.x + item.width + labelDefinition.gapX
+        it.x < item.x + item.width + labelDefinition.gapX,
     )
     .filter((it) => {
       const type = labelDefinition.type;
@@ -406,8 +408,11 @@ function findTextItemRelatedToTextItemLabel(
       throw new Error(`Unknown type ${type} for ${labelDefinition.label}`);
     });
   if (belowItems.length === 0) {
+    console.log(
+      `Could not find cell below item ${item.str} with definition ${JSON.stringify(labelDefinition)}`,
+    );
     throw new Error(
-      `Could not find cell below item ${item.str} with definition ${JSON.stringify(labelDefinition)}`
+      `Could not find cell below item ${item.str} with definition ${JSON.stringify(labelDefinition)}`,
     );
   }
 

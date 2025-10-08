@@ -3,11 +3,15 @@ import * as fs from "node:fs";
 import { serverEnv } from "@/env/server-env";
 import { PubblicaWebApi } from "@/modules/pubblica-web/pubblica-web-api-client";
 import { pubblicaWebUtils } from "@/modules/pubblica-web/pubblica-web.utils";
+import { pubblicaWebServer } from "@/modules/pubblica-web/pubblica-web.server";
+import { db } from "@/drizzle/drizzle-db";
+import { documents, pubblicaWebPayslipSourceFiles } from "@/drizzle/schema";
+import { desc, eq, isNull } from "drizzle-orm";
 
 describe("parse pubblica web data", () => {
   const client = new PubblicaWebApi(
     serverEnv.pubblicaWebUsername,
-    serverEnv.pubblicaWebPassword
+    serverEnv.pubblicaWebPassword,
   );
 
   test("fake test", () => {
@@ -21,16 +25,16 @@ describe("parse pubblica web data", () => {
     // write to file the first pdf
     fs.writeFileSync(
       "__tests__/modules/pubblica-web/Cedolino-2022-08-0000.pdf",
-      Buffer.from(payslips.bytes)
+      Buffer.from(payslips.bytes),
     );
   });
 
   test("it parses multiple salary pdf", async () => {
     const pdfBytes = fs.readFileSync(
-      "__tests__/modules/pubblica-web/Cedolino-2022-08-0000.pdf"
+      "__tests__/modules/pubblica-web/Cedolino-2022-08-0000.pdf",
     );
     const res = await pubblicaWebUtils.parseMultiPageSalaries(
-      new Uint8Array(pdfBytes).buffer
+      new Uint8Array(pdfBytes).buffer,
     );
     const { fullName } = res[0];
 
@@ -44,17 +48,17 @@ describe("parse pubblica web data", () => {
     // write to file the first pdf
     fs.writeFileSync(
       "__tests__/modules/pubblica-web/Bilancino-2022-07-0000.pdf",
-      Buffer.from(balance!.bytes)
+      Buffer.from(balance!.bytes),
     );
   });
 
   test("it parses monthly total business cost from balance pdf", async () => {
     const pdfBytes = fs.readFileSync(
-      "__tests__/modules/pubblica-web/Bilancino-2022-07-0000.pdf"
+      "__tests__/modules/pubblica-web/Bilancino-2023-06.pdf",
     );
 
     const res = await pubblicaWebUtils.parseSalaryMonthlyBalance(
-      new Uint8Array(pdfBytes).buffer
+      new Uint8Array(pdfBytes).buffer,
     );
 
     expect(res.totalBusinessCost).greaterThan(0);
@@ -62,18 +66,18 @@ describe("parse pubblica web data", () => {
 
   test("it computes employee monthly cost based on gross and total business cost", async () => {
     const pdfBytes = fs.readFileSync(
-      "__tests__/modules/pubblica-web/Cedolino-2023-01-0000.pdf"
+      "__tests__/modules/pubblica-web/Cedolino-2023-01-0000.pdf",
     );
     const salaries = await pubblicaWebUtils.parseMultiPageSalaries(
-      new Uint8Array(pdfBytes).buffer
+      new Uint8Array(pdfBytes).buffer,
     );
 
     const pdfBalanceBytes = fs.readFileSync(
-      "__tests__/modules/pubblica-web/Bilancino-2023-01-0000.pdf"
+      "__tests__/modules/pubblica-web/Bilancino-2023-01-0000.pdf",
     );
 
     const balance = await pubblicaWebUtils.parseSalaryMonthlyBalance(
-      new Uint8Array(pdfBalanceBytes).buffer
+      new Uint8Array(pdfBalanceBytes).buffer,
     );
 
     const { totalBusinessCost } = balance;
@@ -84,12 +88,12 @@ describe("parse pubblica web data", () => {
         gross: s.gross,
         fullName: s.fullName,
       })),
-      totalBusinessCost
+      totalBusinessCost,
     );
 
     // 1. La somma dei costi aziendali deve tornare col totale
     expect(
-      employeeCosts.reduce((sum, e) => sum + e.businessCost, 0)
+      employeeCosts.reduce((sum, e) => sum + e.businessCost, 0),
     ).toBeCloseTo(totalBusinessCost, 2);
 
     // 2. Ogni quota deve corrispondere alla proporzione del lordo
@@ -113,18 +117,18 @@ describe("parse pubblica web data", () => {
     const pdfBytes = fs.readFileSync(samplePath);
 
     const payrolls = await pubblicaWebUtils.parseMultiPageSalaries(
-      new Uint8Array(pdfBytes).buffer
+      new Uint8Array(pdfBytes).buffer,
     );
     for (const res of payrolls) {
       console.log(res);
       expect(res.gross).toBeGreaterThan(0);
       expect(res.net).toBeGreaterThan(0);
       expect(
-        typeof res.fullName === "string" && res.fullName.length
+        typeof res.fullName === "string" && res.fullName.length,
       ).toBeTruthy();
       expect(res.cf.length).toBe(16);
       expect(
-        new Date().getFullYear() - res.birthDate.getFullYear()
+        new Date().getFullYear() - res.birthDate.getFullYear(),
       ).toBeGreaterThan(18);
       expect(res.hireDate.getFullYear()).toBeGreaterThan(2000);
       expect(res.permissionsHoursBalance).toBeGreaterThanOrEqual(0);
@@ -132,6 +136,44 @@ describe("parse pubblica web data", () => {
       expect(res.rolHoursBalance).toBeGreaterThanOrEqual(0);
       expect(res.workedDays).toBeGreaterThanOrEqual(0);
       expect(res.workedHours).toBeGreaterThanOrEqual(0);
+    }
+  });
+
+  test("it can parse files from database", async () => {
+    const unimportedFiles = await db
+      .select({
+        id: pubblicaWebPayslipSourceFiles.id,
+        documentId: pubblicaWebPayslipSourceFiles.documentId,
+        year: pubblicaWebPayslipSourceFiles.year,
+        month: pubblicaWebPayslipSourceFiles.month,
+      })
+      .from(pubblicaWebPayslipSourceFiles)
+      .where(isNull(pubblicaWebPayslipSourceFiles.importedAt))
+      .orderBy(
+        desc(pubblicaWebPayslipSourceFiles.year),
+        desc(pubblicaWebPayslipSourceFiles.month),
+      );
+
+    try {
+      await pubblicaWebServer.parseAndStorePayslipsSourceFile(
+        unimportedFiles[0].id,
+      );
+    } catch (e) {
+      const sourceDoc = await db
+        .select({
+          content: documents.content,
+          mime: documents.mime,
+          fileName: documents.fileName,
+          extension: documents.extension,
+        })
+        .from(documents)
+        .where(eq(documents.id, unimportedFiles[0].documentId!))
+        .limit(1);
+      // write file to pdf
+      fs.writeFileSync(
+        `__tests__/modules/pubblica-web/Cedolino-${unimportedFiles[0].year}-${unimportedFiles[0].month}-0000.pdf`,
+        Buffer.from(sourceDoc[0]!.content),
+      );
     }
   });
 });

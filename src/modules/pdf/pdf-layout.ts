@@ -12,6 +12,9 @@
     // Then pick values by (rowIndex, headerMap["NETTO"]) rather than nearest-neighbor.
 */
 
+import { getDocument, Util } from "pdfjs-dist";
+import "pdfjs-dist/build/pdf.worker.min.mjs";
+
 export type PdfTextItem = {
   page: number; // 1-based page index
   str: string; // text content
@@ -21,43 +24,18 @@ export type PdfTextItem = {
   height: number;
 };
 
-// Dynamically import PDF.js so TypeScript doesn't require types at build-time.
-async function loadPdfjs() {
-  const tryPaths = [
-    "pdfjs-dist/legacy/build/pdf.mjs",
-    "pdfjs-dist/build/pdf.mjs",
-    "pdfjs-dist",
-  ];
-  for (const p of tryPaths) {
-    try {
-      const mod: any = await import(p as any);
-      return mod;
-    } catch (e) {
-      // try next
-    }
-  }
-  throw new Error(
-    "pdfjs-dist module not found. Please add it to dependencies."
-  );
-}
-
 export async function extractTextItems(
   pdfBuffer: ArrayBufferLike
 ): Promise<{ items: PdfTextItem[]; numPages: number }> {
-  // if (typeof window !== "undefined") {
-  //   throw new Error("pdf-layout is server-only. Do not call from the client.");
-  // }
-  const pdfjs = await loadPdfjs();
   const data =
     pdfBuffer instanceof ArrayBuffer
       ? new Uint8Array(pdfBuffer)
       : new Uint8Array(pdfBuffer as ArrayBufferLike);
 
-  const loadingTask = pdfjs.getDocument({
+  const loadingTask = getDocument({
     data,
     isEvalSupported: false,
     disableFontFace: true,
-    disableWorker: true, // ensure no worker thread in Next.js server runtime
     verbosity: 0,
   });
   const doc = await loadingTask.promise;
@@ -69,7 +47,7 @@ export async function extractTextItems(
     const content = await page.getTextContent();
     for (const item of content.items as any[]) {
       // item.transform is a 6-element matrix; combine with viewport.transform
-      const m = pdfjs.Util.transform(viewport.transform, item.transform);
+      const m = Util.transform(viewport.transform, item.transform);
       const x = m[4];
       const y = m[5];
       const str: string = (item.str ?? "").trim();

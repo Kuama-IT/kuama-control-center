@@ -18,6 +18,15 @@ import {
 } from "drizzle-orm/pg-core";
 import { sql, SQL } from "drizzle-orm";
 
+const bytea = customType<{
+  data: Buffer;
+  default: false;
+}>({
+  dataType() {
+    return "bytea";
+  },
+});
+
 export const externalPlatforms = pgEnum("external_platforms", [
   "github",
   "gitlab",
@@ -135,23 +144,16 @@ export const payslips = pgTable(
   {
     id: serial().primaryKey(),
     employeeId: serial().references(() => employees.id), // nullable until mapped
-    employeeName: varchar({ length: 256 }).notNull(), // as on document (uppercase)
-    cf: varchar({ length: 16 }),
     year: integer().notNull(),
     month: integer().notNull(),
     gross: real().notNull(),
     net: real().notNull(),
     employerCost: real(), // nullable until monthly balance allocation
-    birthDate: varchar({ length: 24 }),
-    hireDate: varchar({ length: 24 }),
-    sourceFileId: serial().references(() => pubblicaWebPayslipSourceFiles.id),
-    pageIndex: integer().notNull().default(0),
     documentId: serial().references(() => documents.id), // single-page PDF document
     createdAt: timestamp().notNull().defaultNow(),
     updatedAt: timestamp().notNull().defaultNow(),
   },
   (t) => [
-    unique("payslips_source_page_unique").on(t.sourceFileId, t.pageIndex),
     unique("payslips_emp_year_month_unique").on(t.employeeId, t.year, t.month),
   ]
 );
@@ -170,10 +172,8 @@ export const employees = pgTable("employees", {
   phoneNumber: varchar({ length: 256 }),
   iban: varchar({ length: 256 }),
   payrollRegistrationNumber: integer(),
+  cf: varchar({ length: 16 }),
 });
-
-// Each month our employment consultant sends us a pdf file with the estimated costs for each employee
-// Removed employeeEstimatedCosts in favor of storing employerCost on payslips and optionally a history table later if needed.
 
 // Used to generate the legend of the report for our payrolls consultant
 export const absenceReasons = pgTable("absence_reasons", {
@@ -284,15 +284,6 @@ export const accessTokens = pgTable("access_tokens", {
   usageCount: integer().default(0),
 });
 
-const bytea = customType<{
-  data: Buffer;
-  default: false;
-}>({
-  dataType() {
-    return "bytea";
-  },
-});
-
 export const documents = pgTable(
   "documents",
   {
@@ -340,7 +331,6 @@ export const pubblicaWebPayslips = pgTable(
     holidaysHoursBalance: real().notNull().default(0),
     rolHoursBalance: real().notNull().default(0),
     documentId: serial().references(() => documents.id),
-    sourceFileId: serial().references(() => pubblicaWebPayslipSourceFiles.id),
   },
   (t) => [unique("fullName_year_month").on(t.fullName, t.year, t.month)]
 );

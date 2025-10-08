@@ -31,8 +31,6 @@ export const pubblicaWebServer = {
     }
 
     const buffer = new Uint8Array(monthlyBalance!.bytes).buffer;
-    const parsedMonthlyBalance =
-      await pubblicaWebUtils.parseSalaryMonthlyBalance(buffer);
 
     const content = Buffer.from(monthlyBalance.bytes);
     const doc = await db
@@ -50,7 +48,7 @@ export const pubblicaWebServer = {
     await db.insert(pubblicaWebMonthlyBalances).values({
       year,
       month,
-      total: parsedMonthlyBalance.totalBusinessCost,
+      total: 0,
       documentId: doc[0].id,
     });
   },
@@ -61,7 +59,7 @@ export const pubblicaWebServer = {
 
     return this.storeMonthlyBalanceByYearAndMonth({ year, month });
   },
-  async storeMissingMonthlyBalancesSince2019() {
+  async storeMissingMonthlyBalancesSince2021() {
     const existingBalances = await db
       .select({
         year: pubblicaWebMonthlyBalances.year,
@@ -77,7 +75,7 @@ export const pubblicaWebServer = {
     const currentYear = now.getFullYear();
     const currentMonth = now.getMonth() + 1;
 
-    for (let year = 2019; year <= currentYear; year++) {
+    for (let year = 2021; year <= currentYear; year++) {
       for (let month = 1; month <= 12; month++) {
         if (year === currentYear && month > currentMonth) {
           break;
@@ -164,7 +162,12 @@ export const pubblicaWebServer = {
       throw new Error(`Source file with ID ${sourceFileId} not found`);
     }
     const sourceDoc = await db
-      .select({ content: documents.content })
+      .select({
+        content: documents.content,
+        mime: documents.mime,
+        fileName: documents.fileName,
+        extension: documents.extension,
+      })
       .from(documents)
       .where(eq(documents.id, sourceFileResult[0].documentId!))
       .limit(1);
@@ -176,25 +179,39 @@ export const pubblicaWebServer = {
     const parsedPayslips =
       await pubblicaWebUtils.parseMultiPageSalaries(payslipsBuffer);
 
-    const values = parsedPayslips.map((payslip) => ({
-      year: sourceFileResult[0].year,
-      month: sourceFileResult[0].month,
-      fullName: payslip.fullName,
-      cf: payslip.cf,
-      birthDate: `${String(payslip.birthDate.getDate()).padStart(2, "0")}/${String(payslip.birthDate.getMonth() + 1).padStart(2, "0")}/${payslip.birthDate.getFullYear()}`,
-      hireDate: `${String(payslip.hireDate.getDate()).padStart(2, "0")}/${String(payslip.hireDate.getMonth() + 1).padStart(2, "0")}/${payslip.hireDate.getFullYear()}`,
-      gross: payslip.gross,
-      net: payslip.net,
-      workedDays: payslip.workedDays,
-      workedHours: payslip.workedHours,
-      permissionsHoursBalance: payslip.permissionsHoursBalance,
-      holidaysHoursBalance: payslip.holidaysHoursBalance,
-      rolHoursBalance: payslip.rolHoursBalance,
-      sourceFileId: sourceFileResult[0].id,
-    }));
-
     await db.transaction(async (tx) => {
-      await tx.insert(pubblicaWebPayslips).values(values);
+      for (const payslip of parsedPayslips) {
+        // store a document for each payslip
+        const content = payslip.buffer;
+        const doc = await tx
+          .insert(documents)
+          .values({
+            content,
+            sizeInBytes: content.byteLength,
+            sha256: createHash("sha256").update(content).digest("hex"),
+            mime: sourceDoc[0].mime,
+            fileName: sourceDoc[0].fileName,
+            extension: sourceDoc[0].extension,
+          })
+          .returning();
+
+        await tx.insert(pubblicaWebPayslips).values({
+          year: sourceFileResult[0].year,
+          month: sourceFileResult[0].month,
+          fullName: payslip.fullName,
+          cf: payslip.cf,
+          birthDate: `${String(payslip.birthDate.getDate()).padStart(2, "0")}/${String(payslip.birthDate.getMonth() + 1).padStart(2, "0")}/${payslip.birthDate.getFullYear()}`,
+          hireDate: `${String(payslip.hireDate.getDate()).padStart(2, "0")}/${String(payslip.hireDate.getMonth() + 1).padStart(2, "0")}/${payslip.hireDate.getFullYear()}`,
+          gross: payslip.gross,
+          net: payslip.net,
+          workedDays: payslip.workedDays,
+          workedHours: payslip.workedHours,
+          permissionsHoursBalance: payslip.permissionsHoursBalance,
+          holidaysHoursBalance: payslip.holidaysHoursBalance,
+          rolHoursBalance: payslip.rolHoursBalance,
+          documentId: doc[0].id,
+        });
+      }
 
       await tx
         .update(pubblicaWebPayslipSourceFiles)
@@ -203,7 +220,8 @@ export const pubblicaWebServer = {
     });
   },
 
-  async storePayslipsSourceFileSince2019() {
+  // TODO: one shot, drop after running once
+  async storePayslipsSourceFileSince2021() {
     const existingFiles = await db
       .select({
         year: pubblicaWebPayslipSourceFiles.year,
@@ -218,7 +236,7 @@ export const pubblicaWebServer = {
     const currentYear = now.getFullYear();
     const currentMonth = now.getMonth() + 1;
 
-    for (let year = 2019; year <= currentYear; year++) {
+    for (let year = 2021; year <= currentYear; year++) {
       for (let month = 1; month <= 12; month++) {
         if (year === currentYear && month > currentMonth) {
           break;
@@ -256,11 +274,52 @@ export const pubblicaWebServer = {
       console.log(
         `Parsing and storing payslips from source file ID ${file.id}`
       );
+      await this.parseAndStorePayslipsSourceFile(file.id);
+    }
+  },
+
+  async parseAllUnparsedMonthlyBalances() {
+    // all unparsed monthly balances have total = 0
+    const unparsedBalances = await db
+      .select({
+        id: pubblicaWebMonthlyBalances.id,
+        year: pubblicaWebMonthlyBalances.year,
+        month: pubblicaWebMonthlyBalances.month,
+        documentId: pubblicaWebMonthlyBalances.documentId,
+      })
+      .from(pubblicaWebMonthlyBalances)
+      .where(eq(pubblicaWebMonthlyBalances.total, 0))
+      .orderBy(
+        desc(pubblicaWebMonthlyBalances.year),
+        desc(pubblicaWebMonthlyBalances.month)
+      );
+
+    for (const balance of unparsedBalances) {
+      console.log(
+        `Parsing and updating monthly balance for ${balance.year}-${balance.month}`
+      );
       try {
-        await this.parseAndStorePayslipsSourceFile(file.id);
+        const doc = await db
+          .select({ content: documents.content })
+          .from(documents)
+          .where(eq(documents.id, balance.documentId!))
+          .limit(1);
+        if (!doc.length) {
+          console.error(
+            `Document not found for monthly balance ID ${balance.id}`
+          );
+          continue;
+        }
+        const buffer = new Uint8Array(doc[0].content).buffer;
+        const parsedMonthlyBalance =
+          await pubblicaWebUtils.parseSalaryMonthlyBalance(buffer);
+        await db
+          .update(pubblicaWebMonthlyBalances)
+          .set({ total: parsedMonthlyBalance.totalBusinessCost })
+          .where(eq(pubblicaWebMonthlyBalances.id, balance.id));
       } catch (error) {
         console.error(
-          `Failed to parse and store payslips from source file ID ${file.id}:`,
+          `Failed to parse and update monthly balance ID ${balance.id}:`,
           (error as Error).message
         );
       }
