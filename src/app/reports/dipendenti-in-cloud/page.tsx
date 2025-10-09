@@ -37,7 +37,7 @@ export default async function Page({ searchParams }: PageParams) {
     return <ErrorMessage failure={result} />;
   }
 
-  const employees = await employeesServer.listAll();
+  const employees = await employeesServer.all();
 
   if (isFailure(employees)) {
     return <ErrorMessage failure={employees} />;

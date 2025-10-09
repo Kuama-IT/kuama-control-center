@@ -3,7 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { HiArrowSmRight } from "react-icons/hi";
 import { routes } from "@/modules/ui/routes";
-import { KEmployeesRead } from "@/modules/employees/schemas/employees-schemas";
+import { KEmployeesRead } from "@/modules/employees/schemas/employees-read";
 
 export const EmployeeCard = ({
 	employee,

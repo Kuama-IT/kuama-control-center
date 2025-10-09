@@ -102,10 +102,10 @@ const clientsWithProjectsAndTeam = async () => {
 					phoneNumber: row.employee.phoneNumber as any,
 					avatarUrl: row.employee.avatarUrl as any,
 					iban: row.employee.iban as any,
-					nationalInsuranceNumber: row.employee.nationalInsuranceNumber as any,
 					dipendentiInCloudId: row.employee.dipendentiInCloudId as any,
 					hiredOn: row.employee.hiredOn as any,
 					payrollRegistrationNumber: row.employee.payrollRegistrationNumber as any,
+					cf: row.employee.cf as any,
 				});
 		}
 

@@ -7,7 +7,7 @@ import {
   listAllAction,
 } from "./clients.actions";
 import type { ClientRead, VatRead } from "./schemas/clients-schemas";
-import type { EmployeesRead } from "@/modules/employees/schemas/employees-schemas";
+import type { EmployeesRead } from "@/modules/employees/schemas/employees-read";
 
 export type ProjectWithTeam = {
   id: number;

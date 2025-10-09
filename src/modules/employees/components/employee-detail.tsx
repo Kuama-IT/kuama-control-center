@@ -8,7 +8,7 @@ import { ErrorMessage } from "@/modules/ui/components/error-message";
 import { EmployeeDangerZone } from "@/modules/employees/components/employee-danger-zone";
 
 export default async function EmployeeDetail({ id }: { id: number }) {
-	const employee = await employeesServer.byId(id);
+	const employee = await employeesServer.get(id);
 	if (isFailure(employee)) {
 		return <ErrorMessage failure={employee} />;
 	}

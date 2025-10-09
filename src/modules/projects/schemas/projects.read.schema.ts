@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { TaskRead } from "@/modules/tasks/schemas/tasks-schemas";
-import { EmployeesRead } from "@/modules/employees/schemas/employees-schemas";
+import { EmployeesRead } from "@/modules/employees/schemas/employees-read";
 
 export const projectReadSchema = z.object({
   id: z.number(),

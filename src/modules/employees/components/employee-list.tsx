@@ -5,7 +5,7 @@ import { isFailure } from "@/utils/server-action-utils";
 import { ErrorMessage } from "@/modules/ui/components/error-message";
 
 export default async function Employees() {
-	const employees = await employeesServer.listAll();
+	const employees = await employeesServer.all();
 	if (isFailure(employees)) {
 		return <ErrorMessage failure={employees} />;
 	}

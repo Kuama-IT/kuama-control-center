@@ -8,11 +8,9 @@ import type {
   PlatformCredentialsInsert,
   PlatformCredentialsValidForm,
 } from "./schemas/platform-credentials.schemas";
-import {
-  platformCredentialsInsertSchema,
-} from "./schemas/platform-credentials.schemas";
+import { platformCredentialsInsertSchema } from "./schemas/platform-credentials.schemas";
 import type { ProjectRead } from "@/modules/projects/schemas/projects.read.schema";
-import type { EmployeesRead } from "@/modules/employees/schemas/employees-schemas";
+import type { EmployeesRead } from "@/modules/employees/schemas/employees-read";
 import { auth } from "@/modules/auth/auth";
 
 const idSchema = z.number().int().positive();
@@ -23,8 +21,10 @@ async function listAll(): Promise<PlatformCredentialsFullRead[]> {
   const employeeIds = new Set<number>();
   const projectIds = new Set<number>();
   rows.forEach((row: any) => {
-    const rels: Array<{ employeeId?: number | null; projectId?: number | null }> =
-      row.platformCredentialsToEmployeesAndProjects ?? [];
+    const rels: Array<{
+      employeeId?: number | null;
+      projectId?: number | null;
+    }> = row.platformCredentialsToEmployeesAndProjects ?? [];
     rels.forEach(({ employeeId, projectId }) => {
       if (employeeId) employeeIds.add(employeeId);
       if (projectId) projectIds.add(projectId);
@@ -32,26 +32,32 @@ async function listAll(): Promise<PlatformCredentialsFullRead[]> {
   });
 
   const employees = (await platformCredentialsDb.fetchEmployeesByIds(
-    Array.from(employeeIds),
+    Array.from(employeeIds)
   )) as EmployeesRead[];
   const projects = (await platformCredentialsDb.fetchProjectsByIds(
-    Array.from(projectIds),
+    Array.from(projectIds)
   )) as ProjectRead[];
   const employeeMap = new Map<number, EmployeesRead>(
-    employees.map((e) => [e.id, e]),
+    employees.map((e) => [e.id, e])
   );
-  const projectMap = new Map<number, ProjectRead>(projects.map((p) => [p.id, p]));
+  const projectMap = new Map<number, ProjectRead>(
+    projects.map((p) => [p.id, p])
+  );
 
   return rows.map((row: any) => {
     const { platformCredentialsToEmployeesAndProjects, ...credential } = row;
     let enhanced: PlatformCredentialsFullRead = {
       ...(credential as PlatformCredentialsFullRead),
     };
-    const rels: Array<{ employeeId?: number | null; projectId?: number | null }> =
-      platformCredentialsToEmployeesAndProjects ?? [];
+    const rels: Array<{
+      employeeId?: number | null;
+      projectId?: number | null;
+    }> = platformCredentialsToEmployeesAndProjects ?? [];
     if (rels.length > 0) {
-      const relations: { employeeId?: number | null; projectId?: number | null } =
-        firstOrThrow(rels);
+      const relations: {
+        employeeId?: number | null;
+        projectId?: number | null;
+      } = firstOrThrow(rels);
       const project = relations.projectId
         ? (projectMap.get(relations.projectId) as ProjectRead | undefined)
         : undefined;
@@ -74,14 +80,14 @@ async function byId(rawId: unknown): Promise<PlatformCredentialsFullRead> {
   const id = idSchema.parse(rawId);
   const records: any[] = await platformCredentialsDb.getById(id);
   const credentials = firstOrThrow(records) as any;
-  const related: any[] = await platformCredentialsDb.getFirstRelationByCredentialsId(
-    id,
-  );
+  const related: any[] =
+    await platformCredentialsDb.getFirstRelationByCredentialsId(id);
   let enhanced: PlatformCredentialsFullRead = credentials as any;
   if (related.length > 0) {
-    const { projectId, employeeId } = firstOrThrow(
-      related,
-    ) as { projectId?: number | null; employeeId?: number | null };
+    const { projectId, employeeId } = firstOrThrow(related) as {
+      projectId?: number | null;
+      employeeId?: number | null;
+    };
     if (projectId) {
       const projectRes = (await platformCredentialsDb.fetchProjectsByIds([
         projectId,
@@ -101,9 +107,8 @@ async function byId(rawId: unknown): Promise<PlatformCredentialsFullRead> {
 }
 
 async function create(raw: PlatformCredentialsValidForm) {
-  const parsed: PlatformCredentialsInsert = platformCredentialsInsertSchema.parse(
-    raw,
-  );
+  const parsed: PlatformCredentialsInsert =
+    platformCredentialsInsertSchema.parse(raw);
   const session = await auth();
   if (!session || !session.user?.isAdmin) {
     throw new Error("Only admin is allowed to invoke this action");
@@ -111,20 +116,20 @@ async function create(raw: PlatformCredentialsValidForm) {
   await db.transaction(async (trx) => {
     const inserted = (await platformCredentialsDb.insertCredentials(
       parsed,
-      trx,
+      trx
     )) as Array<{ id: number }>;
     const { id } = firstOrThrow(inserted) as { id: number };
     if (parsed.clientId && parsed.employeeId) {
       const client = await platformCredentialsDb.assertClientExists(
         parsed.clientId,
-        trx,
+        trx
       );
       if (client.length === 0) {
         throw new Error(`Client with ID ${parsed.clientId} not found`);
       }
       const employee = await platformCredentialsDb.assertEmployeeExists(
         parsed.employeeId,
-        trx,
+        trx
       );
       if (employee.length === 0) {
         throw new Error(`Employee with ID ${parsed.employeeId} not found`);
@@ -132,7 +137,7 @@ async function create(raw: PlatformCredentialsValidForm) {
       await platformCredentialsDb.insertRelation(
         id,
         { employeeId: parsed.employeeId, projectId: parsed.projectId },
-        trx,
+        trx
       );
     }
   });

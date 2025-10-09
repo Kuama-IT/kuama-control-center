@@ -5,29 +5,24 @@ import { employeesDb } from "./employees.db";
 import { employees, employees as employeesTable } from "@/drizzle/schema";
 import { dipendentiInCloudApiClient } from "../dipendenti-in-cloud/dipendenti-in-cloud-api-client";
 import { youtrackApiClient } from "../you-track/youtrack-api-client";
-
-const idSchema = z.number().int().positive();
-
-export type Employee = typeof employeesTable.$inferSelect;
+import { EmployeesRead } from "./schemas/employees-read";
 
 export const employeesServer = {
-  async listAll(): Promise<Employee[]> {
+  async all(): Promise<EmployeesRead[]> {
     return employeesDb.listAll();
   },
 
-  async byId(rawId: unknown): Promise<Employee> {
-    const id = idSchema.parse(rawId);
+  async get(id: number): Promise<EmployeesRead> {
     const rows = await employeesDb.getById(id);
     return firstOrThrow(rows);
   },
 
-  async deleteEmployee(rawId: unknown): Promise<void> {
-    const id = idSchema.parse(rawId);
-    await db.transaction(async (trx) => {
-      await employeesDb.deletePresenceByEmployeeId(id, trx);
-      await employeesDb.deleteAbsenceByEmployeeId(id, trx);
-      await employeesDb.deleteTeamsByEmployeeId(id, trx);
-      await employeesDb.deleteEmployeeById(id, trx);
+  async deleteEmployee(id: number): Promise<void> {
+    await db.transaction(async (tx) => {
+      await employeesDb.deletePresenceByEmployeeId(id, tx);
+      await employeesDb.deleteAbsenceByEmployeeId(id, tx);
+      await employeesDb.deleteTeamsByEmployeeId(id, tx);
+      await employeesDb.deleteEmployeeById(id, tx);
     });
   },
   async importFromDipendentiInCloudAndYouTrack(): Promise<void> {
