@@ -6,6 +6,7 @@ import { pdfUtils } from "../pdf/pdf.utils";
 type LabelDefinition = {
   type: "text" | "italian_date" | "italian_number" | "number";
   label:
+    | "dipendente"
     | "codice fiscale"
     | "cognome nome"
     | "data di nascita"
@@ -35,10 +36,18 @@ type PayrollInfo = {
   permissionsHoursBalance: number;
   holidaysHoursBalance: number;
   rolHoursBalance: number;
+  payrollRegistrationNumber: number;
   buffer: Buffer; // PDF of the single payslip page
 };
 
 const labelDefinitions: LabelDefinition[] = [
+  {
+    type: "text",
+    label: "dipendente",
+    gapY: 20,
+    gapX: 10,
+    negativeGapX: 0,
+  },
   {
     type: "text",
     label: "codice fiscale",
@@ -207,6 +216,12 @@ export const pubblicaWebUtils = {
           pageIndex - 1,
         );
 
+        const dipendente =
+          rawValues.find((r) => r.label === "dipendente")?.value ?? "";
+        const payrollRegistrationNumber = isNaN(parseInt(dipendente))
+          ? 0
+          : parseInt(dipendente);
+
         payrolls.push({
           cf: rawValues.find((r) => r.label === "codice fiscale")?.value ?? "",
           fullName:
@@ -244,6 +259,7 @@ export const pubblicaWebUtils = {
           rolHoursBalance: parseItalianNumber(
             rawValues.find((r) => r.label === "r.o.l.")?.value ?? "0",
           ),
+          payrollRegistrationNumber,
           buffer: Buffer.from(pageAsPdf),
         });
       } catch (e) {

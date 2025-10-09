@@ -1,33 +1,29 @@
 "use client";
-import { useTransition } from "react";
-import { Button } from "@/components/ui/button";
-import { FaSync } from "react-icons/fa";
 import { cn } from "@/lib/utils";
-import ytImportOrganizations from "@/modules/you-track/actions/yt-import-organizations-action";
+import { BrutalButton } from "@/modules/ui";
+import { FaSync } from "react-icons/fa";
+import { useYouTrackImportOrganizationsMutation } from "../mutations/youtrack.mutations";
+import { useEffect } from "react";
 import { isFailure } from "@/utils/server-action-utils";
 import { notifyError, notifySuccess } from "@/modules/ui/components/notify";
 
 export const YtImportOrganizationsButton = () => {
-  const [isPending, startTransition] = useTransition();
+  const mutation = useYouTrackImportOrganizationsMutation();
 
-  const onImportOrganizationsClick = () => {
-    startTransition(async () => {
-      const result = await ytImportOrganizations();
-
-      if (isFailure(result)) {
-        notifyError("Error while importing organizations");
-
-        return;
+  useEffect(() => {
+    if (mutation.data) {
+      if (!isFailure(mutation.data)) {
+        notifySuccess(mutation.data.message)
+        return
       }
 
-      notifySuccess(result.message);
-    });
-  };
-
+      notifyError(mutation.data.message)
+    }
+  }, [ mutation.data])
   return (
-    <Button disabled={isPending} onClick={onImportOrganizationsClick}>
-      <FaSync className={cn({ "animate-spin": isPending })} />
-      Import Organizations
-    </Button>
+    <BrutalButton disabled={mutation.isPending} onClick={() => mutation.mutate()}>
+      <FaSync className={cn({ "animate-spin": mutation.isPending })} />
+      Import YT Organizations
+    </BrutalButton>
   );
 };

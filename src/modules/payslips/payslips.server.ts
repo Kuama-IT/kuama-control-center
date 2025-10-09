@@ -22,9 +22,9 @@ export const payslipsServer = {
             db
               .select({ documentId: payslips.documentId })
               .from(payslips)
-              .where(not(isNull(payslips.documentId)))
-          )
-        )
+              .where(not(isNull(payslips.documentId))),
+          ),
+        ),
       )
       .orderBy(desc(pubblicaWebPayslips.year), desc(pubblicaWebPayslips.month));
 
@@ -34,7 +34,7 @@ export const payslipsServer = {
 
       if (!employee) {
         throw new Error(
-          `Employee with full name ${missing.fullName} not found. Did you import employees?`
+          `Employee with full name ${missing.fullName} not found. Did you import employees?`,
         );
       }
 
@@ -42,17 +42,17 @@ export const payslipsServer = {
       const monthlyBalance =
         await pubblicaWebDb.getMonthlyBalanceByYearAndMonth(
           missing.year,
-          missing.month
+          missing.month,
         );
       if (!monthlyBalance) {
         throw new Error(
-          `Monthly balance for year ${missing.year} and month ${missing.month} not found. Did you import monthly balances?`
+          `Monthly balance for year ${missing.year} and month ${missing.month} not found. Did you import monthly balances?`,
         );
       }
 
       const [employerCost] = pubblicaWebUtils.computeEmployeesMonthlyCost(
         [missing],
-        monthlyBalance.total
+        monthlyBalance.total,
       );
 
       await payslipsDb.create({
@@ -69,7 +69,7 @@ export const payslipsServer = {
       await employeesDb.update({
         ...employee,
         hiredOn: missing.hireDate,
-        // payrollRegistrationNumber TODO: read payroll number from PDF,
+        payrollRegistrationNumber: missing.payrollRegistrationNumber,
         cf: missing.cf,
         birthdate: missing.birthDate,
       });

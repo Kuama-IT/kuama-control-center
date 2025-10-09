@@ -19,7 +19,7 @@ export const pubblicaWebServer = {
   }: CreatePubblicaWebMonthlyBalanceDto) {
     const client = new PubblicaWebApi(
       serverEnv.pubblicaWebUsername,
-      serverEnv.pubblicaWebPassword
+      serverEnv.pubblicaWebPassword,
     );
 
     await client.authenticate();
@@ -68,7 +68,7 @@ export const pubblicaWebServer = {
       .from(pubblicaWebMonthlyBalances);
 
     const existingBalancesSet = new Set(
-      existingBalances.map((b) => `${b.year}-${b.month}`)
+      existingBalances.map((b) => `${b.year}-${b.month}`),
     );
 
     const now = new Date();
@@ -89,7 +89,7 @@ export const pubblicaWebServer = {
           } catch (error) {
             console.error(
               `Failed to store monthly balance for ${key}:`,
-              (error as Error).message
+              (error as Error).message,
             );
           }
         }
@@ -102,7 +102,7 @@ export const pubblicaWebServer = {
   }: CreatePubblicaWebMonthlyBalanceDto) {
     const client = new PubblicaWebApi(
       serverEnv.pubblicaWebUsername,
-      serverEnv.pubblicaWebPassword
+      serverEnv.pubblicaWebPassword,
     );
 
     await client.authenticate();
@@ -209,6 +209,7 @@ export const pubblicaWebServer = {
           permissionsHoursBalance: payslip.permissionsHoursBalance,
           holidaysHoursBalance: payslip.holidaysHoursBalance,
           rolHoursBalance: payslip.rolHoursBalance,
+          payrollRegistrationNumber: payslip.payrollRegistrationNumber,
           documentId: doc[0].id,
         });
       }
@@ -220,6 +221,15 @@ export const pubblicaWebServer = {
     });
   },
 
+  async parseAllPayslipSourceFiles() {
+    const existingFiles = await db
+      .select({
+        year: pubblicaWebPayslipSourceFiles.year,
+        month: pubblicaWebPayslipSourceFiles.month,
+      })
+      .from(pubblicaWebPayslipSourceFiles);
+  },
+
   // TODO: one shot, drop after running once
   async storePayslipsSourceFileSince2021() {
     const existingFiles = await db
@@ -229,7 +239,7 @@ export const pubblicaWebServer = {
       })
       .from(pubblicaWebPayslipSourceFiles);
     const existingFilesSet = new Set(
-      existingFiles.map((f) => `${f.year}-${f.month}`)
+      existingFiles.map((f) => `${f.year}-${f.month}`),
     );
 
     const now = new Date();
@@ -250,7 +260,7 @@ export const pubblicaWebServer = {
           } catch (error) {
             console.error(
               `Failed to store payslip source file for ${key}:`,
-              (error as Error).message
+              (error as Error).message,
             );
           }
         }
@@ -267,12 +277,12 @@ export const pubblicaWebServer = {
       .where(isNull(pubblicaWebPayslipSourceFiles.importedAt))
       .orderBy(
         desc(pubblicaWebPayslipSourceFiles.year),
-        desc(pubblicaWebPayslipSourceFiles.month)
+        desc(pubblicaWebPayslipSourceFiles.month),
       );
 
     for (const file of unimportedFiles) {
       console.log(
-        `Parsing and storing payslips from source file ID ${file.id}`
+        `Parsing and storing payslips from source file ID ${file.id}`,
       );
       await this.parseAndStorePayslipsSourceFile(file.id);
     }
@@ -291,12 +301,12 @@ export const pubblicaWebServer = {
       .where(eq(pubblicaWebMonthlyBalances.total, 0))
       .orderBy(
         desc(pubblicaWebMonthlyBalances.year),
-        desc(pubblicaWebMonthlyBalances.month)
+        desc(pubblicaWebMonthlyBalances.month),
       );
 
     for (const balance of unparsedBalances) {
       console.log(
-        `Parsing and updating monthly balance for ${balance.year}-${balance.month}`
+        `Parsing and updating monthly balance for ${balance.year}-${balance.month}`,
       );
       try {
         const doc = await db
@@ -306,7 +316,7 @@ export const pubblicaWebServer = {
           .limit(1);
         if (!doc.length) {
           console.error(
-            `Document not found for monthly balance ID ${balance.id}`
+            `Document not found for monthly balance ID ${balance.id}`,
           );
           continue;
         }
@@ -320,7 +330,7 @@ export const pubblicaWebServer = {
       } catch (error) {
         console.error(
           `Failed to parse and update monthly balance ID ${balance.id}:`,
-          (error as Error).message
+          (error as Error).message,
         );
       }
     }
@@ -332,7 +342,7 @@ export const pubblicaWebServer = {
       .from(pubblicaWebPayslipSourceFiles)
       .orderBy(
         desc(pubblicaWebPayslipSourceFiles.year),
-        desc(pubblicaWebPayslipSourceFiles.month)
+        desc(pubblicaWebPayslipSourceFiles.month),
       );
   },
 };

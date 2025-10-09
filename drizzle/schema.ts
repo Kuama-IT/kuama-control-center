@@ -67,7 +67,7 @@ export const platformCredentialsToEmployeesAndProjects = pgTable(
       foreignColumns: [projects.id],
       name: "fk_project_id",
     }),
-  ]
+  ],
 );
 
 export const invoices = pgTable("invoices", {
@@ -88,8 +88,12 @@ export const invoices = pgTable("invoices", {
 });
 
 export const invoiceProjects = pgTable("invoice_projects", {
-  invoiceId: serial().references(() => invoices.id),
-  projectId: serial().references(() => projects.id),
+  invoiceId: integer()
+    .references(() => invoices.id)
+    .notNull(),
+  projectId: integer()
+    .references(() => projects.id)
+    .notNull(),
 });
 
 // Our clients can have more than one VAT number
@@ -103,10 +107,14 @@ export const vats = pgTable("vats", {
 export const clientsVats = pgTable(
   "clients_vats",
   {
-    vatId: serial().references(() => vats.id),
-    clientId: serial().references(() => clients.id),
+    vatId: integer()
+      .references(() => vats.id)
+      .notNull(),
+    clientId: integer()
+      .references(() => clients.id)
+      .notNull(),
   },
-  (t) => [primaryKey({ columns: [t.vatId, t.clientId] })]
+  (t) => [primaryKey({ columns: [t.vatId, t.clientId] })],
 );
 
 export const clients = pgTable("clients", {
@@ -119,21 +127,27 @@ export const organizations = pgTable("organizations", {
   name: varchar({ length: 256 }).notNull(),
   avatarUrl: text(),
   youTrackRingId: varchar({ length: 256 }).unique(),
-  clientId: serial().references(() => clients.id),
+  clientId: integer().references(() => clients.id),
 });
 
 // We can agree with the client to have a fixed daily rate for a project...
 export const projectDailyRates = pgTable("project_daily_rates", {
   id: serial().primaryKey(),
-  employee: serial().references(() => employees.id),
-  project: serial().references(() => projects.id),
+  employee: integer()
+    .references(() => employees.id)
+    .notNull(),
+  project: integer()
+    .references(() => projects.id)
+    .notNull(),
   rate: real().notNull(),
 });
 
 // ... or a fixed monthly rate
 export const projectMonthlyRates = pgTable("project_monthly_rates", {
   id: serial().primaryKey(),
-  project: serial().references(() => projects.id),
+  project: integer()
+    .references(() => projects.id)
+    .notNull(),
   rate: real().notNull(),
 });
 
@@ -149,13 +163,13 @@ export const payslips = pgTable(
     gross: real().notNull(),
     net: real().notNull(),
     employerCost: real(), // nullable until monthly balance allocation
-    documentId: serial().references(() => documents.id), // single-page PDF document
+    documentId: integer().references(() => documents.id), // single-page PDF document
     createdAt: timestamp().notNull().defaultNow(),
     updatedAt: timestamp().notNull().defaultNow(),
   },
   (t) => [
     unique("payslips_emp_year_month_unique").on(t.employeeId, t.year, t.month),
-  ]
+  ],
 );
 
 export const employees = pgTable("employees", {
@@ -193,7 +207,9 @@ export const closures = pgTable("closures", {
 export const absenceDays = pgTable("absence_days", {
   id: serial().primaryKey(),
   date: date(),
-  employeeId: serial().references(() => employees.id),
+  employeeId: integer()
+    .references(() => employees.id)
+    .notNull(),
   description: text(),
   reasonCode: varchar({ length: 256 }),
   duration: interval({ fields: "minute" }),
@@ -206,7 +222,9 @@ export const absenceDays = pgTable("absence_days", {
 export const presenceDays = pgTable("presence_days", {
   id: serial().primaryKey(),
   date: date(),
-  employeeId: serial().references(() => employees.id),
+  employeeId: integer()
+    .references(() => employees.id)
+    .notNull(),
   duration: interval({ fields: "minute" }),
 });
 
@@ -224,7 +242,7 @@ export const projects = pgTable("projects", {
 // Payment schedule for projects - tracks how the total project price will be divided over future months
 export const projectPaymentSchedule = pgTable("project_payment_schedule", {
   id: serial().primaryKey(),
-  projectId: serial()
+  projectId: integer()
     .references(() => projects.id)
     .notNull(),
   amount: real().notNull(),
@@ -240,7 +258,9 @@ export const projectPaymentSchedule = pgTable("project_payment_schedule", {
 export const projectMedias = pgTable("project_medias", {
   id: serial().primaryKey(),
   url: text(),
-  projectId: serial().references(() => projects.id),
+  projectId: serial()
+    .references(() => projects.id)
+    .notNull(),
 });
 
 // Mainly used to generate reports
@@ -250,8 +270,12 @@ export const tasks = pgTable("tasks", {
   description: text(),
   platform: externalPlatforms().notNull(),
   externalTrackerId: varchar({ length: 256 }).unique(),
-  projectId: serial().references(() => projects.id),
-  employeeId: serial().references(() => employees.id),
+  projectId: integer()
+    .references(() => projects.id)
+    .notNull(),
+  employeeId: integer()
+    .references(() => employees.id)
+    .notNull(),
   creationDate: date(),
 });
 
@@ -263,13 +287,19 @@ export const spentTimes = pgTable("spent_times", {
   description: text(),
   platform: externalPlatforms().notNull(),
   externalTrackerId: varchar({ length: 256 }).unique(),
-  taskId: serial().references(() => tasks.id),
+  taskId: integer()
+    .references(() => tasks.id)
+    .notNull(),
 });
 
 export const teams = pgTable("teams", {
   id: serial().primaryKey(),
-  employeeId: serial().references(() => employees.id),
-  projectId: serial().references(() => projects.id),
+  employeeId: integer()
+    .references(() => employees.id)
+    .notNull(),
+  projectId: integer()
+    .references(() => projects.id)
+    .notNull(),
 });
 
 // Used to grant access temporarily to the site to user that do not have an account
@@ -296,7 +326,7 @@ export const documents = pgTable(
     fileName: varchar({ length: 512 }),
     extension: varchar({ length: 16 }),
   },
-  (t) => [unique("documents_sha256_unique").on(t.sha256)]
+  (t) => [unique("documents_sha256_unique").on(t.sha256)],
 );
 
 export const pubblicaWebPayslipSourceFiles = pgTable(
@@ -305,10 +335,12 @@ export const pubblicaWebPayslipSourceFiles = pgTable(
     id: serial().primaryKey(),
     year: integer().notNull(),
     month: integer().notNull(),
-    documentId: serial().references(() => documents.id),
+    documentId: integer()
+      .references(() => documents.id)
+      .notNull(),
     importedAt: timestamp(),
     createdAt: timestamp().notNull().defaultNow(),
-  }
+  },
 );
 
 export const pubblicaWebPayslips = pgTable(
@@ -329,9 +361,12 @@ export const pubblicaWebPayslips = pgTable(
     permissionsHoursBalance: real().notNull().default(0),
     holidaysHoursBalance: real().notNull().default(0),
     rolHoursBalance: real().notNull().default(0),
-    documentId: serial().references(() => documents.id),
+    payrollRegistrationNumber: integer().notNull().default(0),
+    documentId: integer()
+      .references(() => documents.id)
+      .notNull(),
   },
-  (t) => [unique("fullName_year_month").on(t.fullName, t.year, t.month)]
+  (t) => [unique("fullName_year_month").on(t.fullName, t.year, t.month)],
 );
 export const pubblicaWebMonthlyBalances = pgTable(
   "pubblica_web_monthly_balances",
@@ -341,9 +376,11 @@ export const pubblicaWebMonthlyBalances = pgTable(
     month: integer().notNull(),
     createdAt: timestamp().notNull().defaultNow(),
     total: real().notNull(),
-    documentId: serial().references(() => documents.id),
+    documentId: integer()
+      .references(() => documents.id)
+      .notNull(),
   },
-  (t) => [unique("year_month").on(t.year, t.month)]
+  (t) => [unique("year_month").on(t.year, t.month)],
 );
 
 export const cashFlowCategoryType = pgEnum("cash_flow_category_type", [
@@ -384,12 +421,12 @@ export const cashFlowEntry = pgTable(
       table.date,
       table.amount,
       table.description,
-      table.extendedDescription
+      table.extendedDescription,
     ),
-  ]
+  ],
 );
 
-// Cash Flow Import (Excel)
+// Cash Flow Import (Excel) TODO move to documents
 export const cashFlowImport = pgTable("cash_flow_import", {
   id: serial().primaryKey(),
   fileBase64: text().notNull(),
