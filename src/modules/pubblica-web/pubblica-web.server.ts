@@ -11,6 +11,7 @@ import {
 import { CreatePubblicaWebMonthlyBalanceDto } from "./schemas/pubblica-web.create.schema";
 import { eq, desc, isNull } from "drizzle-orm";
 import { createHash } from "crypto";
+import fs from "node:fs";
 
 export const pubblicaWebServer = {
   async storeMonthlyBalanceByYearAndMonth({
@@ -221,13 +222,40 @@ export const pubblicaWebServer = {
     });
   },
 
+  // TODO this can probably be dropped once we reach a "stable" set of information we want to parse from payslips
   async parseAllPayslipSourceFiles() {
-    const existingFiles = await db
-      .select({
-        year: pubblicaWebPayslipSourceFiles.year,
-        month: pubblicaWebPayslipSourceFiles.month,
-      })
-      .from(pubblicaWebPayslipSourceFiles);
+    const payslips = await db.select().from(pubblicaWebPayslips);
+
+    for (const payslip of payslips) {
+      const [document] = await db
+        .select()
+        .from(documents)
+        .where(eq(documents.id, payslip.documentId));
+
+      const payslipsBuffer = new Uint8Array(document.content).buffer;
+
+      const [parsedPayslip] =
+        await pubblicaWebUtils.parseMultiPageSalaries(payslipsBuffer);
+
+      // upsert payslip info
+      await db
+        .update(pubblicaWebPayslips)
+        .set({
+          fullName: parsedPayslip.fullName,
+          cf: parsedPayslip.cf,
+          birthDate: `${String(parsedPayslip.birthDate.getDate()).padStart(2, "0")}/${String(parsedPayslip.birthDate.getMonth() + 1).padStart(2, "0")}/${parsedPayslip.birthDate.getFullYear()}`,
+          hireDate: `${String(parsedPayslip.hireDate.getDate()).padStart(2, "0")}/${String(parsedPayslip.hireDate.getMonth() + 1).padStart(2, "0")}/${parsedPayslip.hireDate.getFullYear()}`,
+          gross: parsedPayslip.gross,
+          net: parsedPayslip.net,
+          workedDays: parsedPayslip.workedDays,
+          workedHours: parsedPayslip.workedHours,
+          permissionsHoursBalance: parsedPayslip.permissionsHoursBalance,
+          holidaysHoursBalance: parsedPayslip.holidaysHoursBalance,
+          rolHoursBalance: parsedPayslip.rolHoursBalance,
+          payrollRegistrationNumber: parsedPayslip.payrollRegistrationNumber,
+        })
+        .where(eq(pubblicaWebPayslips.id, payslip.id));
+    }
   },
 
   // TODO: one shot, drop after running once

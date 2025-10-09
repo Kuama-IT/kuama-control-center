@@ -4,7 +4,7 @@ import { Failure, isFailure } from "./server-action-utils";
 export const serverActionUtils = {
   createSafeAction: <ReturnType, ArgsType extends unknown[]>(
     serverAction: (...args: ArgsType) => Promise<ReturnType>,
-    revalidatePaths?: string[]
+    revalidatePaths?: string[],
   ): ((...args: ArgsType) => Promise<ReturnType | Failure>) => {
     return async (...args: ArgsType) => {
       try {

@@ -163,7 +163,9 @@ export const payslips = pgTable(
     gross: real().notNull(),
     net: real().notNull(),
     employerCost: real(), // nullable until monthly balance allocation
-    documentId: integer().references(() => documents.id), // single-page PDF document
+    documentId: integer()
+      .references(() => documents.id)
+      .notNull(), // single-page PDF document
     createdAt: timestamp().notNull().defaultNow(),
     updatedAt: timestamp().notNull().defaultNow(),
   },
@@ -350,8 +352,8 @@ export const pubblicaWebPayslips = pgTable(
     fullName: varchar({ length: 256 }).notNull(),
     year: integer().notNull(),
     month: integer().notNull(),
-    birthDate: varchar({ length: 24 }), // iso date string
-    hireDate: varchar({ length: 24 }), // iso date string
+    birthDate: varchar({ length: 24 }),
+    hireDate: varchar({ length: 24 }),
     cf: varchar({ length: 16 }),
     createdAt: timestamp().notNull().defaultNow(),
     net: real().notNull(),

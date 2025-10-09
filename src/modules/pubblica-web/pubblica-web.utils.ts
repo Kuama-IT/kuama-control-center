@@ -339,6 +339,9 @@ async function readTotalBusinessCostFromPage(page: Page) {
 }
 
 function findByText(text: string, items: PdfTextItem[]): PdfTextItem {
+  // ensure items are "vertically" sorted
+  items.sort((a, b) => a.y - b.y);
+
   for (const item of items) {
     if (item.str.toLocaleLowerCase() === text) {
       return item;

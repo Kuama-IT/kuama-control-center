@@ -1,0 +1,29 @@
+"use client";
+
+import { useReparsePubblicaWebPayslipsMutation } from "@/modules/pubblica-web/mutations/pubblica-web.mutations";
+import { BrutalButton } from "@/modules/ui";
+import { isFailure } from "@/utils/failures.utils";
+import { notifyError, notifySuccess } from "@/modules/ui/components/notify";
+
+export function ReparsePubblicaWebPayslipsButton() {
+  const mutation = useReparsePubblicaWebPayslipsMutation();
+
+  return (
+    <BrutalButton
+      onClick={() =>
+        mutation.mutate(undefined, {
+          onSuccess: (res) => {
+            if (isFailure(res)) {
+              notifyError(res.message);
+              return;
+            }
+
+            notifySuccess("All payslips correctly re-parsed");
+          },
+        })
+      }
+    >
+      Re-import pubblica web payslips
+    </BrutalButton>
+  );
+}

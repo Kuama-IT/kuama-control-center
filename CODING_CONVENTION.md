@@ -9,7 +9,6 @@
 - **TypeScript-first:** avoid `any`; prefer precise types and Zod schemas.
 - **Co-location, not duplication:** keep domain logic close. Logic for BE is in `.server`.
 - **Conventional commits:** `feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`
-- The related YouTrack task link must be added manually in the PR description.
 
 ## 2. Project Structure
 

@@ -176,4 +176,8 @@ describe("parse pubblica web data", () => {
       );
     }
   });
+
+  test("it can parse again payslips", async () => {
+    await pubblicaWebServer.parseAllPayslipSourceFiles();
+  });
 });
