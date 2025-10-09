@@ -16,3 +16,7 @@ export const db = drizzle({
   logger: serverEnv.showDatabaseLogs,
   schema: { ...schema, ...relations },
 });
+
+// Transaction type inferred from db.transaction callback parameter
+export type DB = typeof db;
+export type Transaction = Parameters<Parameters<DB["transaction"]>[0]>[0];

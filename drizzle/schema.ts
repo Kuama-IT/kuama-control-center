@@ -168,7 +168,6 @@ export const employees = pgTable("employees", {
   avatarUrl: text(),
   dipendentiInCloudId: varchar({ length: 256 }).unique(),
   hiredOn: date(),
-  nationalInsuranceNumber: varchar({ length: 256 }),
   phoneNumber: varchar({ length: 256 }),
   iban: varchar({ length: 256 }),
   payrollRegistrationNumber: integer(),
