@@ -2,19 +2,24 @@
 
 import { useServerActionMutation } from "@/modules/ui/hooks/use-server-action-mutation";
 import {
-  autoLinkYouTrackOrgsAction,
   linkOrganizationToClientAction,
   unlinkOrganizationFromClientAction,
 } from "../clients.actions";
 
-export const useAutoLinkMutation = () => {
-  return useServerActionMutation(autoLinkYouTrackOrgsAction);
+export const useLinkOrganizationToClientMutation = (id: number) => {
+  return useServerActionMutation({
+    action: linkOrganizationToClientAction,
+    invalidateQueries: {
+      queryKey: ["clients", id, "organization-link-suggestions"],
+    },
+  });
 };
 
-export const useLinkOrganizationToClientMutation = () => {
-  return useServerActionMutation(linkOrganizationToClientAction);
-};
-
-export const useUnlinkOrganizationFromClientMutation = () => {
-  return useServerActionMutation(unlinkOrganizationFromClientAction);
+export const useUnlinkOrganizationFromClientMutation = (id: number) => {
+  return useServerActionMutation({
+    action: unlinkOrganizationFromClientAction,
+    invalidateQueries: {
+      queryKey: ["clients", id, "organization-link-suggestions"],
+    },
+  });
 };

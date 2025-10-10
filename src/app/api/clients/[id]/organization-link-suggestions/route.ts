@@ -1,0 +1,27 @@
+import { NextApiRequest, NextApiResponse } from "next";
+import { OrganizationRead } from "@/modules/you-track/schemas/organization-read";
+import { clientsServer } from "@/modules/clients/clients.server";
+import { z } from "zod";
+import { NextRequest, NextResponse } from "next/server";
+
+const paramSchema = z.object({ id: z.string() });
+// TODO: ensure auth
+export async function GET(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  try {
+    const parsedRequest = paramSchema.parse(await params);
+    const clientId = parseInt(parsedRequest.id);
+    if (isNaN(clientId)) {
+      NextResponse.json({ error: "improper data provided" }, { status: 400 });
+      return;
+    }
+    const result = await clientsServer.findOrganizationSuggestionById(
+      parseInt(parsedRequest.id),
+    );
+    return NextResponse.json(result);
+  } catch (err) {
+    NextResponse.json({ error: "failed to load data" }, { status: 500 });
+  }
+}

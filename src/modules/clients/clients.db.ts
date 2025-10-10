@@ -1,11 +1,18 @@
 import { db } from "@/drizzle/drizzle-db";
-import { asc, eq, ilike } from "drizzle-orm";
+import { asc, eq, ilike, isNull } from "drizzle-orm";
 import { clients } from "@/drizzle/schema";
 
 // Basic data-access layer for the `clients` table only (no joins)
 export const clientsDb = {
-  async list() {
+  async all() {
     return db.select().from(clients).orderBy(asc(clients.name));
+  },
+  async allWhereOrganizationIdIsNull() {
+    return db
+      .select()
+      .from(clients)
+      .where(isNull(clients.organizationId))
+      .orderBy(asc(clients.name));
   },
 
   async getById(id: number) {

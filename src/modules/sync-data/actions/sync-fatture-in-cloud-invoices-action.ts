@@ -1,5 +1,5 @@
 "use server";
-import { fattureInCloudApiClient } from "@/modules/fatture-in-cloud/fatture-in-cloud-api-client";
+import { fattureInCloudApiClient } from "@/modules/fatture-in-cloud/fatture-in-cloud-api";
 import { db } from "@/drizzle/drizzle-db";
 import { invoices, vats } from "@/drizzle/schema";
 import { eq, sql } from "drizzle-orm";
@@ -25,7 +25,6 @@ const handled = handleServerErrors(async () => {
   //   }
   //   invoicesByVat.get(vat)?.push(fattureInCloudInvoice);
   // }
-
   // const vats = Array.from(invoicesByVat.keys())
   //   .map((vat) => `'${vat}'`)
   //   .join(", ");
@@ -41,9 +40,7 @@ const handled = handleServerErrors(async () => {
   //     WHERE ${vats}.vat IS NULL;
   //   `
   // );
-
   // const missingVats: string[] = missingVatsRows.map((row) => row.vat as string);
-
   // if (missingVats.length > 0) {
   //   const values: (typeof vats.$inferInsert)[] = [];
   //   for (const vat of missingVats) {
@@ -51,7 +48,6 @@ const handled = handleServerErrors(async () => {
   //     if (!fattureInCloudInvoice) {
   //       continue;
   //     }
-
   //     const value: typeof vats.$inferInsert = {
   //       vat: fattureInCloudInvoice.entity?.vat_number ?? "",
   //       companyName: fattureInCloudInvoice.entity?.name ?? "UNKNOWN",
@@ -59,12 +55,10 @@ const handled = handleServerErrors(async () => {
   //     };
   //     values.push(value);
   //   }
-
   //   await db.transaction(async (tx) => {
   //     await tx.insert(vats).values(values);
   //   });
   // }
-
   // // store invoices
   // await db.transaction(async (tx) => {
   //   for (let i = 0; i < fattureInCloudInvoices.length; i += BATCH_SIZE) {
@@ -79,9 +73,7 @@ const handled = handleServerErrors(async () => {
   //           .select()
   //           .from(vats)
   //           .where(eq(vats.vat, vat));
-
   //         const vatRecord = firstOrThrow(vatRecords);
-
   //         const record: KInvoiceInsert = {
   //           vat: vatRecord.id,
   //           subject: fattureInCloudInvoice.subject ?? "UNKNOWN",
@@ -91,11 +83,9 @@ const handled = handleServerErrors(async () => {
   //           date: fattureInCloudInvoice.date ?? "",
   //           number: fattureInCloudInvoice.number ?? 0,
   //         };
-
   //         return record;
   //       })
   //     );
-
   //     await tx
   //       .insert(invoices)
   //       .values(

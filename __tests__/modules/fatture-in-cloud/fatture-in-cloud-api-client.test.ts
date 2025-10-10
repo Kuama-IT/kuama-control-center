@@ -1,4 +1,4 @@
-import { fattureInCloudApiClient } from "@/modules/fatture-in-cloud/fatture-in-cloud-api-client";
+import { fattureInCloudApiClient } from "@/modules/fatture-in-cloud/fatture-in-cloud-api";
 import { describe, expect, test } from "vitest";
 import { invoicesService } from "@/modules/invoices/invoices.service";
 

@@ -1,0 +1,3 @@
+import { employees } from "@/drizzle/schema";
+
+export type EmployeeRead = typeof employees.$inferSelect;

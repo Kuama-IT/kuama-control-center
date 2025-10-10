@@ -155,7 +155,6 @@ export const pubblicaWebUtils = {
         totalBusinessCost += await readTotalBusinessCostFromPage(page);
       } catch (e) {
         console.error("Error reading total business cost from page:", e);
-        continue;
       }
     }
 
@@ -208,8 +207,6 @@ export const pubblicaWebUtils = {
             value: relatedTextItem[0].str,
           });
         }
-
-        console.log("Raw values extracted from page:", rawValues);
 
         const pageAsPdf = await pdfUtils.extractPageAsPdf(
           buffer,
@@ -324,7 +321,6 @@ async function readTotalBusinessCostFromPage(page: Page) {
         parsedAmounts.push({
           parsed,
         });
-        continue;
       }
     }
   }

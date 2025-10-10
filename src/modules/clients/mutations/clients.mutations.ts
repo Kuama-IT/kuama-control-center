@@ -2,5 +2,5 @@ import { useServerActionMutation } from "@/modules/ui/hooks/use-server-action-mu
 import { importFromFattureInCloudAction } from "../clients.actions";
 
 export const useImportClientsFromFattureInCloudMutation = () => {
-  return useServerActionMutation(importFromFattureInCloudAction);
+  return useServerActionMutation({ action: importFromFattureInCloudAction });
 };

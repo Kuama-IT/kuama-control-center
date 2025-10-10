@@ -1,4 +1,4 @@
-import { fattureInCloudApiClient } from "@/modules/fatture-in-cloud/fatture-in-cloud-api-client";
+import { fattureInCloudApiClient } from "@/modules/fatture-in-cloud/fatture-in-cloud-api";
 import { clientsServer } from "@/modules/clients/clients.server";
 import { ClientsSelector } from "./clients-selector";
 import { isFailure } from "@/utils/server-action-utils";

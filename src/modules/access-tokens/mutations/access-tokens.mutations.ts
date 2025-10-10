@@ -4,4 +4,4 @@ import { useServerActionMutation } from "@/modules/ui/hooks/use-server-action-mu
 import { createAccessToken } from "../access-tokens.actions";
 
 export const useCreateAccessTokenMutation = () =>
-  useServerActionMutation(createAccessToken);
+  useServerActionMutation({ action: createAccessToken });

@@ -120,6 +120,7 @@ export const clientsVats = pgTable(
 export const clients = pgTable("clients", {
   id: serial().primaryKey(),
   name: varchar({ length: 256 }).notNull(),
+  organizationId: integer().references(() => organizations.id),
 });
 
 export const organizations = pgTable("organizations", {
@@ -127,7 +128,6 @@ export const organizations = pgTable("organizations", {
   name: varchar({ length: 256 }).notNull(),
   avatarUrl: text(),
   youTrackRingId: varchar({ length: 256 }).unique(),
-  clientId: integer().references(() => clients.id),
 });
 
 // We can agree with the client to have a fixed daily rate for a project...
@@ -191,19 +191,27 @@ export const employees = pgTable("employees", {
 });
 
 // Used to generate the legend of the report for our payrolls consultant
-export const absenceReasons = pgTable("absence_reasons", {
-  id: serial().primaryKey(),
-  code: varchar({ length: 256 }).notNull(),
-  name: varchar({ length: 256 }).notNull(),
-});
+export const absenceReasons = pgTable(
+  "absence_reasons",
+  {
+    id: serial().primaryKey(),
+    code: varchar({ length: 256 }).notNull(),
+    name: varchar({ length: 256 }).notNull(),
+  },
+  (t) => [unique("code_name").on(t.code, t.name)],
+);
 
-export const closures = pgTable("closures", {
-  id: serial().primaryKey(),
-  day: integer().notNull(),
-  month: integer().notNull(),
-  year: integer(),
-  description: varchar({ length: 256 }),
-});
+export const closures = pgTable(
+  "closures",
+  {
+    id: serial().primaryKey(),
+    day: integer().notNull(),
+    month: integer().notNull(),
+    year: integer(),
+    description: varchar({ length: 256 }),
+  },
+  (t) => [unique("day_month_year").on(t.day, t.month, t.year)],
+);
 
 // Help to understand who is working this week
 export const absenceDays = pgTable("absence_days", {

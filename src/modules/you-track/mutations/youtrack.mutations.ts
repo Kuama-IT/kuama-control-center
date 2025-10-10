@@ -2,5 +2,5 @@ import { useServerActionMutation } from "@/modules/ui/hooks/use-server-action-mu
 import { importYouTrackOrganizationsAction } from "../youtrack.actions";
 
 export const useYouTrackImportOrganizationsMutation = () => {
-  return useServerActionMutation(importYouTrackOrganizationsAction);
+  return useServerActionMutation({ action: importYouTrackOrganizationsAction });
 };

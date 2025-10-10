@@ -2,18 +2,18 @@ import { db } from "@/drizzle/drizzle-db";
 import { invoices } from "@/drizzle/schema";
 import { handleServerErrors } from "@/utils/server-action-utils";
 import { gte, lte, desc, and } from "drizzle-orm";
-import { fattureInCloudApiClient } from "./fatture-in-cloud-api-client";
+import { fattureInCloudApiClient } from "./fatture-in-cloud-api";
 
 export const handledFattureInCloudClientsAll = handleServerErrors(
   async function () {
     return await fattureInCloudApiClient.getClients();
-  }
+  },
 );
 
 export const handledFattureInCloudSuppliersAll = handleServerErrors(
   async function () {
     return await fattureInCloudApiClient.getSuppliers();
-  }
+  },
 );
 
 export const handledGetFattureInCloudEmittedInvoicesGraphData =
@@ -31,7 +31,7 @@ export const handledGetFattureInCloudEmittedInvoicesGraphData =
       .select()
       .from(invoices)
       .where(
-        and(gte(invoices.date, startDateStr), lte(invoices.date, endDateStr))
+        and(gte(invoices.date, startDateStr), lte(invoices.date, endDateStr)),
       )
       .orderBy(desc(invoices.date));
 
@@ -63,7 +63,7 @@ export const handledGetFattureInCloudEmittedInvoicesGraphData =
 
     // convert to array and sort by month
     const result = Object.values(dataMap).sort((a, b) =>
-      a.month.localeCompare(b.month)
+      a.month.localeCompare(b.month),
     );
 
     // fix amounts to 2 decimals

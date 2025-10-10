@@ -8,20 +8,19 @@ import {
   BrutalSelectItem,
 } from "@/modules/ui";
 import { useLinkOrganizationToClientMutation } from "../mutations/clients-mappings.mutations";
-
-type ClientOption = { id: number; name: string | null };
+import { OrganizationRead } from "@/modules/you-track/schemas/organization-read";
 
 export function ManualLinkOrganizationToClient({
-  organizationId,
-  clients,
+  clientId,
+  organizations,
 }: {
-  organizationId: number;
-  clients: ClientOption[];
+  clientId: number;
+  organizations: OrganizationRead[];
 }) {
   const [value, setValue] = useState<string | undefined>(undefined);
-  const mutation = useLinkOrganizationToClientMutation();
+  const mutation = useLinkOrganizationToClientMutation(clientId);
 
-  const selectedClientId = value ? parseInt(value, 10) : undefined;
+  const selectedOrganizationId = value ? parseInt(value, 10) : undefined;
 
   return (
     <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-end">
@@ -31,19 +30,19 @@ export function ManualLinkOrganizationToClient({
           onValueChange={setValue}
           placeholder="Select client..."
         >
-          {clients.map((c) => (
-            <BrutalSelectItem key={c.id} value={String(c.id)}>
-              {c.name ?? `Client #${c.id}`}
+          {organizations.map((o) => (
+            <BrutalSelectItem key={o.id} value={String(o.id)}>
+              {o.name ?? `Organization #${o.id}`}
             </BrutalSelectItem>
           ))}
         </BrutalSelect>
       </BrutalFormField>
       <BrutalButton
         onClick={() =>
-          selectedClientId &&
-          mutation.mutate({ organizationId, clientId: selectedClientId })
+          selectedOrganizationId &&
+          mutation.mutate({ organizationId: selectedOrganizationId, clientId })
         }
-        disabled={!selectedClientId || mutation.isPending}
+        disabled={!selectedOrganizationId || mutation.isPending}
       >
         Link
       </BrutalButton>

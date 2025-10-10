@@ -1,19 +1,20 @@
 import DipendentiInCloudReport from "@/modules/dipendenti-in-cloud/components/dipendenti-in-cloud-report";
 import { employeesServer } from "@/modules/employees/employees.server";
 import { isFailure } from "@/utils/server-action-utils";
-import { timesheetsAbsenceServer } from "@/modules/timesheets/timesheets-absence.server";
-import type { AbsenceDaysList, AbsenceReasonList } from "@/modules/timesheets/schemas";
+import type {
+  AbsenceDaysList,
+  AbsenceReasonList,
+  ClosuresList,
+} from "@/modules/timesheets/schemas";
 import { parse } from "date-fns";
 import { accessTokensServer } from "@/modules/access-tokens/access-tokens.server";
 import {
   accessTokenParamsSchema,
   datePeriodParamsSchema,
   PageParams,
-  SearchParams,
 } from "@/modules/routing/schemas/routing-schemas";
 import { ErrorMessage } from "@/modules/ui/components/error-message";
-import { timesheetsClosuresServer } from "@/modules/timesheets/timesheets-closures.server";
-import type { ClosuresList } from "@/modules/timesheets/schemas";
+import { timesheetsServer } from "@/modules/timesheets/timesheets.server";
 
 const paramsSchema = datePeriodParamsSchema.and(accessTokenParamsSchema);
 
@@ -48,7 +49,7 @@ export default async function Page({ searchParams }: PageParams) {
 
   let absences: AbsenceDaysList;
   try {
-    absences = await timesheetsAbsenceServer.list({
+    absences = await timesheetsServer.absenceDaysAll({
       from,
       to,
     });
@@ -67,7 +68,7 @@ export default async function Page({ searchParams }: PageParams) {
 
   let absenceReasons: AbsenceReasonList;
   try {
-    absenceReasons = await timesheetsAbsenceServer.listReasons();
+    absenceReasons = await timesheetsServer.absenceReasonsAll();
   } catch (error) {
     console.error(error);
     return (
@@ -83,7 +84,7 @@ export default async function Page({ searchParams }: PageParams) {
 
   let closures: ClosuresList;
   try {
-    closures = await timesheetsClosuresServer.list();
+    closures = await timesheetsServer.closuresAll();
   } catch (error) {
     console.error(error);
     return (

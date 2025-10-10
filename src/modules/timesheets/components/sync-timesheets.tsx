@@ -3,9 +3,6 @@ import { Title } from "@/modules/ui/components/title";
 import { endOfMonth, format, startOfMonth } from "date-fns";
 import { FormEvent, useEffect, useRef, useState, useTransition } from "react";
 import { DateRange } from "react-day-picker";
-import syncDipendentiInCloudTimesheet from "@/modules/dipendenti-in-cloud/actions/sync-dipendenti-in-cloud-timesheet-action";
-import syncDipendentiInCloudEmployees from "@/modules/dipendenti-in-cloud/actions/dipendenti-in-cloud-import-employees-action";
-import syncDipendentiInCloudAbsenceReasonsAndClosures from "@/modules/dipendenti-in-cloud/actions/dipendenti-in-cloud-import-absence-reasons-and-closures";
 import { getUnlimitedAccessToken } from "@/modules/access-tokens/access-tokens.actions";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
@@ -21,16 +18,19 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { useDateRange } from "@/modules/ui/hooks/useDateRange";
+import {
+  useSyncAbsenceReasonsAndClosuresFromDipendentiInCloudMutation,
+  useSyncPresenceAndAbsenceFromDipendentiInCloudActionMutation,
+} from "@/modules/timesheets/mutations/timesheets.mutations";
 
-export default function SyncDipendentiInCloud() {
+export default function SyncTimesheets() {
   return (
     <div className="border rounded-lg p-4">
-      <Title>Dipendenti in cloud</Title>
+      <Title>Timesheets</Title>
 
       <div className="flex flex-col gap-8 items-center">
         <SyncTimesheetForm />
         <Separator />
-        <SyncEmployeeData />
         <Separator />
         <SyncAbsenceReasonsAndClosures />
         <Separator />
@@ -73,7 +73,6 @@ const PreviewEmployeePresenceReport = () => {
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0 flex flex-col gap-4" align="start">
         <Calendar
-          initialFocus
           defaultMonth={range?.from}
           numberOfMonths={2}
           today={today}
@@ -111,54 +110,28 @@ const PreviewEmployeePresenceReport = () => {
   );
 };
 
-const SyncEmployeeData = () => {
-  const [isPending, startTransition] = useTransition();
-
-  const onSubmit = (ev: FormEvent) => {
-    ev.preventDefault();
-    startTransition(async () => {
-      const res = await syncDipendentiInCloudEmployees();
-      if (isFailure(res)) {
-        notifyError(
-          "Error while syncing dipendenti in cloud employees general info"
-        );
-        return;
-      }
-
-      notifySuccess(res.message);
-    });
-  };
-
-  return (
-    <form onSubmit={onSubmit}>
-      <Button disabled={isPending} size="lg">
-        <FaSync className={cn({ "animate-spin": isPending })} />
-        Sync employees general information
-      </Button>
-    </form>
-  );
-};
-
 const SyncAbsenceReasonsAndClosures = () => {
-  const [isPending, startTransition] = useTransition();
+  const mutation =
+    useSyncAbsenceReasonsAndClosuresFromDipendentiInCloudMutation();
 
   const onSubmit = (ev: FormEvent) => {
     ev.preventDefault();
-    startTransition(async () => {
-      const res = await syncDipendentiInCloudAbsenceReasonsAndClosures();
-      if (isFailure(res)) {
-        notifyError("Error while syncing dipendenti in cloud general info");
-        return;
-      }
+    mutation.mutate(undefined, {
+      onSuccess: (res) => {
+        if (isFailure(res)) {
+          notifyError("Error while syncing dipendenti in cloud general info");
+          return;
+        }
 
-      notifySuccess(res.message);
+        notifySuccess(res.message);
+      },
     });
   };
 
   return (
     <form onSubmit={onSubmit}>
-      <Button disabled={isPending} size="lg">
-        <FaSync className={cn({ "animate-spin": isPending })} />
+      <Button disabled={mutation.isPending} size="lg">
+        <FaSync className={cn({ "animate-spin": mutation.isPending })} />
         Sync closures and absence reasons
       </Button>
     </form>
@@ -174,25 +147,31 @@ const SyncTimesheetForm = () => {
     to: lastDateRange,
   };
   const [range, setRange] = useState<DateRange | undefined>(initialRange);
-  const [isPending, startTransition] = useTransition();
+  const mutation =
+    useSyncPresenceAndAbsenceFromDipendentiInCloudActionMutation();
 
   const onSubmit = (ev: FormEvent) => {
     ev.preventDefault();
-    startTransition(async () => {
-      if (range?.to === undefined || range?.from === undefined) {
-        return;
-      }
-      const res = await syncDipendentiInCloudTimesheet({
+    if (!range || !range.from || !range.to) {
+      return;
+    }
+
+    mutation.mutate(
+      {
         to: range.to,
         from: range.from,
-      });
-      if (isFailure(res)) {
-        notifyError("Error while syncing dipendenti in cloud timesheet");
-        return;
-      }
+      },
+      {
+        onSuccess: (res) => {
+          if (isFailure(res)) {
+            notifyError("Error while syncing dipendenti in cloud timesheet");
+            return;
+          }
 
-      notifySuccess("Dipendenti in cloud timesheet synced");
-    });
+          notifySuccess("Dipendenti in cloud timesheet synced");
+        },
+      },
+    );
   };
   return (
     <form className="flex flex-col gap-2 items-center" onSubmit={onSubmit}>
@@ -207,10 +186,16 @@ const SyncTimesheetForm = () => {
         <Button
           size="lg"
           disabled={
-            isPending || range?.from === undefined || range?.to === undefined
+            mutation.isPending ||
+            range?.from === undefined ||
+            range?.to === undefined
           }
         >
-          {isPending ? <FaSync className="animate-spin" /> : <FaCalendar />}
+          {mutation.isPending ? (
+            <FaSync className="animate-spin" />
+          ) : (
+            <FaCalendar />
+          )}
           Sync employee presence information
         </Button>
         {range && range?.from && range?.to && (

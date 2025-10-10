@@ -21,14 +21,14 @@ export const ClientsSelector = ({ clients, fattureInCloudClients }: Props) => {
     Client | undefined
   >(undefined);
   const router = useRouter();
-  const { mutateAsync, isPending } = useServerActionMutation(
-    associateFattureInCloudClientAction,
-  );
+  const { mutateAsync, isPending } = useServerActionMutation({
+    action: associateFattureInCloudClientAction,
+  });
 
   return (
     <div className="flex flex-col gap-8">
       <div className="flex flex-col gap-4">
-  <h1 className="uppercase text-sm">Clients</h1>
+        <h1 className="uppercase text-sm">Clients</h1>
         <div className="overflow-x-auto px-2 py-4 max-w-xl">
           <ul className="flex gap-4">
             {clients.map((client) => (

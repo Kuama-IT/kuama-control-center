@@ -102,44 +102,6 @@ export const dipendentiInCloudTimesheetResponseSchema = z.object({
   data: z.object({ timesheet: dipendentiInCloudTimesheetSchema }),
 });
 
-const payrollSchema = z.object({
-  id: z.number(),
-  month: z.number(),
-  year: z.number(),
-  net: z.number(),
-  date: z.string(),
-  description: z.string(),
-  balance_aligned: z.boolean(),
-  read: z.boolean(),
-  read_at: z.string().nullable(),
-  balance: z.array(
-    z.object({
-      id: z.number(),
-      previous_year: z.number().nullable(),
-      maturation: z.number().nullable(),
-      used: z.number().nullable(),
-    }),
-  ),
-  attachments: z.array(
-    z.object({
-      id: z.number(),
-      filename: z.string(),
-      created_at: z.string(),
-      updated_at: z.string(),
-      url: z.string(),
-    }),
-  ),
-  employee: dipendentiInCloudEmployeeSchema.omit({
-    current_contract: true,
-    job_title: true,
-    email: true,
-    birth_date: true,
-  }),
-});
-
-export const dipendentiInCloudPayrollsSchema =
-  makePagedResponseSchema(payrollSchema);
-
 export const absenceReasonSchema = z.object({
   category: z.string(),
   code: z.string(),
@@ -161,28 +123,3 @@ export const closureSchema = z.object({
 });
 
 export const closuresResponseSchema = makePagedResponseSchema(closureSchema);
-
-// these types are not used to parse other endpoint responses, just to build our internal stuff
-export type Salary = {
-  date: string;
-  net: number;
-  url: string;
-  dipendentiInCloudPayrollId: number;
-};
-export type SalaryWithGross = Salary & { gross: number };
-export type SalaryByYear = {
-  [key in number]: Salary[];
-};
-export type SalaryWithGrossByYear = {
-  [key in number]: SalaryWithGross[];
-};
-export type EmployeeSalaryHistory = {
-  employeeName: string;
-  employeeId: number;
-  salaries: SalaryByYear;
-};
-export type EmployeeSalaryWithGrossHistory = {
-  employeeName: string;
-  employeeId: number;
-  salaries: SalaryWithGrossByYear;
-};

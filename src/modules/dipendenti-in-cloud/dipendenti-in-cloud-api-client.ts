@@ -5,10 +5,7 @@ import {
   DipendentiInCloudEmployeeDetail,
   dipendentiInCloudEmployeeDetailResponseSchema,
   dipendentiInCloudEmployeesSchema,
-  dipendentiInCloudPayrollsSchema,
   dipendentiInCloudTimesheetResponseSchema,
-  EmployeeSalaryHistory,
-  Salary,
 } from "@/modules/dipendenti-in-cloud/schemas/dipendenti-in-cloud-schemas";
 import { format } from "date-fns";
 
@@ -77,56 +74,6 @@ export class DipendentiInCloudApi {
     return parsed.data.timesheet;
   }
 
-  async getPayrolls(id: number, year: number) {
-    const endpoint = `${this.endpoint}payrolls?`;
-    const params = new URLSearchParams({
-      employee_id: id.toString(),
-      year: year.toString(),
-    });
-
-    const rawResponse = await fetch(
-      endpoint + params,
-      this.authenticationHeaders,
-    );
-
-    const jsonResponse = await rawResponse.json();
-    const parsed = dipendentiInCloudPayrollsSchema.parse(jsonResponse);
-
-    return parsed.data;
-  }
-
-  async getPayrollsHistory(years: number[]) {
-    const employees = await this.getEmployees();
-    const payrolls: EmployeeSalaryHistory[] = [];
-
-    for (const employee of employees) {
-      const employeePayrolls: EmployeeSalaryHistory = {
-        employeeName: employee.full_name,
-        employeeId: employee.id,
-        salaries: {},
-      };
-      for (const year of years) {
-        employeePayrolls.salaries[year] = [];
-
-        const payrolls = await this.getPayrolls(employee.id, year);
-        for (const payroll of payrolls) {
-          for (const attachment of payroll.attachments) {
-            employeePayrolls.salaries[year].push({
-              net: payroll.net,
-              url: attachment.url,
-              date: payroll.date,
-              dipendentiInCloudPayrollId: payroll.id,
-            });
-          }
-        }
-      }
-
-      payrolls.push(employeePayrolls);
-    }
-
-    return payrolls;
-  }
-
   /**
    * Sends payrolls to DipendentiInCloud. Be aware that this will still require manual confirmation from the user.
    */
@@ -159,11 +106,6 @@ export class DipendentiInCloudApi {
     return res.ok;
   }
 
-  async downloadSalary(salary: Salary) {
-    const res = await fetch(salary.url);
-    return await res.arrayBuffer();
-  }
-
   async getAbsenceReasons() {
     const endpoint = `${this.endpoint}reasons`;
     const res = await fetch(endpoint, this.authenticationHeaders);
@@ -192,6 +134,7 @@ export class DipendentiInCloudApi {
   }
 }
 
+// TODO would be better to create a factory that fetches data from client credentials
 export const dipendentiInCloudApiClient = new DipendentiInCloudApi(
   serverEnv.dipendentiInCloudApiPersistentToken,
   serverEnv.dipendentiInCloudApiEndpoint,

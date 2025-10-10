@@ -1,4 +1,4 @@
-import { fattureInCloudApiClient } from "@/modules/fatture-in-cloud/fatture-in-cloud-api-client";
+import { fattureInCloudApiClient } from "@/modules/fatture-in-cloud/fatture-in-cloud-api";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
   if (!dateFrom || !dateTo) {
     return NextResponse.json(
       { error: "date_from and date_to are required" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 

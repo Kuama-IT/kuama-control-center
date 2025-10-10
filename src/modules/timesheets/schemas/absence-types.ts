@@ -42,7 +42,7 @@ export type AbsenceDayWithEmployee = {
     avatarUrl: string | null;
     dipendentiInCloudId: string | null;
     hiredOn: string | null;
-    nationalInsuranceNumber: string | null;
+    cf: string | null;
     phoneNumber: string | null;
     iban: string | null;
     payrollRegistrationNumber: number | null;

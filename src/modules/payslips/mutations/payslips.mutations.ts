@@ -2,5 +2,7 @@ import { useServerActionMutation } from "@/modules/ui/hooks/use-server-action-mu
 import { importFromPubblicaWebPayslipsAction } from "../payslips.actions";
 
 export function useImportFromPubblicaWebPayslipsMutation() {
-  return useServerActionMutation(importFromPubblicaWebPayslipsAction);
+  return useServerActionMutation({
+    action: importFromPubblicaWebPayslipsAction,
+  });
 }

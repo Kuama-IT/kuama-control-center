@@ -1,6 +1,10 @@
 import { eachDayOfInterval, format, getDate, getDay, parseISO } from "date-fns";
 import { it } from "date-fns/locale";
-import type { AbsenceDaysList, AbsenceReasonList, ClosuresList } from "@/modules/timesheets/schemas";
+import type {
+  AbsenceDaysList,
+  AbsenceReasonList,
+  ClosuresList,
+} from "@/modules/timesheets/schemas";
 import { EmployeesListAllActionResult } from "@/modules/employees/employees.actions";
 import parsePostgresInterval from "postgres-interval";
 import { ChronoUnit, Duration } from "@js-joda/core";
@@ -179,7 +183,7 @@ export const getDataForReport = ({
   for (const employee of employees) {
     const item: ReportRow = {
       employeeName: `${employee.name} ${employee.surname}`,
-      employeeNationalInsuranceNumber: employee.nationalInsuranceNumber,
+      employeeNationalInsuranceNumber: employee.cf,
       reasons: [],
       totals: [],
       monthlyTotal: Duration.of(maxWorkableHoursPerPeriod, ChronoUnit.HOURS),

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { EmployeesRead } from "@/modules/employees/schemas/employees-read";
+import { EmployeeRead } from "@/modules/employees/schemas/employee-read";
 import { ProjectRead } from "@/modules/projects/schemas/projects.read.schema";
 
 export const SupportedPlatforms = z.enum([
@@ -61,7 +61,7 @@ export type PlatformCredentialsRead = z.infer<
 >;
 
 export type PlatformCredentialsFullRead = PlatformCredentialsRead & {
-  employee?: EmployeesRead;
+  employee?: EmployeeRead;
   project?: ProjectRead;
 };
 

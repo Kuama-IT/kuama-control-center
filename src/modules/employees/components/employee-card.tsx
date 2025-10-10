@@ -3,14 +3,14 @@ import Link from "next/link";
 import Image from "next/image";
 import { HiArrowSmRight } from "react-icons/hi";
 import { routes } from "@/modules/ui/routes";
-import { EmployeesRead } from "@/modules/employees/schemas/employees-read";
+import { EmployeeRead } from "@/modules/employees/schemas/employee-read";
 import { brutalTheme } from "@/modules/ui/brutal-theme";
 
 export const EmployeeCard = ({
   employee,
   index,
 }: {
-  employee: EmployeesRead;
+  employee: EmployeeRead;
   index: number;
 }) => {
   const style = {

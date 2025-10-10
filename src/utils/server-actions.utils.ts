@@ -1,5 +1,5 @@
 import { revalidatePath } from "next/cache";
-import { Failure, isFailure } from "./server-action-utils";
+import { isFailure, Failure } from "./failures.utils";
 
 export const serverActionUtils = {
   createSafeAction: <ReturnType, ArgsType extends unknown[]>(

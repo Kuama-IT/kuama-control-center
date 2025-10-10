@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { TaskRead } from "@/modules/tasks/schemas/tasks-schemas";
-import { EmployeesRead } from "@/modules/employees/schemas/employees-read";
+import { EmployeeRead } from "@/modules/employees/schemas/employee-read";
 
 export const projectReadSchema = z.object({
   id: z.number(),
@@ -28,5 +28,5 @@ export const projectMediaReadSchema = z.object({
   projectId: z.number(),
 });
 export type TeamRead = z.infer<typeof teamReadSchema>;
-export type TeamWithEmployeeRead = TeamRead & { employee: EmployeesRead };
+export type TeamWithEmployeeRead = TeamRead & { employee: EmployeeRead };
 export type ProjectMediaRead = z.infer<typeof projectMediaReadSchema>;

@@ -1,4 +1,3 @@
-import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 const failureSchema = z.object({
@@ -14,7 +13,7 @@ export const isFailure = (value: unknown): value is Failure => {
 };
 
 export const handleServerErrors = <ReturnType, ArgsType extends unknown[]>(
-  serverAction: (...args: ArgsType) => Promise<ReturnType>
+  serverAction: (...args: ArgsType) => Promise<ReturnType>,
 ): ((...args: ArgsType) => Promise<ReturnType | Failure>) => {
   return async (...args: ArgsType) => {
     try {

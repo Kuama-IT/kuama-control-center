@@ -4,15 +4,49 @@ import { employeesDb } from "./employees.db";
 import { employees } from "@/drizzle/schema";
 import { dipendentiInCloudApiClient } from "../dipendenti-in-cloud/dipendenti-in-cloud-api-client";
 import { youtrackApiClient } from "../you-track/youtrack-api-client";
-import { EmployeesRead } from "./schemas/employees-read";
+import { EmployeeRead } from "./schemas/employee-read";
 import { youTrackUtils } from "@/modules/you-track/youtrack-utils";
+import { EmployeeReadExtended } from "@/modules/employees/schemas/employee-read-extended";
+import { payslipsDb } from "@/modules/payslips/payslips.db";
+import { differenceInYears, isValid, parse } from "date-fns";
 
 export const employeesServer = {
-  async all(): Promise<EmployeesRead[]> {
+  async all(): Promise<EmployeeRead[]> {
     return employeesDb.listAll();
   },
 
-  async get(id: number): Promise<EmployeesRead> {
+  async allExtended(): Promise<EmployeeReadExtended[]> {
+    const employeesResult = await employeesDb.listAll();
+
+    const today = new Date();
+
+    return await Promise.all(
+      employeesResult.map(async (employee) => {
+        const employeePayslips = await payslipsDb.allByEmployeeId(employee.id);
+
+        const birthdate = parseDate(employee.birthdate);
+        const hiredOn = parseDate(employee.hiredOn);
+
+        const age = calculateAge(birthdate, today);
+        const averagePayroll = calculateAveragePayslip(employeePayslips);
+        const yearsWithCompany = hiredOn
+          ? differenceInYears(today, hiredOn)
+          : null;
+
+        return {
+          ...employee,
+          birthdate,
+          hiredOn,
+          payslips: employeePayslips,
+          age,
+          averagePayroll,
+          yearsWithCompany,
+        };
+      }),
+    );
+  },
+
+  async get(id: number): Promise<EmployeeRead> {
     const rows = await employeesDb.getById(id);
     return firstOrThrow(rows);
   },
@@ -29,8 +63,6 @@ export const employeesServer = {
     const dicEmployees = await dipendentiInCloudApiClient.getEmployees();
 
     const ytUsers = await youtrackApiClient.getUsers();
-
-    console.log(ytUsers);
 
     const values = dicEmployees.map((emp) => {
       const ytAvatarUrl = ytUsers.find((u) => u.email === emp.email)?.avatarUrl;
@@ -71,4 +103,31 @@ export const employeesServer = {
         });
     }
   },
+};
+
+const calculateAge = (
+  birthdate: Date | null,
+  referenceDate: Date,
+): number | null => {
+  if (!birthdate || !isValid(birthdate)) return null;
+  try {
+    return differenceInYears(referenceDate, birthdate);
+  } catch (error) {
+    console.error(`Failed to parse birthdate: ${birthdate}`, error);
+    return null;
+  }
+};
+
+const calculateAveragePayslip = (payslips: Array<{ net: number }>): number => {
+  if (payslips.length === 0) return 0;
+  const total = payslips.reduce((sum, payroll) => sum + payroll.net, 0);
+  return total / payslips.length;
+};
+
+const parseDate = (birthdate: string | null | undefined): Date | null => {
+  if (!birthdate) return null;
+
+  const parsed = parse(birthdate, "dd/MM/yyyy", new Date());
+
+  return isValid(parsed) ? parsed : null;
 };

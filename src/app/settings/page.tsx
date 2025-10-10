@@ -1,10 +1,8 @@
 import { Title } from "@/modules/ui/components/title";
 import { IoMdSettings } from "react-icons/io";
 import type { Metadata } from "next";
-import SyncDipendentiInCloud from "@/modules/dipendenti-in-cloud/components/sync-dipendenti-in-cloud";
 import SyncFattureInCloud from "@/modules/fatture-in-cloud/components/sync-fatture-in-cloud";
 import { SyncYoutrack } from "@/modules/settings/components/sync-youtrack";
-import SyncPubblicaWeb from "@/modules/pubblica-web/components/sync-pubblica-web";
 import AccessTokenManagement from "@/modules/access-tokens/components/access-token-management";
 import PlatformCredentialsList from "@/modules/platform-credentials/components/platform-credentials-list";
 import { BackButton } from "@/modules/ui/components/back-button";
@@ -25,9 +23,7 @@ async function Page() {
         <div className="col-span-4">
           <PlatformCredentialsList />
         </div>
-        <SyncDipendentiInCloud />
         <SyncYoutrack />
-        <SyncPubblicaWeb />
         <SyncFattureInCloud />
         <div className="col-span-4">
           <AccessTokenManagement />
