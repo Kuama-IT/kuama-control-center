@@ -5,19 +5,9 @@ import { BrutalContainer, brutalTheme } from "@/modules/ui";
 import { LinkClientOrganizationCard } from "@/modules/clients/components/link-client-organization-card";
 
 async function Page() {
-  const unlinkedClients = await clientsServer.allUnlinked();
-  //
-  // const suggestions = await clientsServer.suggestYouTrackOrgMatches({
-  //   minScore: 0.2,
-  // });
+  const unlinkedClients = await clientsServer.allUnlinkedExtended();
 
-  const allClients = await clientsServer.allExtended();
   const allOrganizations = await clientsServer.allOrganizations();
-
-  // const suggestionsByOrg = new Map<number, (typeof suggestions)[number]>();
-  // for (const s of suggestions) {
-  //   suggestionsByOrg.set(s.organizationId, s);
-  // }
 
   return (
     <BrutalContainer size="lg">
@@ -37,7 +27,7 @@ async function Page() {
               All clients are linked to at least one organization .
             </p>
           )}
-          {allClients.map((client) => {
+          {unlinkedClients.map((client) => {
             return (
               <LinkClientOrganizationCard
                 key={client.id}

@@ -15,7 +15,7 @@ export function ImportEmployeesButton() {
       notifyError(res.message ?? "Failed to import employees");
       return;
     }
-    notifySuccess("Employees imported successfully");
+    notifySuccess("EmployeeList imported successfully");
   };
 
   return (

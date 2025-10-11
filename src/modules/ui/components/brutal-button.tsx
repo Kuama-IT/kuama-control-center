@@ -4,7 +4,7 @@ import { brutalTheme, brutalUtils, cn } from "../brutal-theme";
 
 export interface BrutalButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "secondary" | "danger";
+  variant?: "primary" | "secondary" | "danger" | "ghost";
   size?: "sm" | "md" | "lg";
   children: React.ReactNode;
 }
@@ -23,7 +23,7 @@ export const BrutalButton: React.FC<BrutalButtonProps> = ({
       "hover:bg-white hover:text-black",
       brutalTheme.shadows.button.primary,
       brutalTheme.shadows.hover.primary,
-      brutalUtils.hoverTransform("primary")
+      brutalUtils.hoverTransform("primary"),
     ),
     secondary: cn(
       "bg-white text-black",
@@ -31,7 +31,7 @@ export const BrutalButton: React.FC<BrutalButtonProps> = ({
       "hover:bg-white hover:text-black hover:border-white",
       brutalTheme.shadows.button.secondary,
       brutalTheme.shadows.hover.secondary,
-      brutalUtils.hoverTransform("secondary")
+      brutalUtils.hoverTransform("secondary"),
     ),
     danger: cn(
       "bg-red-500 text-white",
@@ -39,8 +39,9 @@ export const BrutalButton: React.FC<BrutalButtonProps> = ({
       "hover:bg-red-500 hover:text-white hover:border-red-500",
       brutalTheme.shadows.button.danger,
       brutalTheme.shadows.hover.danger,
-      brutalUtils.hoverTransform("danger")
+      brutalUtils.hoverTransform("danger"),
     ),
+    ghost: cn("bg-transparent text-black"),
   };
 
   return (

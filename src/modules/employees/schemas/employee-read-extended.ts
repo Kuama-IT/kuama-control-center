@@ -7,8 +7,9 @@ export type EmployeeReadExtended = Omit<
 > & {
   birthdate: Date | null;
   hiredOn: Date | null;
-  payslips: Array<PayslipRead>;
+  payslips: PayslipRead[];
   age: number | null;
-  averagePayroll: number;
+  averageNet: number;
+  averageCost: number;
   yearsWithCompany: number | null;
 };

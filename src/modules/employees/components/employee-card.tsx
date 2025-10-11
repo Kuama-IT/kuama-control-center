@@ -1,16 +1,16 @@
 import { CSSProperties } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { HiArrowSmRight } from "react-icons/hi";
 import { routes } from "@/modules/ui/routes";
-import { EmployeeRead } from "@/modules/employees/schemas/employee-read";
 import { brutalTheme } from "@/modules/ui/brutal-theme";
+import { EmployeeReadExtended } from "@/modules/employees/schemas/employee-read-extended";
+import { EmployeeAvatar } from "@/modules/employees/components/employee-avatar";
 
 export const EmployeeCard = ({
   employee,
   index,
 }: {
-  employee: EmployeeRead;
+  employee: EmployeeReadExtended;
   index: number;
 }) => {
   const style = {
@@ -30,23 +30,16 @@ export const EmployeeCard = ({
           className={`flex flex-col gap-4 ${brutalTheme.spacing.card} ${brutalTheme.borders.thick} ${brutalTheme.shadows.lg} ${brutalTheme.transitions.normal} bg-white flex-1 relative ${brutalTheme.base.sharp} hover:${brutalTheme.shadows.xl}`}
         >
           <div className="flex gap-4 items-center">
-            <div
-              className={`w-[50px] h-[50px] relative overflow-hidden bg-white flex items-center justify-center`}
-            >
-              {employee.avatarUrl && employee.fullName && (
-                <Image
-                  src={employee.avatarUrl}
-                  alt={employee.fullName}
-                  height={100}
-                  width={100}
-                />
-              )}
-            </div>
+            <EmployeeAvatar
+              avatarUrl={employee.avatarUrl}
+              fullName={employee.fullName}
+              size={50}
+            />
             <h2 className={brutalTheme.typography.body}>{employee.fullName}</h2>
           </div>
           <p className={brutalTheme.typography.body}>{employee.email}</p>
           <p className={brutalTheme.typography.caption}>
-            {employee.birthdate.toLocaleString()}
+            {employee.birthdate?.toLocaleString()}
           </p>
         </div>
         <HiArrowSmRight className="pointer-events-none absolute right-0 opacity-0 text-2xl text-gray-300 group-hover:opacity-100 group-hover:right-4 transition-all" />

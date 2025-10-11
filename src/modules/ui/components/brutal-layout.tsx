@@ -1,4 +1,4 @@
-import React from "react";
+import React, { CSSProperties } from "react";
 import {
   Table,
   TableBody,
@@ -17,12 +17,14 @@ export interface BrutalCardProps {
   children: React.ReactNode;
   variant?: "primary" | "secondary";
   className?: string;
+  style?: CSSProperties;
 }
 
 export const BrutalCard: React.FC<BrutalCardProps> = ({
   children,
   variant = "primary",
   className,
+  style,
 }) => {
   const variants = {
     primary: brutalUtils.cardBase(),
@@ -31,11 +33,15 @@ export const BrutalCard: React.FC<BrutalCardProps> = ({
       brutalTheme.borders.medium,
       "shadow-[6px_6px_0px_0px_#333333]",
       "p-4",
-      brutalTheme.base.sharp
+      brutalTheme.base.sharp,
     ),
   };
 
-  return <div className={cn(variants[variant], className)}>{children}</div>;
+  return (
+    <div style={style} className={cn(variants[variant], className)}>
+      {children}
+    </div>
+  );
 };
 
 // Brutal Table Components
@@ -57,7 +63,7 @@ export const BrutalTable: React.FC<BrutalTableProps> = ({
         brutalTheme.shadows.lg,
         "bg-white",
         brutalTheme.base.sharp,
-        className
+        className,
       )}
     >
       {caption && (
@@ -89,7 +95,7 @@ export const BrutalTableRow: React.FC<{
       className={cn(
         "border-b-2 border-black hover:bg-gray-50",
         brutalTheme.transitions.fast,
-        className
+        className,
       )}
     >
       {children}
@@ -105,7 +111,7 @@ export const BrutalTableHead: React.FC<{
     <TableHead
       className={cn(
         "border-r-2 border-black p-6 font-black uppercase text-lg last:border-r-0",
-        className
+        className,
       )}
     >
       {children}
@@ -121,7 +127,7 @@ export const BrutalTableCell: React.FC<{
     <TableCell
       className={cn(
         "border-r-2 border-black p-6 font-bold last:border-r-0",
-        className
+        className,
       )}
     >
       {children}
@@ -145,7 +151,7 @@ export const BrutalSeparator: React.FC<BrutalSeparatorProps> = ({
       className={cn(
         orientation === "horizontal" ? "border-t-4" : "border-l-4",
         "border-black",
-        className
+        className,
       )}
     />
   );

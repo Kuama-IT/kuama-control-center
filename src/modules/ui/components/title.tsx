@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import { brutalTheme } from "@/modules/ui";
 
 export const Title = ({
   icon,
@@ -10,7 +11,9 @@ export const Title = ({
   className?: string;
 }) => {
   return (
-    <h1 className={`flex gap-4 text-3xl items-center ${className}`}>
+    <h1
+      className={`flex gap-4 text-3xl items-center ${brutalTheme.typography.heading}`}
+    >
       {icon}
       {children}
     </h1>

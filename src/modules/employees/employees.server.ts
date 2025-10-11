@@ -9,6 +9,7 @@ import { youTrackUtils } from "@/modules/you-track/youtrack-utils";
 import { EmployeeReadExtended } from "@/modules/employees/schemas/employee-read-extended";
 import { payslipsDb } from "@/modules/payslips/payslips.db";
 import { differenceInYears, isValid, parse } from "date-fns";
+import { payslipsUtils } from "@/modules/payslips/payslips.utils";
 
 export const employeesServer = {
   async all(): Promise<EmployeeRead[]> {
@@ -28,7 +29,9 @@ export const employeesServer = {
         const hiredOn = parseDate(employee.hiredOn);
 
         const age = calculateAge(birthdate, today);
-        const averagePayroll = calculateAveragePayslip(employeePayslips);
+        const averageNet = payslipsUtils.calculateAverageNet(employeePayslips);
+        const averageCost =
+          payslipsUtils.calculateAverageCost(employeePayslips) / 13;
         const yearsWithCompany = hiredOn
           ? differenceInYears(today, hiredOn)
           : null;
@@ -39,7 +42,8 @@ export const employeesServer = {
           hiredOn,
           payslips: employeePayslips,
           age,
-          averagePayroll,
+          averageNet,
+          averageCost,
           yearsWithCompany,
         };
       }),
@@ -118,16 +122,10 @@ const calculateAge = (
   }
 };
 
-const calculateAveragePayslip = (payslips: Array<{ net: number }>): number => {
-  if (payslips.length === 0) return 0;
-  const total = payslips.reduce((sum, payroll) => sum + payroll.net, 0);
-  return total / payslips.length;
-};
-
 const parseDate = (birthdate: string | null | undefined): Date | null => {
   if (!birthdate) return null;
 
-  const parsed = parse(birthdate, "dd/MM/yyyy", new Date());
+  const parsed = parse(birthdate, "yyyy-MM-dd", new Date());
 
   return isValid(parsed) ? parsed : null;
 };

@@ -26,7 +26,7 @@ export const NavBar = async () => {
 
       {session.user.isAdmin && (
         <Link href={routes.employees()}>
-          <FaUserGroup aria-label="Employees" />
+          <FaUserGroup aria-label="EmployeeList" />
         </Link>
       )}
 

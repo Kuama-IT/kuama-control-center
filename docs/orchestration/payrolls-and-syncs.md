@@ -151,7 +151,7 @@ Tables to add (names are indicative; implement in `drizzle/schema.ts`):
 - Admin → Profitability
   - Year filter; margin by client/project and by employee; drill‑down into time and invoices
 
-- Employees → My payrolls
+- EmployeeList → My payrolls
   - List/download my monthly payrolls and view basic totals
 
 - Sync dashboard

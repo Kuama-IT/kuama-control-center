@@ -1,16 +1,19 @@
 import type { Metadata } from "next";
 import { AuthenticatedPageWrapper } from "@/modules/auth/authenticated-page-wrapper";
 import EmployeeList from "@/modules/employees/components/employee-list";
+import { EmployeesWithPayslips } from "@/modules/employees/components/employees-with-payslips";
+import { employeesServer } from "@/modules/employees/employees.server";
 
 export const metadata: Metadata = {
-  title: "EmployeeList | K1 App",
-  description: "EmployeeList | Kuama Control Center",
+  title: "Employee Payslips Overview | K1 App",
+  description: '"Employee Payslips Overview | Kuama Control Center',
 };
 
 async function Page() {
+  const employees = await employeesServer.allExtended();
   return (
-    <div className="max-w-(--breakpoint-lg) mx-auto pt-4">
-      <EmployeeList />
+    <div className="mx-16 pt-4">
+      <EmployeesWithPayslips employees={employees} />
     </div>
   );
 }

@@ -23,7 +23,9 @@ export function ReparsePubblicaWebPayslipsButton() {
         })
       }
     >
-      Re-import pubblica web payslips
+      {mutation.isPending
+        ? "re-importing all payslips from pubblica web"
+        : "Re-import pubblica web payslips"}
     </BrutalButton>
   );
 }
