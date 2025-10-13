@@ -9,7 +9,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { format } from "date-fns";
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import { ChevronDown, ChevronsUpDown, ChevronUp } from "lucide-react";
 import { EmployeeReadExtended } from "@/modules/employees/schemas/employee-read-extended";
 import { Title } from "@/modules/ui/components/title";
@@ -17,7 +17,6 @@ import { BrutalSeparator, brutalTheme } from "@/modules/ui";
 import Link from "next/link";
 import { BrutalCard } from "@/modules/ui/components/brutal-layout";
 import { BrutalButton } from "@/modules/ui/components/brutal-button";
-// Added Recharts imports for the comparative chart
 import {
   ResponsiveContainer,
   BarChart,
@@ -30,7 +29,16 @@ import {
   Text,
 } from "recharts";
 
-type SortField = "age" | "averageNet" | "lastPayroll" | "averageCost" | null;
+type SortField =
+  | "age"
+  | "averageNet"
+  | "lastPayroll"
+  | "averageCost"
+  | "permissionsHoursBalance"
+  | "holidaysHoursBalance"
+  | "rolHoursBalance"
+  | null;
+
 type SortDirection = "asc" | "desc";
 
 export const EmployeesWithPayslips = ({
@@ -68,6 +76,17 @@ export const EmployeesWithPayslips = ({
     } else if (sortField === "lastPayroll") {
       aValue = a.payslips.length > 0 ? a.payslips[0].net : -1; // Treat no payrolls as -1
       bValue = b.payslips.length > 0 ? b.payslips[0].net : -1;
+    } else if (sortField === "permissionsHoursBalance") {
+      aValue =
+        a.payslips.length > 0 ? a.payslips[0].permissionsHoursBalance : -1;
+      bValue =
+        b.payslips.length > 0 ? b.payslips[0].permissionsHoursBalance : -1;
+    } else if (sortField === "holidaysHoursBalance") {
+      aValue = a.payslips.length > 0 ? a.payslips[0].holidaysHoursBalance : -1;
+      bValue = b.payslips.length > 0 ? b.payslips[0].holidaysHoursBalance : -1;
+    } else if (sortField === "rolHoursBalance") {
+      aValue = a.payslips.length > 0 ? a.payslips[0].rolHoursBalance : -1;
+      bValue = b.payslips.length > 0 ? b.payslips[0].rolHoursBalance : -1;
     } else {
       return 0;
     }
@@ -110,27 +129,6 @@ export const EmployeesWithPayslips = ({
       maximumFractionDigits: 0,
     }).format(value);
 
-  // Custom Y-Axis tick to ensure perfect vertical centering
-  const YAxisTick = ({
-    x,
-    y,
-    payload,
-  }: {
-    x: number;
-    y: number;
-    payload: any;
-  }) => (
-    <Text
-      x={x}
-      y={y}
-      verticalAnchor="middle"
-      textAnchor="end"
-      style={{ fontWeight: 700 }}
-    >
-      {payload?.value}
-    </Text>
-  );
-
   return (
     <BrutalCard className="space-y-4 p-8">
       <div className="flex items-center justify-between">
@@ -143,7 +141,7 @@ export const EmployeesWithPayslips = ({
       <BrutalSeparator />
       {/* Comparative Chart */}
       {employees.length > 0 ? (
-        <div className="w-full bg-white border-4 border-black shadow-[8px_8px_0px_0px_#000] p-4 overflow-x-auto">
+        <div className="w-full bg-white border-4 border-black p-4 overflow-x-auto">
           <div className="flex items-center justify-between mb-2">
             <h3 className={brutalTheme.typography.subheading}>
               Average Net vs Average Cost
@@ -201,55 +199,57 @@ export const EmployeesWithPayslips = ({
       <Table className="w-full border-4 border-black shadow-[8px_8px_0px_0px_#000000] rounded-none bg-white">
         <TableHeader className="bg-gray-100 border-b-4 border-black">
           <TableRow className="border-b-4 border-black">
+            <TableHead className="text-right font-black uppercase tracking-wide border-r-4 border-black">
+              Number
+            </TableHead>
+
             <TableHead className="font-black uppercase tracking-wide border-r-4 border-black">
               Full Name
             </TableHead>
-            <TableHead className="font-black uppercase tracking-wide border-r-4 border-black">
-              <BrutalButton
-                variant="ghost"
-                onClick={() => handleSort("age")}
-                className="h-auto p-0 font-medium hover:bg-transparent"
-              >
-                Age
-                {getSortIcon("age")}
-              </BrutalButton>
-            </TableHead>
+
+            <SortableTableHead
+              onClick={() => handleSort("age")}
+              sortIcon={getSortIcon("age")}
+              label="Age"
+            />
+
             <TableHead className="font-black uppercase tracking-wide border-r-4 border-black">
               Hired On
             </TableHead>
-            <TableHead className="font-black uppercase tracking-wide border-r-4 border-black">
-              Years with Company
-            </TableHead>
+
+            <SortableTableHead
+              onClick={() => handleSort("lastPayroll")}
+              sortIcon={getSortIcon("lastPayroll")}
+              label="Last Payslip"
+            />
+
+            <SortableTableHead
+              onClick={() => handleSort("averageNet")}
+              sortIcon={getSortIcon("averageNet")}
+              label="Avg Payslip"
+            />
+
             <TableHead className="text-right font-black uppercase tracking-wide border-r-4 border-black">
-              <BrutalButton
-                variant="ghost"
-                onClick={() => handleSort("lastPayroll")}
-                className="h-auto p-0 font-medium hover:bg-transparent ml-auto flex items-center"
-              >
-                Last Payroll
-                {getSortIcon("lastPayroll")}
-              </BrutalButton>
+              Average Cost
             </TableHead>
-            <TableHead className="text-right font-black uppercase tracking-wide border-r-4 border-black">
-              <BrutalButton
-                variant="ghost"
-                onClick={() => handleSort("averageNet")}
-                className="h-auto p-0 font-medium hover:bg-transparent ml-auto flex items-center"
-              >
-                Average Payroll
-                {getSortIcon("averageNet")}
-              </BrutalButton>
-            </TableHead>
-            <TableHead className="text-right font-black uppercase tracking-wide">
-              <BrutalButton
-                variant="ghost"
-                onClick={() => handleSort("averageCost")}
-                className="h-auto p-0 font-medium hover:bg-transparent ml-auto flex items-center"
-              >
-                Average Cost
-                {getSortIcon("averageCost")}
-              </BrutalButton>
-            </TableHead>
+
+            <SortableTableHead
+              onClick={() => handleSort("permissionsHoursBalance")}
+              sortIcon={getSortIcon("permissionsHoursBalance")}
+              label="Perm (h)"
+            />
+
+            <SortableTableHead
+              onClick={() => handleSort("holidaysHoursBalance")}
+              sortIcon={getSortIcon("holidaysHoursBalance")}
+              label="Holidays (h)"
+            />
+
+            <SortableTableHead
+              onClick={() => handleSort("rolHoursBalance")}
+              sortIcon={getSortIcon("rolHoursBalance")}
+              label="ROL (h)"
+            />
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -260,6 +260,12 @@ export const EmployeesWithPayslips = ({
 
             return (
               <TableRow key={employee.id} className="border-b-4 border-black">
+                <TableCell className="text-right font-mono border-r-4 border-black">
+                  {employee.payslips.length > 0
+                    ? employee.payslips[0].payrollRegistrationNumber
+                    : "N/A"}
+                </TableCell>
+
                 <TableCell className="font-bold border-r-4 border-black">
                   {fullName}
                 </TableCell>
@@ -269,13 +275,14 @@ export const EmployeesWithPayslips = ({
                 <TableCell className="border-r-4 border-black">
                   {employee.hiredOn
                     ? format(new Date(employee.hiredOn), "dd/MM/yyyy")
-                    : "N/A"}
-                </TableCell>
-                <TableCell className="border-r-4 border-black">
+                    : "N/A"}{" "}
+                  (
                   {employee.yearsWithCompany !== null
                     ? `${employee.yearsWithCompany} years`
                     : "N/A"}
+                  )
                 </TableCell>
+
                 <TableCell className="text-right font-mono border-r-4 border-black">
                   {employee.payslips.length > 0
                     ? `€${employee.payslips[0].net.toFixed(2)}`
@@ -284,8 +291,23 @@ export const EmployeesWithPayslips = ({
                 <TableCell className="text-right font-mono border-r-4 border-black">
                   €{employee.averageNet.toFixed(2)}
                 </TableCell>
-                <TableCell className="text-right font-mono">
+                <TableCell className="text-right font-mono border-r-4 border-black">
                   €{employee.averageCost.toFixed(2)}
+                </TableCell>
+                <TableCell className="text-right font-mono border-r-4 border-black">
+                  {employee.payslips.length > 0
+                    ? employee.payslips[0].permissionsHoursBalance
+                    : "N/A"}
+                </TableCell>
+                <TableCell className="text-right font-mono border-r-4 border-black">
+                  {employee.payslips.length > 0
+                    ? employee.payslips[0].holidaysHoursBalance
+                    : "N/A"}
+                </TableCell>
+                <TableCell className="text-right font-mono border-r-4 border-black">
+                  {employee.payslips.length > 0
+                    ? employee.payslips[0].rolHoursBalance
+                    : "N/A"}
                 </TableCell>
               </TableRow>
             );
@@ -299,5 +321,50 @@ export const EmployeesWithPayslips = ({
         </div>
       )}
     </BrutalCard>
+  );
+};
+
+// Custom Y-Axis tick to ensure perfect vertical centering
+const YAxisTick = ({
+  x,
+  y,
+  payload,
+}: {
+  x: number;
+  y: number;
+  payload?: { value: string | number };
+}) => (
+  <Text
+    x={x}
+    y={y}
+    verticalAnchor="middle"
+    textAnchor="end"
+    style={{ fontWeight: 700 }}
+  >
+    {payload?.value}
+  </Text>
+);
+
+const SortableTableHead = ({
+  onClick,
+  sortIcon,
+  label,
+}: {
+  onClick: () => void;
+  sortIcon: ReactNode;
+  label: ReactNode;
+}) => {
+  return (
+    <TableHead className="text-right font-black uppercase tracking-wide border-r-4 border-black">
+      <BrutalButton
+        variant="ghost"
+        onClick={onClick}
+        className="h-auto p-0 font-black uppercase tracking-wide flex items-center"
+        style={{ fontWeight: 900, fontSize: "inherit" }}
+      >
+        {label}
+        {sortIcon}
+      </BrutalButton>
+    </TableHead>
   );
 };

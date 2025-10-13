@@ -2,6 +2,7 @@ import { extractTextItems, PdfTextItem } from "@/modules/pdf/pdf-layout";
 import { parse } from "date-fns/parse";
 import { Page } from "pdf2json";
 import { pdfUtils } from "../pdf/pdf.utils";
+import { PubblicaWebEmployeeMonthlyCost } from "@/modules/pubblica-web/schemas/pubblica-web-employee-monthly-cost-read";
 
 type LabelDefinition = {
   type: "text" | "italian_date" | "italian_number" | "number";
@@ -271,7 +272,7 @@ export const pubblicaWebUtils = {
   computeEmployeesMonthlyCost(
     employeePayrolls: { gross: number; fullName: string }[],
     totalBusinessCost: number,
-  ) {
+  ): PubblicaWebEmployeeMonthlyCost[] {
     // Step 1: Calculate total gross
     const L_tot = employeePayrolls.reduce((sum, emp) => sum + emp.gross, 0);
     // Step 2: Calculate total oneri (O_tot)

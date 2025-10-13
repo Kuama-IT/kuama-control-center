@@ -1,11 +1,14 @@
 import { db } from "@/drizzle/drizzle-db";
 import { payslips, pubblicaWebPayslips } from "@/drizzle/schema";
-import { desc, inArray, isNull, not } from "drizzle-orm";
+import { PubblicaWebEmployeeMonthlyCost } from "@/modules/pubblica-web/schemas/pubblica-web-employee-monthly-cost-read";
+import { PubblicaWebPayslipRead } from "@/modules/pubblica-web/schemas/pubblica-web-payslip-read";
+import { format, parse } from "date-fns";
+import { desc, eq, isNull, or, gt } from "drizzle-orm";
 import { employeesDb } from "../employees/employees.db";
 import { pubblicaWebDb } from "../pubblica-web/pubblica-web.db";
 import { pubblicaWebUtils } from "../pubblica-web/pubblica-web.utils";
 import { payslipsDb } from "./payslips.db";
-import { parse, format } from "date-fns";
+import { firstOrThrow } from "@/utils/array-utils";
 
 export const payslipsServer = {
   /**
@@ -15,20 +18,85 @@ export const payslipsServer = {
    */
   async importFromPubblicaWebPayslips() {
     const missingPayslips = await db
-      .select()
+      .select({
+        // List all columns from pubblicaWebPayslips you want to select
+        id: pubblicaWebPayslips.id,
+        fullName: pubblicaWebPayslips.fullName,
+        year: pubblicaWebPayslips.year,
+        month: pubblicaWebPayslips.month,
+        birthDate: pubblicaWebPayslips.birthDate,
+        hireDate: pubblicaWebPayslips.hireDate,
+        cf: pubblicaWebPayslips.cf,
+        createdAt: pubblicaWebPayslips.createdAt,
+        updatedAt: pubblicaWebPayslips.updatedAt,
+        net: pubblicaWebPayslips.net,
+        gross: pubblicaWebPayslips.gross,
+        workedDays: pubblicaWebPayslips.workedDays,
+        workedHours: pubblicaWebPayslips.workedHours,
+        permissionsHoursBalance: pubblicaWebPayslips.permissionsHoursBalance,
+        holidaysHoursBalance: pubblicaWebPayslips.holidaysHoursBalance,
+        rolHoursBalance: pubblicaWebPayslips.rolHoursBalance,
+        payrollRegistrationNumber:
+          pubblicaWebPayslips.payrollRegistrationNumber,
+        documentId: pubblicaWebPayslips.documentId,
+      })
       .from(pubblicaWebPayslips)
+      .leftJoin(
+        payslips,
+        eq(pubblicaWebPayslips.documentId, payslips.documentId),
+      )
       .where(
-        not(
-          inArray(
-            pubblicaWebPayslips.documentId,
-            db
-              .select({ documentId: payslips.documentId })
-              .from(payslips)
-              .where(not(isNull(payslips.documentId))),
-          ),
+        or(
+          isNull(payslips.id),
+          gt(pubblicaWebPayslips.updatedAt, payslips.updatedAt),
         ),
       )
       .orderBy(desc(pubblicaWebPayslips.year), desc(pubblicaWebPayslips.month));
+
+    // for each month and year, compute employer cost
+
+    // group missing payslips by year and month
+    const payslipsByYearAndMonth = new Map<string, PubblicaWebPayslipRead[]>();
+    for (const missing of missingPayslips) {
+      const key = `${missing.year}_${missing.month}`;
+      if (!payslipsByYearAndMonth.has(key)) {
+        payslipsByYearAndMonth.set(key, []);
+      }
+      payslipsByYearAndMonth.get(key)?.push(missing);
+    }
+
+    // key will be year_month_full_name
+    const employerCostByYearAndMonth = new Map<
+      string,
+      PubblicaWebEmployeeMonthlyCost
+    >();
+    for (const entry of payslipsByYearAndMonth.entries()) {
+      const [key, missingPayslipsByYearAndMonth] = entry;
+
+      const [year, month] = key.split("_").map(Number);
+      // get total business cost in missing year and month
+      const monthlyBalance =
+        await pubblicaWebDb.getMonthlyBalanceByYearAndMonth(year, month);
+      if (!monthlyBalance) {
+        throw new Error(
+          `Monthly balance for year ${year} and month ${month} not found. Did you import monthly balances?`,
+        );
+      }
+
+      const monthlyCosts = pubblicaWebUtils.computeEmployeesMonthlyCost(
+        missingPayslipsByYearAndMonth,
+        monthlyBalance.total,
+      );
+      for (const monthlyCost of monthlyCosts) {
+        const employeeKey = monthlyCost.fullName
+          .toLowerCase()
+          .replace(/\s/g, "_");
+        employerCostByYearAndMonth.set(
+          `${year}_${month}_${employeeKey}`,
+          monthlyCost,
+        );
+      }
+    }
 
     for (const missing of missingPayslips) {
       // create payslip record and update related employee infos
@@ -40,23 +108,15 @@ export const payslipsServer = {
         );
         continue;
       }
+      const employeeKey = missing.fullName.toLowerCase().replace(/\s/g, "_");
+      const key = `${missing.year}_${missing.month}_${employeeKey}`;
+      const employerCost = employerCostByYearAndMonth.get(key);
 
-      // get total business cost in missing year and month
-      const monthlyBalance =
-        await pubblicaWebDb.getMonthlyBalanceByYearAndMonth(
-          missing.year,
-          missing.month,
-        );
-      if (!monthlyBalance) {
+      if (!employerCost) {
         throw new Error(
-          `Monthly balance for year ${missing.year} and month ${missing.month} not found. Did you import monthly balances?`,
+          `Missing employer cost for ${missing.fullName} in ${missing.month}/${missing.year}`,
         );
       }
-
-      const [employerCost] = pubblicaWebUtils.computeEmployeesMonthlyCost(
-        [missing],
-        monthlyBalance.total,
-      );
 
       await payslipsDb
         .create({
@@ -65,8 +125,16 @@ export const payslipsServer = {
           month: missing.month,
           gross: missing.gross,
           net: missing.net,
-          employerCost: employerCost.businessCost,
+          businessCost: employerCost.businessCost,
+          oneri: employerCost.oneri,
+          quota: employerCost.quota,
           documentId: missing.documentId,
+          workedDays: missing.workedDays,
+          workedHours: missing.workedHours,
+          permissionsHoursBalance: missing.permissionsHoursBalance,
+          holidaysHoursBalance: missing.holidaysHoursBalance,
+          rolHoursBalance: missing.rolHoursBalance,
+          payrollRegistrationNumber: missing.payrollRegistrationNumber,
         })
         .onConflictDoUpdate({
           target: [payslips.employeeId, payslips.month, payslips.year],
@@ -76,7 +144,15 @@ export const payslipsServer = {
             month: missing.month,
             gross: missing.gross,
             net: missing.net,
-            employerCost: employerCost.businessCost,
+            businessCost: employerCost.businessCost,
+            oneri: employerCost.oneri,
+            quota: employerCost.quota,
+            workedDays: missing.workedDays,
+            workedHours: missing.workedHours,
+            permissionsHoursBalance: missing.permissionsHoursBalance,
+            holidaysHoursBalance: missing.holidaysHoursBalance,
+            rolHoursBalance: missing.rolHoursBalance,
+            payrollRegistrationNumber: missing.payrollRegistrationNumber,
           },
         });
 
@@ -95,5 +171,16 @@ export const payslipsServer = {
         ),
       });
     }
+  },
+
+  async getLatestByEmployeeId(employeeId: number) {
+    const res = await db
+      .select()
+      .from(payslips)
+      .where(eq(payslips.employeeId, employeeId))
+      .orderBy(desc(payslips.year), desc(payslips.month))
+      .limit(1);
+
+    return firstOrThrow(res);
   },
 };

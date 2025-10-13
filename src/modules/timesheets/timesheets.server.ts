@@ -106,6 +106,7 @@ export const timesheetsServer = {
       .from(employees)
       .where(isNotNull(employees.dipendentiInCloudId));
 
+      console.log(`syncing ${employeesResult.length}`)
     // remove absenceDays for the given range
     await db
       .delete(absenceDays)

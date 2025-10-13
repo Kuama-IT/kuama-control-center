@@ -162,7 +162,15 @@ export const payslips = pgTable(
     month: integer().notNull(),
     gross: real().notNull(),
     net: real().notNull(),
-    employerCost: real(), // nullable until monthly balance allocation
+    businessCost: real(), // nullable until monthly balance allocation
+    oneri: real(), // nullable until monthly balance allocation
+    quota: real(), // nullable until monthly balance allocation
+    workedDays: real().notNull().default(0),
+    workedHours: real().notNull().default(0),
+    permissionsHoursBalance: real().notNull().default(0),
+    holidaysHoursBalance: real().notNull().default(0),
+    rolHoursBalance: real().notNull().default(0),
+    payrollRegistrationNumber: integer().notNull().default(0),
     documentId: integer()
       .references(() => documents.id)
       .notNull(), // single-page PDF document
@@ -360,10 +368,11 @@ export const pubblicaWebPayslips = pgTable(
     fullName: varchar({ length: 256 }).notNull(),
     year: integer().notNull(),
     month: integer().notNull(),
-    birthDate: varchar({ length: 24 }),
-    hireDate: varchar({ length: 24 }),
-    cf: varchar({ length: 16 }),
+    birthDate: varchar({ length: 24 }).notNull(),
+    hireDate: varchar({ length: 24 }).notNull(),
+    cf: varchar({ length: 16 }).notNull(),
     createdAt: timestamp().notNull().defaultNow(),
+    updatedAt: timestamp().notNull().defaultNow(),
     net: real().notNull(),
     gross: real().notNull(),
     workedDays: real().notNull().default(0),
@@ -378,6 +387,7 @@ export const pubblicaWebPayslips = pgTable(
   },
   (t) => [unique("fullName_year_month").on(t.fullName, t.year, t.month)],
 );
+
 export const pubblicaWebMonthlyBalances = pgTable(
   "pubblica_web_monthly_balances",
   {

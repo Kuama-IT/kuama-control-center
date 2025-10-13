@@ -17,5 +17,5 @@ export type EmployeesListAllActionResult = Awaited<
 >;
 // TODO mah...
 export type EmployeeByIdActionResult = Awaited<
-  ReturnType<typeof employeesServer.get>
+  ReturnType<typeof employeesServer.getExtended>
 >;

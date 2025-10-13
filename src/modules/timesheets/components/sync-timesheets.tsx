@@ -6,11 +6,10 @@ import { DateRange } from "react-day-picker";
 import { getUnlimitedAccessToken } from "@/modules/access-tokens/access-tokens.actions";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
-import { FaArrowRight, FaCalendar, FaEye, FaSync } from "react-icons/fa";
+import { FaArrowRight, FaEye } from "react-icons/fa";
 import { Separator } from "@/components/ui/separator";
 import { isFailure } from "@/utils/server-action-utils";
 import { notifyError, notifySuccess } from "@/modules/ui/components/notify";
-import { cn } from "@/lib/utils";
 import Link from "next/link";
 import {
   Popover,
@@ -22,21 +21,22 @@ import {
   useSyncAbsenceReasonsAndClosuresFromDipendentiInCloudMutation,
   useSyncPresenceAndAbsenceFromDipendentiInCloudActionMutation,
 } from "@/modules/timesheets/mutations/timesheets.mutations";
+import { BrutalButton, BrutalCalendar, BrutalSeparator } from "@/modules/ui";
 
 export default function SyncTimesheets() {
   return (
-    <div className="border rounded-lg p-4">
+    <>
       <Title>Timesheets</Title>
 
       <div className="flex flex-col gap-8 items-center">
         <SyncTimesheetForm />
-        <Separator />
-        <Separator />
+        <BrutalSeparator />
+
         <SyncAbsenceReasonsAndClosures />
-        <Separator />
+        <BrutalSeparator />
         <PreviewEmployeePresenceReport />
       </div>
-    </div>
+    </>
   );
 }
 
@@ -63,13 +63,9 @@ const PreviewEmployeePresenceReport = () => {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        {isPending ? (
-          <FaSync className="animate-spin" />
-        ) : (
-          <Button ref={syncButtonToggle}>
-            <FaEye /> Preview presence report
-          </Button>
-        )}
+        <BrutalButton ref={syncButtonToggle}>
+          {isPending ? "Previewing presence report" : "Preview presence report"}
+        </BrutalButton>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0 flex flex-col gap-4" align="start">
         <Calendar
@@ -130,10 +126,11 @@ const SyncAbsenceReasonsAndClosures = () => {
 
   return (
     <form onSubmit={onSubmit}>
-      <Button disabled={mutation.isPending} size="lg">
-        <FaSync className={cn({ "animate-spin": mutation.isPending })} />
-        Sync closures and absence reasons
-      </Button>
+      <BrutalButton disabled={mutation.isPending} size="lg">
+        {mutation.isPending
+          ? "Syncing closures and absence reasons"
+          : "Sync closures and absence reasons"}
+      </BrutalButton>
     </form>
   );
 };
@@ -163,6 +160,7 @@ const SyncTimesheetForm = () => {
       },
       {
         onSuccess: (res) => {
+            console.log(res)
           if (isFailure(res)) {
             notifyError("Error while syncing dipendenti in cloud timesheet");
             return;
@@ -180,10 +178,11 @@ const SyncTimesheetForm = () => {
         mode="range"
         onSelect={setRange}
         selected={range}
+        numberOfMonths={2}
       />
 
       <div className="flex flex-col gap-2">
-        <Button
+        <BrutalButton
           size="lg"
           disabled={
             mutation.isPending ||
@@ -191,13 +190,11 @@ const SyncTimesheetForm = () => {
             range?.to === undefined
           }
         >
-          {mutation.isPending ? (
-            <FaSync className="animate-spin" />
-          ) : (
-            <FaCalendar />
-          )}
-          Sync employee presence information
-        </Button>
+          {mutation.isPending
+            ? "Syncing employee presence information"
+            : "Sync employee presence information"}
+        </BrutalButton>
+
         {range && range?.from && range?.to && (
           <p className="italic text-sm flex gap-2 items-center justify-center">
             {format(range.from, "dd-MM-yyyy")}

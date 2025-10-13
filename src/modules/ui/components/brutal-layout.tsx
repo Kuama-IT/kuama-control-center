@@ -1,7 +1,6 @@
 import React, { CSSProperties } from "react";
 import {
   Table,
-  TableBody,
   TableCaption,
   TableCell,
   TableHead,
@@ -10,12 +9,12 @@ import {
 } from "@/components/ui/table";
 import { Separator as ShadcnSeparator } from "@/components/ui/separator";
 import { Skeleton as ShadcnSkeleton } from "@/components/ui/skeleton";
-import { brutalTheme, brutalUtils, cn } from "../brutal-theme";
+import { brutalTheme, brutalUtils, cn } from "@/modules/ui";
 
 // Brutal Card Component
 export interface BrutalCardProps {
   children: React.ReactNode;
-  variant?: "primary" | "secondary";
+  variant?: "primary" | "secondary" | "danger";
   className?: string;
   style?: CSSProperties;
 }
@@ -35,6 +34,7 @@ export const BrutalCard: React.FC<BrutalCardProps> = ({
       "p-4",
       brutalTheme.base.sharp,
     ),
+    danger: cn(brutalUtils.cardBase(), brutalTheme.borders.accent),
   };
 
   return (

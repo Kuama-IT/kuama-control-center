@@ -6,38 +6,53 @@ import { ProjectCard } from "@/modules/projects/components/project-card";
 import { isFailure } from "@/utils/server-action-utils";
 import { ErrorMessage } from "@/modules/ui/components/error-message";
 import { EmployeeDangerZone } from "@/modules/employees/components/employee-danger-zone";
+import { EmployeeQuotas } from "@/modules/employees/components/employee-quotas";
+import { BrutalCard } from "@/modules/ui";
+import { EmployeeDetailPayslips } from "@/modules/employees/components/employee-detail-payslips";
 
 export default async function EmployeeDetail({ id }: { id: number }) {
-	const employee = await employeesServer.get(id);
-	if (isFailure(employee)) {
-		return <ErrorMessage failure={employee} />;
-	}
-	const employeeProjects = await projectsServer.getByEmployeeId(id);
-	return (
-		<div className="flex flex-col">
-			<div className="flex gap-4 items-center p-8 top-0 relative z-10">
-				<BackButton />
-				{employee.avatarUrl && employee.fullName && (
-					<Image
-						src={employee.avatarUrl}
-						alt={employee.fullName}
-						width={100}
-						height={100}
-						className="rounded-full animate-fade-in-from-left"
-					/>
-				)}
-				<h2 className="text-2xl animate-fade-in-from-left stagger-animation-700">{employee.fullName}</h2>
-			</div>
+  const employee = await employeesServer.getExtended(id);
+  if (isFailure(employee)) {
+    return <ErrorMessage failure={employee} />;
+  }
+  const employeeProjects = await projectsServer.getByEmployeeId(id);
+  return (
+    <div className="flex flex-col">
+      <div className="flex gap-4 items-center p-8 top-0 relative z-10">
+        <BackButton />
+        {employee.avatarUrl && employee.fullName && (
+          <Image
+            src={employee.avatarUrl}
+            alt={employee.fullName}
+            width={100}
+            height={100}
+            className="rounded-full animate-fade-in-from-left"
+          />
+        )}
+        <h2 className="text-2xl animate-fade-in-from-left stagger-animation-700">
+          {employee.fullName}
+        </h2>
+      </div>
 
-			<div className="grid grid-cols-4 gap-8 px-8">
-				{employeeProjects.map((it, index) => (
-					<ProjectCard key={it.id} project={it} index={index} />
-				))}
-			</div>
+      <div className="flex flex-col gap-8">
+        <BrutalCard className="mx-8">
+          <EmployeeQuotas employee={employee} />
+        </BrutalCard>
 
-			<div className="p-8">
-				<EmployeeDangerZone employee={employee} />
-			</div>
-		</div>
-	);
+        <BrutalCard className="mx-8">
+          <EmployeeDetailPayslips payslips={employee.payslips} />
+        </BrutalCard>
+      </div>
+
+      <div className="grid grid-cols-4 gap-8 px-8">
+        {employeeProjects.map((it, index) => (
+          <ProjectCard key={it.id} project={it} index={index} />
+        ))}
+      </div>
+
+      <div className="p-8">
+        <EmployeeDangerZone employee={employee} />
+      </div>
+    </div>
+  );
 }

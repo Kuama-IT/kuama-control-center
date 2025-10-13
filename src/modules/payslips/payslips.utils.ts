@@ -9,7 +9,7 @@ export const payslipsUtils = {
   calculateAverageCost(payslips: PayslipRead[]): number {
     if (payslips.length === 0) return 0;
     const total = payslips.reduce(
-      (sum, payslip) => sum + (payslip.employerCost ?? 0),
+      (sum, payslip) => sum + (payslip.businessCost ?? 0),
       0,
     );
     return total / payslips.length;

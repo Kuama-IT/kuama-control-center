@@ -1,5 +1,3 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import { OrganizationRead } from "@/modules/you-track/schemas/organization-read";
 import { clientsServer } from "@/modules/clients/clients.server";
 import { z } from "zod";
 import { NextRequest, NextResponse } from "next/server";

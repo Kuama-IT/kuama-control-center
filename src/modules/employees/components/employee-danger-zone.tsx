@@ -20,6 +20,7 @@ import { useRouter } from "next/navigation";
 import { FaSync } from "react-icons/fa";
 import { notifyError, notifySuccess } from "@/modules/ui/components/notify";
 import { useServerActionMutation } from "@/modules/ui/hooks/use-server-action-mutation";
+import { BrutalButton, BrutalCard } from "@/modules/ui";
 
 export const EmployeeDangerZone = ({
   employee,
@@ -46,7 +47,7 @@ export const EmployeeDangerZone = ({
   return (
     <div className="flex flex-col gap-4">
       <Title className="uppercase">Danger zone</Title>
-      <div className="rounded border border-destructive p-4">
+      <BrutalCard className=" border border-destructive p-4">
         <div className="flex justify-between items-center">
           <div>
             <p className="font-bold">Delete this employee</p>
@@ -58,9 +59,9 @@ export const EmployeeDangerZone = ({
 
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button variant="destructive" size="lg">
+              <BrutalButton variant="danger" size="lg">
                 Delete this employee
-              </Button>
+              </BrutalButton>
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
@@ -83,7 +84,7 @@ export const EmployeeDangerZone = ({
             </AlertDialogContent>
           </AlertDialog>
         </div>
-      </div>
+      </BrutalCard>
     </div>
   );
 };

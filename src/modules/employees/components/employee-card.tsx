@@ -5,6 +5,7 @@ import { routes } from "@/modules/ui/routes";
 import { brutalTheme } from "@/modules/ui/brutal-theme";
 import { EmployeeReadExtended } from "@/modules/employees/schemas/employee-read-extended";
 import { EmployeeAvatar } from "@/modules/employees/components/employee-avatar";
+import { EmployeeQuotas } from "@/modules/employees/components/employee-quotas";
 
 export const EmployeeCard = ({
   employee,
@@ -41,6 +42,7 @@ export const EmployeeCard = ({
           <p className={brutalTheme.typography.caption}>
             {employee.birthdate?.toLocaleString()}
           </p>
+          <EmployeeQuotas employee={employee} />
         </div>
         <HiArrowSmRight className="pointer-events-none absolute right-0 opacity-0 text-2xl text-gray-300 group-hover:opacity-100 group-hover:right-4 transition-all" />
       </div>

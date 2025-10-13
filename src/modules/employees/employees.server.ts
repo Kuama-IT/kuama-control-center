@@ -19,40 +19,16 @@ export const employeesServer = {
   async allExtended(): Promise<EmployeeReadExtended[]> {
     const employeesResult = await employeesDb.listAll();
 
-    const today = new Date();
-
     return await Promise.all(
       employeesResult.map(async (employee) => {
-        const employeePayslips = await payslipsDb.allByEmployeeId(employee.id);
-
-        const birthdate = parseDate(employee.birthdate);
-        const hiredOn = parseDate(employee.hiredOn);
-
-        const age = calculateAge(birthdate, today);
-        const averageNet = payslipsUtils.calculateAverageNet(employeePayslips);
-        const averageCost =
-          payslipsUtils.calculateAverageCost(employeePayslips) / 13;
-        const yearsWithCompany = hiredOn
-          ? differenceInYears(today, hiredOn)
-          : null;
-
-        return {
-          ...employee,
-          birthdate,
-          hiredOn,
-          payslips: employeePayslips,
-          age,
-          averageNet,
-          averageCost,
-          yearsWithCompany,
-        };
+        return await _extend(employee);
       }),
     );
   },
 
-  async get(id: number): Promise<EmployeeRead> {
+  async getExtended(id: number): Promise<EmployeeReadExtended> {
     const rows = await employeesDb.getById(id);
-    return firstOrThrow(rows);
+    return await _extend(firstOrThrow(rows));
   },
 
   async deleteEmployee(id: number): Promise<void> {
@@ -81,7 +57,7 @@ export const employeesServer = {
           ? new Date(emp.birth_date).toISOString()
           : null,
         fullName: emp.full_name,
-        dipendentiInCloudId: emp.person_id.toString(),
+        dipendentiInCloudId: emp.id.toString(),
         phoneNumber: emp.phone_number,
         iban: emp.iban,
         avatarUrl,
@@ -129,3 +105,27 @@ const parseDate = (birthdate: string | null | undefined): Date | null => {
 
   return isValid(parsed) ? parsed : null;
 };
+
+async function _extend(employee: EmployeeRead): Promise<EmployeeReadExtended> {
+  const today = new Date();
+  const employeePayslips = await payslipsDb.allByEmployeeId(employee.id);
+
+  const birthdate = parseDate(employee.birthdate);
+  const hiredOn = parseDate(employee.hiredOn);
+
+  const age = calculateAge(birthdate, today);
+  const averageNet = payslipsUtils.calculateAverageNet(employeePayslips);
+  const averageCost = payslipsUtils.calculateAverageCost(employeePayslips);
+  const yearsWithCompany = hiredOn ? differenceInYears(today, hiredOn) : null;
+
+  return {
+    ...employee,
+    birthdate,
+    hiredOn,
+    payslips: employeePayslips,
+    age,
+    averageNet,
+    averageCost,
+    yearsWithCompany,
+  };
+}

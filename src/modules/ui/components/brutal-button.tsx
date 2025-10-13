@@ -1,12 +1,13 @@
-import React from "react";
+import React, {Ref} from "react";
 import { Button as ShadcnButton } from "@/components/ui/button";
-import { brutalTheme, brutalUtils, cn } from "../brutal-theme";
+import { brutalTheme, brutalUtils, cn } from "@/modules/ui";
 
 export interface BrutalButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "primary" | "secondary" | "danger" | "ghost";
   size?: "sm" | "md" | "lg";
   children: React.ReactNode;
+  ref?: Ref<HTMLButtonElement>;
 }
 
 export const BrutalButton: React.FC<BrutalButtonProps> = ({

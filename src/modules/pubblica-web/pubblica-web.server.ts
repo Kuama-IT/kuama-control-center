@@ -14,51 +14,17 @@ import { createHash } from "crypto";
 import fs from "node:fs";
 
 export const pubblicaWebServer = {
-  async storeMonthlyBalanceByYearAndMonth({
-    year,
-    month,
-  }: CreatePubblicaWebMonthlyBalanceDto) {
-    const client = new PubblicaWebApi(
-      serverEnv.pubblicaWebUsername,
-      serverEnv.pubblicaWebPassword,
-    );
-
-    await client.authenticate();
-
-    const monthlyBalance = await client.fetchMonthlyBalance(year, month);
-
-    if (!monthlyBalance) {
-      throw new Error("No monthly balance found");
-    }
-
-    const buffer = new Uint8Array(monthlyBalance!.bytes).buffer;
-
-    const content = Buffer.from(monthlyBalance.bytes);
-    const doc = await db
-      .insert(documents)
-      .values({
-        content,
-        sizeInBytes: content.byteLength,
-        sha256: createHash("sha256").update(content).digest("hex"),
-        mime: monthlyBalance.mimeType,
-        fileName: monthlyBalance.name,
-        extension: monthlyBalance.name.split(".").pop(),
-      })
-      .returning();
-
-    await db.insert(pubblicaWebMonthlyBalances).values({
-      year,
-      month,
-      total: 0,
-      documentId: doc[0].id,
-    });
+  async storeMonthlyBalanceByYearAndMonth(
+    dto: CreatePubblicaWebMonthlyBalanceDto,
+  ) {
+    return await _storeMonthlyBalanceByYearAndMonth(dto);
   },
   async storeCurrentMonthMonthlyBalance() {
     const now = new Date();
     const year = now.getFullYear();
     const month = now.getMonth() + 1;
 
-    return this.storeMonthlyBalanceByYearAndMonth({ year, month });
+    return await _storeMonthlyBalanceByYearAndMonth({ year, month });
   },
   async storeMissingMonthlyBalancesSince2021() {
     const existingBalances = await db
@@ -86,58 +52,23 @@ export const pubblicaWebServer = {
         if (!existingBalancesSet.has(key)) {
           console.log(`Storing missing monthly balance for ${key}`);
           try {
-            await this.storeMonthlyBalanceByYearAndMonth({ year, month });
-          } catch (error) {
-            console.error(
-              `Failed to store monthly balance for ${key}:`,
-              (error as Error).message,
-            );
+            await _storeMonthlyBalanceByYearAndMonth({ year, month });
+          } catch (e) {
+            if (year === currentYear && month === currentMonth) {
+              // current month may not be published yet, it's ok to fail
+              continue;
+            }
+            throw e;
           }
         }
       }
     }
   },
-  async storePayslipsSourceFileByYearAndMonth({
-    year,
-    month,
-  }: CreatePubblicaWebMonthlyBalanceDto) {
-    const client = new PubblicaWebApi(
-      serverEnv.pubblicaWebUsername,
-      serverEnv.pubblicaWebPassword,
-    );
 
-    await client.authenticate();
-
-    const payslips = await client.fetchPayslips(year, month);
-
-    console.log(`Fetched payslips for ${year}-${month}: ${payslips.name}`);
-
-    const content = Buffer.from(payslips.bytes);
-    const doc = await db
-      .insert(documents)
-      .values({
-        content,
-        sizeInBytes: content.byteLength,
-        sha256: createHash("sha256").update(content).digest("hex"),
-        mime: payslips.mimeType,
-        fileName: payslips.name,
-        extension: payslips.name.split(".").pop(),
-      })
-      .returning();
-
-    const result = await db
-      .insert(pubblicaWebPayslipSourceFiles)
-      .values({
-        year,
-        month,
-        documentId: doc[0].id,
-        importedAt: null,
-      })
-      .returning();
-
-    if (result.length === 0) {
-      throw new Error("Failed to insert payslip source file");
-    }
+  async storePayslipsSourceFileByYearAndMonth(
+    dto: CreatePubblicaWebMonthlyBalanceDto,
+  ) {
+    return await _storePayslipsSourceFileByYearAndMonth(dto);
   },
 
   async storeCurrentMonthPayslipsSourceFile() {
@@ -145,81 +76,11 @@ export const pubblicaWebServer = {
     const year = now.getFullYear();
     const month = now.getMonth() + 1;
 
-    return this.storePayslipsSourceFileByYearAndMonth({ year, month });
+    return _storePayslipsSourceFileByYearAndMonth({ year, month });
   },
+
   async parseAndStorePayslipsSourceFile(sourceFileId: number) {
-    const sourceFileResult = await db
-      .select({
-        id: pubblicaWebPayslipSourceFiles.id,
-        documentId: pubblicaWebPayslipSourceFiles.documentId,
-        year: pubblicaWebPayslipSourceFiles.year,
-        month: pubblicaWebPayslipSourceFiles.month,
-      })
-      .from(pubblicaWebPayslipSourceFiles)
-      .where(eq(pubblicaWebPayslipSourceFiles.id, sourceFileId))
-      .limit(1);
-
-    if (!sourceFileResult || sourceFileResult.length === 0) {
-      throw new Error(`Source file with ID ${sourceFileId} not found`);
-    }
-    const sourceDoc = await db
-      .select({
-        content: documents.content,
-        mime: documents.mime,
-        fileName: documents.fileName,
-        extension: documents.extension,
-      })
-      .from(documents)
-      .where(eq(documents.id, sourceFileResult[0].documentId!))
-      .limit(1);
-    if (!sourceDoc.length) {
-      throw new Error("Document not found for source file");
-    }
-    const payslipsBuffer = new Uint8Array(sourceDoc[0].content).buffer;
-
-    const parsedPayslips =
-      await pubblicaWebUtils.parseMultiPageSalaries(payslipsBuffer);
-
-    await db.transaction(async (tx) => {
-      for (const payslip of parsedPayslips) {
-        // store a document for each payslip
-        const content = payslip.buffer;
-        const doc = await tx
-          .insert(documents)
-          .values({
-            content,
-            sizeInBytes: content.byteLength,
-            sha256: createHash("sha256").update(content).digest("hex"),
-            mime: sourceDoc[0].mime,
-            fileName: sourceDoc[0].fileName,
-            extension: sourceDoc[0].extension,
-          })
-          .returning();
-
-        await tx.insert(pubblicaWebPayslips).values({
-          year: sourceFileResult[0].year,
-          month: sourceFileResult[0].month,
-          fullName: payslip.fullName,
-          cf: payslip.cf,
-          birthDate: `${String(payslip.birthDate.getDate()).padStart(2, "0")}/${String(payslip.birthDate.getMonth() + 1).padStart(2, "0")}/${payslip.birthDate.getFullYear()}`,
-          hireDate: `${String(payslip.hireDate.getDate()).padStart(2, "0")}/${String(payslip.hireDate.getMonth() + 1).padStart(2, "0")}/${payslip.hireDate.getFullYear()}`,
-          gross: payslip.gross,
-          net: payslip.net,
-          workedDays: payslip.workedDays,
-          workedHours: payslip.workedHours,
-          permissionsHoursBalance: payslip.permissionsHoursBalance,
-          holidaysHoursBalance: payslip.holidaysHoursBalance,
-          rolHoursBalance: payslip.rolHoursBalance,
-          payrollRegistrationNumber: payslip.payrollRegistrationNumber,
-          documentId: doc[0].id,
-        });
-      }
-
-      await tx
-        .update(pubblicaWebPayslipSourceFiles)
-        .set({ importedAt: new Date() })
-        .where(eq(pubblicaWebPayslipSourceFiles.id, sourceFileId));
-    });
+    return await _parseAndStorePayslipsSourceFile(sourceFileId);
   },
 
   // TODO this can probably be dropped once we reach a "stable" set of information we want to parse from payslips
@@ -283,13 +144,20 @@ export const pubblicaWebServer = {
         const key = `${year}-${month}`;
         if (!existingFilesSet.has(key)) {
           console.log(`Storing missing payslip source file for ${key}`);
+
           try {
-            await this.storePayslipsSourceFileByYearAndMonth({ year, month });
-          } catch (error) {
-            console.error(
-              `Failed to store payslip source file for ${key}:`,
-              (error as Error).message,
-            );
+            await _storePayslipsSourceFileByYearAndMonth({ year, month });
+          } catch (e) {
+            if (
+              (year === currentYear && month === currentMonth) ||
+              (year === 2021 && month === 7)
+            ) {
+              // current month may not be published yet, it's ok to fail
+              // TODO ask payroll consultant what happened in 07/2021.. the file is actually missing
+              continue;
+            }
+
+            throw e;
           }
         }
       }
@@ -312,7 +180,7 @@ export const pubblicaWebServer = {
       console.log(
         `Parsing and storing payslips from source file ID ${file.id}`,
       );
-      await this.parseAndStorePayslipsSourceFile(file.id);
+      await _parseAndStorePayslipsSourceFile(file.id);
     }
   },
 
@@ -374,3 +242,159 @@ export const pubblicaWebServer = {
       );
   },
 };
+
+async function _storeMonthlyBalanceByYearAndMonth({
+  year,
+  month,
+}: CreatePubblicaWebMonthlyBalanceDto) {
+  const client = new PubblicaWebApi(
+    serverEnv.pubblicaWebUsername,
+    serverEnv.pubblicaWebPassword,
+  );
+
+  await client.authenticate();
+
+  const monthlyBalance = await client.fetchMonthlyBalance(year, month);
+
+  if (!monthlyBalance) {
+    throw new Error("No monthly balance found");
+  }
+
+  const content = Buffer.from(monthlyBalance.bytes);
+  const doc = await db
+    .insert(documents)
+    .values({
+      content,
+      sizeInBytes: content.byteLength,
+      sha256: createHash("sha256").update(content).digest("hex"),
+      mime: monthlyBalance.mimeType,
+      fileName: monthlyBalance.name,
+      extension: monthlyBalance.name.split(".").pop(),
+    })
+    .returning();
+
+  await db.insert(pubblicaWebMonthlyBalances).values({
+    year,
+    month,
+    total: 0,
+    documentId: doc[0].id,
+  });
+}
+
+async function _storePayslipsSourceFileByYearAndMonth({
+  year,
+  month,
+}: CreatePubblicaWebMonthlyBalanceDto) {
+  const client = new PubblicaWebApi(
+    serverEnv.pubblicaWebUsername,
+    serverEnv.pubblicaWebPassword,
+  );
+
+  await client.authenticate();
+
+  const payslips = await client.fetchPayslips(year, month);
+
+  console.log(`Fetched payslips for ${year}-${month}: ${payslips.name}`);
+
+  const content = Buffer.from(payslips.bytes);
+  const doc = await db
+    .insert(documents)
+    .values({
+      content,
+      sizeInBytes: content.byteLength,
+      sha256: createHash("sha256").update(content).digest("hex"),
+      mime: payslips.mimeType,
+      fileName: payslips.name,
+      extension: payslips.name.split(".").pop(),
+    })
+    .returning();
+
+  const result = await db
+    .insert(pubblicaWebPayslipSourceFiles)
+    .values({
+      year,
+      month,
+      documentId: doc[0].id,
+      importedAt: null,
+    })
+    .returning();
+
+  if (result.length === 0) {
+    throw new Error("Failed to insert payslip source file");
+  }
+}
+
+async function _parseAndStorePayslipsSourceFile(sourceFileId: number) {
+  const sourceFileResult = await db
+    .select({
+      id: pubblicaWebPayslipSourceFiles.id,
+      documentId: pubblicaWebPayslipSourceFiles.documentId,
+      year: pubblicaWebPayslipSourceFiles.year,
+      month: pubblicaWebPayslipSourceFiles.month,
+    })
+    .from(pubblicaWebPayslipSourceFiles)
+    .where(eq(pubblicaWebPayslipSourceFiles.id, sourceFileId))
+    .limit(1);
+
+  if (!sourceFileResult || sourceFileResult.length === 0) {
+    throw new Error(`Source file with ID ${sourceFileId} not found`);
+  }
+  const sourceDoc = await db
+    .select({
+      content: documents.content,
+      mime: documents.mime,
+      fileName: documents.fileName,
+      extension: documents.extension,
+    })
+    .from(documents)
+    .where(eq(documents.id, sourceFileResult[0].documentId!))
+    .limit(1);
+  if (!sourceDoc.length) {
+    throw new Error("Document not found for source file");
+  }
+  const payslipsBuffer = new Uint8Array(sourceDoc[0].content).buffer;
+
+  const parsedPayslips =
+    await pubblicaWebUtils.parseMultiPageSalaries(payslipsBuffer);
+
+  await db.transaction(async (tx) => {
+    for (const payslip of parsedPayslips) {
+      // store a document for each payslip
+      const content = payslip.buffer;
+      const doc = await tx
+        .insert(documents)
+        .values({
+          content,
+          sizeInBytes: content.byteLength,
+          sha256: createHash("sha256").update(content).digest("hex"),
+          mime: sourceDoc[0].mime,
+          fileName: sourceDoc[0].fileName,
+          extension: sourceDoc[0].extension,
+        })
+        .returning();
+
+      await tx.insert(pubblicaWebPayslips).values({
+        year: sourceFileResult[0].year,
+        month: sourceFileResult[0].month,
+        fullName: payslip.fullName,
+        cf: payslip.cf,
+        birthDate: `${String(payslip.birthDate.getDate()).padStart(2, "0")}/${String(payslip.birthDate.getMonth() + 1).padStart(2, "0")}/${payslip.birthDate.getFullYear()}`,
+        hireDate: `${String(payslip.hireDate.getDate()).padStart(2, "0")}/${String(payslip.hireDate.getMonth() + 1).padStart(2, "0")}/${payslip.hireDate.getFullYear()}`,
+        gross: payslip.gross,
+        net: payslip.net,
+        workedDays: payslip.workedDays,
+        workedHours: payslip.workedHours,
+        permissionsHoursBalance: payslip.permissionsHoursBalance,
+        holidaysHoursBalance: payslip.holidaysHoursBalance,
+        rolHoursBalance: payslip.rolHoursBalance,
+        payrollRegistrationNumber: payslip.payrollRegistrationNumber,
+        documentId: doc[0].id,
+      });
+    }
+
+    await tx
+      .update(pubblicaWebPayslipSourceFiles)
+      .set({ importedAt: new Date() })
+      .where(eq(pubblicaWebPayslipSourceFiles.id, sourceFileId));
+  });
+}
