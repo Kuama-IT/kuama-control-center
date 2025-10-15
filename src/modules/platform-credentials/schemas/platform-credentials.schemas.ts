@@ -3,66 +3,66 @@ import { EmployeeRead } from "@/modules/employees/schemas/employee-read";
 import { ProjectRead } from "@/modules/projects/schemas/projects.read.schema";
 
 export const SupportedPlatforms = z.enum([
-  "github",
-  "gitlab",
-  "jira",
-  "easyredmine",
-  "youtrack",
+    "github",
+    "gitlab",
+    "jira",
+    "easyredmine",
+    "youtrack",
 ]);
 
 // Backward-compat export to ease migration from k- modules
 export const KSupportedPlatforms = SupportedPlatforms;
 
 export const platformCredentialsFormSchema = z.object({
-  platform: SupportedPlatforms,
-  name: z.string(),
-  persistentToken: z.string(),
-  endpoint: z.string().url(),
-  clientId: z.string(),
-  employeeId: z.string().optional(),
-  projectId: z.string().optional(),
+    platform: SupportedPlatforms,
+    name: z.string(),
+    persistentToken: z.string(),
+    endpoint: z.string().url(),
+    clientId: z.string(),
+    employeeId: z.string().optional(),
+    projectId: z.string().optional(),
 });
 
 export const platformCredentialsInsertSchema = z.object({
-  platform: SupportedPlatforms,
-  name: z.string(),
-  persistentToken: z.string(),
-  endpoint: z.string().url(),
-  clientId: z
-    .string()
-    .transform((val) => (val ? parseInt(val, 10) : undefined)),
-  employeeId: z
-    .string()
-    .transform((val) => (val ? parseInt(val, 10) : undefined))
-    .optional(),
-  projectId: z
-    .string()
-    .transform((val) => (val ? parseInt(val, 10) : undefined))
-    .optional(),
+    platform: SupportedPlatforms,
+    name: z.string(),
+    persistentToken: z.string(),
+    endpoint: z.string().url(),
+    clientId: z
+        .string()
+        .transform((val) => (val ? parseInt(val, 10) : undefined)),
+    employeeId: z
+        .string()
+        .transform((val) => (val ? parseInt(val, 10) : undefined))
+        .optional(),
+    projectId: z
+        .string()
+        .transform((val) => (val ? parseInt(val, 10) : undefined))
+        .optional(),
 });
 
 export type PlatformCredentialsInsert = z.infer<
-  typeof platformCredentialsInsertSchema
+    typeof platformCredentialsInsertSchema
 >;
 
 export type PlatformCredentialsValidForm = z.infer<
-  typeof platformCredentialsFormSchema
+    typeof platformCredentialsFormSchema
 >;
 
 export const platformCredentialsReadSchema = z.object({
-  id: z.number(),
-  platform: SupportedPlatforms,
-  name: z.string(),
-  persistentToken: z.string(),
-  endpoint: z.url(),
+    id: z.number(),
+    platform: SupportedPlatforms,
+    name: z.string(),
+    persistentToken: z.string(),
+    endpoint: z.url(),
 });
 export type PlatformCredentialsRead = z.infer<
-  typeof platformCredentialsReadSchema
+    typeof platformCredentialsReadSchema
 >;
 
 export type PlatformCredentialsFullRead = PlatformCredentialsRead & {
-  employee?: EmployeeRead;
-  project?: ProjectRead;
+    employee?: EmployeeRead;
+    project?: ProjectRead;
 };
 
 // Backward-compat type aliases for incremental migration

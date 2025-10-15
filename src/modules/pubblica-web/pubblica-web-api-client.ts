@@ -1,208 +1,212 @@
 import {
-  documentsResponseSchema,
-  folderTreeResponseSchema,
-  PubblicaWebAuthenticationResponse,
-  pubblicaWebAuthenticationResponseSchema,
-  repositoriesResponseSchema,
+    documentsResponseSchema,
+    folderTreeResponseSchema,
+    PubblicaWebAuthenticationResponse,
+    pubblicaWebAuthenticationResponseSchema,
+    repositoriesResponseSchema,
 } from "@/modules/pubblica-web/schemas/pubblica-web-schemas";
 import { firstOrThrow } from "@/utils/array-utils";
 
 export class PubblicaWebApi {
-  private readonly baseAuthUrl =
-    "https://sv23.cloudserverds.it/pubblicaweb/studiobortoletto/api/v1/";
+    private readonly baseAuthUrl =
+        "https://sv23.cloudserverds.it/pubblicaweb/studiobortoletto/api/v1/";
 
-  private readonly baseUrl =
-    "https://sv23.cloudserverds.it/pubblicaweb/studiobortoletto/api/v2/";
+    private readonly baseUrl =
+        "https://sv23.cloudserverds.it/pubblicaweb/studiobortoletto/api/v2/";
 
-  private readonly baseDocumentsUrl =
-    "https://sv23.cloudserverds.it/pubblicaweb/studiobortoletto/api/";
-  private authenticationToken: string | undefined;
+    private readonly baseDocumentsUrl =
+        "https://sv23.cloudserverds.it/pubblicaweb/studiobortoletto/api/";
+    private authenticationToken: string | undefined;
 
-  constructor(
-    public readonly username: string,
-    public readonly password: string,
-  ) {}
+    constructor(
+        public readonly username: string,
+        public readonly password: string,
+    ) {}
 
-  private get authenticationHeaders() {
-    return {
-      headers: {
-        "Content-Type": "application/json",
-        "x-auth-token": this.authenticationToken ?? "",
-      },
-    };
-  }
-
-  /**
-   * Authenticates against Account endpoint and stores received cookies for further requests.
-   */
-  async authenticate(): Promise<PubblicaWebAuthenticationResponse> {
-    const response = await fetch(`${this.baseAuthUrl}Account`, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-      method: "POST",
-      body: JSON.stringify({
-        Username: this.username,
-        Password: this.password,
-        SourceType: "spa",
-        TwoFactorEnabled: false,
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error("Authentication failed");
+    private get authenticationHeaders() {
+        return {
+            headers: {
+                "Content-Type": "application/json",
+                "x-auth-token": this.authenticationToken ?? "",
+            },
+        };
     }
 
-    const responseBody = await response.json();
-    const parsed = pubblicaWebAuthenticationResponseSchema.parse(responseBody);
-    this.authenticationToken = parsed.AuthToken;
-    return parsed;
-  }
+    /**
+     * Authenticates against Account endpoint and stores received cookies for further requests.
+     */
+    async authenticate(): Promise<PubblicaWebAuthenticationResponse> {
+        const response = await fetch(`${this.baseAuthUrl}Account`, {
+            headers: {
+                "Content-Type": "application/json",
+            },
+            method: "POST",
+            body: JSON.stringify({
+                Username: this.username,
+                Password: this.password,
+                SourceType: "spa",
+                TwoFactorEnabled: false,
+            }),
+        });
 
-  /**
-   * Fetches a single document that contains all employees payslips for a given yearAndMonth.
-   * Documents inside PubblicaWeb are organized this way:
-   * .
-   * ├── 2021/
-   * │   ├── 2021-01/
-   * │   │   └── LUL-2021-01.pdf <- this is the document we want to fetch
-   * │   ├── 2021-02
-   * │   └── ...
-   * └── 2022/
-   *     └── ...
-   */
-  async fetchPayslips(year: number, month: number) {
-    const formattedMonth = `${year}-${month.toString().padStart(2, "0")}`;
+        if (!response.ok) {
+            throw new Error("Authentication failed");
+        }
 
-    const repository = await this.getDefaultRepository();
-
-    const folderTree = await this.readFolderTreeAtPath(repository.Id);
-    const folderTreeYearItem = folderTree.find(
-      (item) => item.text === year.toString(),
-    );
-
-    if (!folderTreeYearItem) {
-      throw new Error(`Year ${year} not found in folder tree`);
+        const responseBody = await response.json();
+        const parsed =
+            pubblicaWebAuthenticationResponseSchema.parse(responseBody);
+        this.authenticationToken = parsed.AuthToken;
+        return parsed;
     }
 
-    const yearFolderTree = await this.readFolderTreeAtPath(
-      repository.Id,
-      folderTreeYearItem.data.path,
-    );
+    /**
+     * Fetches a single document that contains all employees payslips for a given yearAndMonth.
+     * Documents inside PubblicaWeb are organized this way:
+     * .
+     * ├── 2021/
+     * │   ├── 2021-01/
+     * │   │   └── LUL-2021-01.pdf <- this is the document we want to fetch
+     * │   ├── 2021-02
+     * │   └── ...
+     * └── 2022/
+     *     └── ...
+     */
+    async fetchPayslips(year: number, month: number) {
+        const formattedMonth = `${year}-${month.toString().padStart(2, "0")}`;
 
-    const monthFolderTreeItem = yearFolderTree.find(
-      (item) => item.text === formattedMonth,
-    );
-    if (!monthFolderTreeItem) {
-      throw new Error(`Month ${formattedMonth} not found in folder tree`);
-    }
-    const documents = await this.readDocumentsAtPath(
-      repository.Id,
-      monthFolderTreeItem.data.path,
-    );
+        const repository = await this.getDefaultRepository();
 
-    const allPaySlipsDocuments = documents.filter((document) =>
-      document.Name.toLowerCase().startsWith("lul-"),
-    );
+        const folderTree = await this.readFolderTreeAtPath(repository.Id);
+        const folderTreeYearItem = folderTree.find(
+            (item) => item.text === year.toString(),
+        );
 
-    const allPaySlipsDocument = firstOrThrow(allPaySlipsDocuments);
+        if (!folderTreeYearItem) {
+            throw new Error(`Year ${year} not found in folder tree`);
+        }
 
-    const buffer = await this.downloadDocument(allPaySlipsDocument.Id);
-    return {
-      bytes: buffer,
-      mimeType: allPaySlipsDocument.MimeType,
-      name: allPaySlipsDocument.Name,
-    };
-  }
+        const yearFolderTree = await this.readFolderTreeAtPath(
+            repository.Id,
+            folderTreeYearItem.data.path,
+        );
 
-  public async fetchMonthlyBalance(year: number, month: number) {
-    const formattedMonth = `${year}-${month.toString().padStart(2, "0")}`;
+        const monthFolderTreeItem = yearFolderTree.find(
+            (item) => item.text === formattedMonth,
+        );
+        if (!monthFolderTreeItem) {
+            throw new Error(`Month ${formattedMonth} not found in folder tree`);
+        }
+        const documents = await this.readDocumentsAtPath(
+            repository.Id,
+            monthFolderTreeItem.data.path,
+        );
 
-    const repository = await this.getDefaultRepository();
+        const allPaySlipsDocuments = documents.filter((document) =>
+            document.Name.toLowerCase().startsWith("lul-"),
+        );
 
-    const folderTree = await this.readFolderTreeAtPath(repository.Id);
-    const folderTreeYearItem = folderTree.find(
-      (item) => item.text === year.toString(),
-    );
+        const allPaySlipsDocument = firstOrThrow(allPaySlipsDocuments);
 
-    if (!folderTreeYearItem) {
-      return null;
-    }
-
-    const yearFolderTree = await this.readFolderTreeAtPath(
-      repository.Id,
-      folderTreeYearItem.data.path,
-    );
-
-    const monthFolderTreeItem = yearFolderTree.find(
-      (item) => item.text === formattedMonth,
-    );
-    if (!monthFolderTreeItem) {
-      return null;
-    }
-    const documents = await this.readDocumentsAtPath(
-      repository.Id,
-      monthFolderTreeItem.data.path,
-    );
-
-    const allPaySlipsDocuments = documents.filter((document) =>
-      document.Name.toLowerCase().startsWith("bilanci"),
-    );
-
-    const balanceDocument = allPaySlipsDocuments[0];
-
-    if (!balanceDocument) {
-      return null;
+        const buffer = await this.downloadDocument(allPaySlipsDocument.Id);
+        return {
+            bytes: buffer,
+            mimeType: allPaySlipsDocument.MimeType,
+            name: allPaySlipsDocument.Name,
+        };
     }
 
-    const buffer = await this.downloadDocument(balanceDocument.Id);
-    return {
-      bytes: buffer,
-      mimeType: balanceDocument.MimeType,
-      name: balanceDocument.Name,
-    };
-  }
+    public async fetchMonthlyBalance(year: number, month: number) {
+        const formattedMonth = `${year}-${month.toString().padStart(2, "0")}`;
 
-  private async readFolderTreeAtPath(
-    repositoryId: number,
-    path: string = "\\", // default to root
-  ) {
-    const response = await fetch(
-      `${this.baseUrl}folderTree?${new URLSearchParams({ repositoryId: repositoryId.toString(), path, unread: true.toString() })}`,
-      this.authenticationHeaders,
-    );
-    const responseBody = await response.json();
-    return folderTreeResponseSchema.parse(responseBody);
-  }
+        const repository = await this.getDefaultRepository();
 
-  private async readDocumentsAtPath(repositoryId: number, path: string = "\\") {
-    const response = await fetch(
-      `${this.baseUrl}documents?${new URLSearchParams({ repositoryId: repositoryId.toString(), path })}`,
-      this.authenticationHeaders,
-    );
-    const responseBody = await response.json();
-    return documentsResponseSchema.parse(responseBody);
-  }
+        const folderTree = await this.readFolderTreeAtPath(repository.Id);
+        const folderTreeYearItem = folderTree.find(
+            (item) => item.text === year.toString(),
+        );
 
-  private async downloadDocument(documentId: number) {
-    const response = await fetch(
-      `${this.baseDocumentsUrl}Documents?Id=${documentId}&SubjectId=`,
-      this.authenticationHeaders,
-    );
-    return await response.arrayBuffer();
-  }
+        if (!folderTreeYearItem) {
+            return null;
+        }
 
-  private async getDefaultRepository() {
-    const repositoriesResponse = await fetch(
-      `${this.baseUrl}repositories?SubjectId=`,
-      this.authenticationHeaders,
-    );
+        const yearFolderTree = await this.readFolderTreeAtPath(
+            repository.Id,
+            folderTreeYearItem.data.path,
+        );
 
-    const repositoriesResponseBody = await repositoriesResponse.json();
-    const repositories = repositoriesResponseSchema.parse(
-      repositoriesResponseBody,
-    );
+        const monthFolderTreeItem = yearFolderTree.find(
+            (item) => item.text === formattedMonth,
+        );
+        if (!monthFolderTreeItem) {
+            return null;
+        }
+        const documents = await this.readDocumentsAtPath(
+            repository.Id,
+            monthFolderTreeItem.data.path,
+        );
 
-    return firstOrThrow(repositories);
-  }
+        const allPaySlipsDocuments = documents.filter((document) =>
+            document.Name.toLowerCase().startsWith("bilanci"),
+        );
+
+        const balanceDocument = allPaySlipsDocuments[0];
+
+        if (!balanceDocument) {
+            return null;
+        }
+
+        const buffer = await this.downloadDocument(balanceDocument.Id);
+        return {
+            bytes: buffer,
+            mimeType: balanceDocument.MimeType,
+            name: balanceDocument.Name,
+        };
+    }
+
+    private async readFolderTreeAtPath(
+        repositoryId: number,
+        path: string = "\\", // default to root
+    ) {
+        const response = await fetch(
+            `${this.baseUrl}folderTree?${new URLSearchParams({ repositoryId: repositoryId.toString(), path, unread: true.toString() })}`,
+            this.authenticationHeaders,
+        );
+        const responseBody = await response.json();
+        return folderTreeResponseSchema.parse(responseBody);
+    }
+
+    private async readDocumentsAtPath(
+        repositoryId: number,
+        path: string = "\\",
+    ) {
+        const response = await fetch(
+            `${this.baseUrl}documents?${new URLSearchParams({ repositoryId: repositoryId.toString(), path })}`,
+            this.authenticationHeaders,
+        );
+        const responseBody = await response.json();
+        return documentsResponseSchema.parse(responseBody);
+    }
+
+    private async downloadDocument(documentId: number) {
+        const response = await fetch(
+            `${this.baseDocumentsUrl}Documents?Id=${documentId}&SubjectId=`,
+            this.authenticationHeaders,
+        );
+        return await response.arrayBuffer();
+    }
+
+    private async getDefaultRepository() {
+        const repositoriesResponse = await fetch(
+            `${this.baseUrl}repositories?SubjectId=`,
+            this.authenticationHeaders,
+        );
+
+        const repositoriesResponseBody = await repositoriesResponse.json();
+        const repositories = repositoriesResponseSchema.parse(
+            repositoriesResponseBody,
+        );
+
+        return firstOrThrow(repositories);
+    }
 }

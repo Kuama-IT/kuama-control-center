@@ -3,24 +3,26 @@ import { isFailure } from "@/utils/server-action-utils";
 import { ErrorMessage } from "@/modules/ui/components/error-message";
 
 export default async function ClientSpentTime({
-	date,
-	projectIds,
-	className,
+    date,
+    projectIds,
+    className,
 }: {
-	date: Date;
-	projectIds: number[];
-	className?: string;
+    date: Date;
+    projectIds: number[];
+    className?: string;
 }) {
-	try {
-		const res = await clientsServer.getTasksAndSpentTimes({ projectIds, date });
-		if (isFailure(res)) {
-			return <ErrorMessage failure={res} />;
-		}
-		const { humanReadableDuration } = res;
+    try {
+        const res = await clientsServer.getTasksAndSpentTimes({
+            projectIds,
+            date,
+        });
+        if (isFailure(res)) {
+            return <ErrorMessage failure={res} />;
+        }
+        const { humanReadableDuration } = res;
 
-		return <div className={className}>{humanReadableDuration}</div>;
-	} catch (e) {
-		return <div>error</div>;
-	}
+        return <div className={className}>{humanReadableDuration}</div>;
+    } catch (e) {
+        return <div>error</div>;
+    }
 }
-

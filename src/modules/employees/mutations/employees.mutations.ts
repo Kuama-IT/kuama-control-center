@@ -2,7 +2,7 @@ import { useServerActionMutation } from "@/modules/ui/hooks/use-server-action-mu
 import { importFromDipendentiInCloudAndYouTrackAction } from "../employees.actions";
 
 export function useImportEmployeesMutation() {
-  return useServerActionMutation({
-    action: importFromDipendentiInCloudAndYouTrackAction,
-  });
+    return useServerActionMutation({
+        action: importFromDipendentiInCloudAndYouTrackAction,
+    });
 }

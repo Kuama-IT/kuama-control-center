@@ -100,7 +100,7 @@
     "@types/react-dom": "19.1.9",
     "@typescript/native-preview": "7.0.0-dev.20250919.1",
     "@vitejs/plugin-react": "^5.0.3",
-    "biome": "0.3.3",
+    "@biomejs/biome": "2.2.6",
     "dotenv": "^17.2.2",
     "drizzle-kit": "^0.31.4",
     "jsdom": "^27.0.0",

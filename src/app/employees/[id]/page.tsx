@@ -5,30 +5,30 @@ import { ErrorMessage } from "@/modules/ui/components/error-message";
 import { z } from "zod";
 
 const paramsSchema = z.object({
-  id: z.string(),
+    id: z.string(),
 });
 
 async function Page(pageParams: PageParams | undefined) {
-  if (!pageParams) {
-    return (
-      <ErrorMessage
-        failure={{
-          type: "__failure__",
-          code: "__invalid_params__",
-          message: "Missing page params",
-        }}
-      />
-    );
-  }
-  const awaited = await pageParams.params;
+    if (!pageParams) {
+        return (
+            <ErrorMessage
+                failure={{
+                    type: "__failure__",
+                    code: "__invalid_params__",
+                    message: "Missing page params",
+                }}
+            />
+        );
+    }
+    const awaited = await pageParams.params;
 
-  const { id } = paramsSchema.parse(awaited);
+    const { id } = paramsSchema.parse(awaited);
 
-  return <EmployeeDetail id={Number(id)} />;
+    return <EmployeeDetail id={Number(id)} />;
 }
 
 export default async function (params: PageParams) {
-  return await AuthenticatedPageWrapper(Page, params);
+    return await AuthenticatedPageWrapper(Page, params);
 }
 
 export const dynamic = "force-dynamic"; // opt-out of static rendering

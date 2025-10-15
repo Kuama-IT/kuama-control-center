@@ -11,97 +11,101 @@ import { ParseAndCreateMissingPubblicaWebPayslipsButton } from "@/modules/pubbli
 import SyncTimesheets from "@/modules/timesheets/components/sync-timesheets";
 
 async function Page() {
-  const heading = (
-    <div className="flex items-center justify-between">
-      <h1 className={brutalTheme.typography.heading}>Employees · Imports</h1>
-      <Link href="/employees" className={brutalTheme.typography.caption}>
-        Back to Employees
-      </Link>
-    </div>
-  );
-
-  return (
-    <BrutalContainer size="lg">
-      <div className="py-10 space-y-6">
-        {heading}
-
-        <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2">
-          <BrutalCard className="space-y-3">
-            <h2 className={brutalTheme.typography.subheading}>
-              Import from Dipendenti in Cloud
-            </h2>
-            <p className="text-sm text-muted-foreground">
-              Fetch active employees from Dipendenti in Cloud and upsert them in
-              the local database.
-            </p>
-            <ImportEmployeesButton />
-          </BrutalCard>
-
-          <BrutalCard className="space-y-3">
-            <h2 className={brutalTheme.typography.subheading}>
-              Pubblica Web Monthly balances
-            </h2>
-            <p className="text-sm text-muted-foreground">
-              Fetch all available monthly balance (from 2021 to current) from
-              Pubblica Web and store them.
-            </p>
-            <StoreAllPubblicaWebMonthlyBalancesButton />
-            <p className="text-sm text-muted-foreground">
-              Parse all available monthly balance from Pubblica Web.
-            </p>
-            <ParseAllPubblicaWebMonthlyBalancesButton />
-          </BrutalCard>
-
-          <BrutalCard className="space-y-3">
-            <h2 className={brutalTheme.typography.subheading}>
-              Pubblica Web Payslips Source files
-            </h2>
-            <p className="text-sm text-muted-foreground">
-              Fetch all available payslips source files (cedolone/LUL from 2021
-              to current) from Pubblica Web and store them.
-            </p>
-            <StoreAllPubblicaWebPayslipSourceFilesButton />
-            <p className="text-sm text-muted-foreground">
-              Parse all not imported payslips source files and generate related
-              Pubblica Web payslip records.
-            </p>
-            <ParseAndCreateMissingPubblicaWebPayslipsButton />
-          </BrutalCard>
-
-          <BrutalCard className="space-y-3">
-            <h2 className={brutalTheme.typography.subheading}>
-              Sync all payrolls
-            </h2>
-            <p className="text-sm text-muted-foreground">
-              Sync all present payslips in pubblica web table with the official
-              payslips table across all years (from 2021 to current). This may
-              take a while.
-            </p>
-            <ImportPubblicaWebPayslipsButton />
-          </BrutalCard>
-
-          <BrutalCard className="space-y-3">
-            <h2 className={brutalTheme.typography.subheading}>
-              Re-Sync all payrolls
-            </h2>
-            <p className="text-sm text-muted-foreground">
-              Parse again all employees payslips. Handy if you changed the
-              payslips tables. It may take a while.
-            </p>
-            <ReparsePubblicaWebPayslipsButton />
-          </BrutalCard>
-
-          <BrutalCard className="col-span-2">
-            <SyncTimesheets />
-          </BrutalCard>
+    const heading = (
+        <div className="flex items-center justify-between">
+            <h1 className={brutalTheme.typography.heading}>
+                Employees · Imports
+            </h1>
+            <Link href="/employees" className={brutalTheme.typography.caption}>
+                Back to Employees
+            </Link>
         </div>
-      </div>
-    </BrutalContainer>
-  );
+    );
+
+    return (
+        <BrutalContainer size="lg">
+            <div className="py-10 space-y-6">
+                {heading}
+
+                <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2">
+                    <BrutalCard className="space-y-3">
+                        <h2 className={brutalTheme.typography.subheading}>
+                            Import from Dipendenti in Cloud
+                        </h2>
+                        <p className="text-sm text-muted-foreground">
+                            Fetch active employees from Dipendenti in Cloud and
+                            upsert them in the local database.
+                        </p>
+                        <ImportEmployeesButton />
+                    </BrutalCard>
+
+                    <BrutalCard className="space-y-3">
+                        <h2 className={brutalTheme.typography.subheading}>
+                            Pubblica Web Monthly balances
+                        </h2>
+                        <p className="text-sm text-muted-foreground">
+                            Fetch all available monthly balance (from 2021 to
+                            current) from Pubblica Web and store them.
+                        </p>
+                        <StoreAllPubblicaWebMonthlyBalancesButton />
+                        <p className="text-sm text-muted-foreground">
+                            Parse all available monthly balance from Pubblica
+                            Web.
+                        </p>
+                        <ParseAllPubblicaWebMonthlyBalancesButton />
+                    </BrutalCard>
+
+                    <BrutalCard className="space-y-3">
+                        <h2 className={brutalTheme.typography.subheading}>
+                            Pubblica Web Payslips Source files
+                        </h2>
+                        <p className="text-sm text-muted-foreground">
+                            Fetch all available payslips source files
+                            (cedolone/LUL from 2021 to current) from Pubblica
+                            Web and store them.
+                        </p>
+                        <StoreAllPubblicaWebPayslipSourceFilesButton />
+                        <p className="text-sm text-muted-foreground">
+                            Parse all not imported payslips source files and
+                            generate related Pubblica Web payslip records.
+                        </p>
+                        <ParseAndCreateMissingPubblicaWebPayslipsButton />
+                    </BrutalCard>
+
+                    <BrutalCard className="space-y-3">
+                        <h2 className={brutalTheme.typography.subheading}>
+                            Sync all payrolls
+                        </h2>
+                        <p className="text-sm text-muted-foreground">
+                            Sync all present payslips in pubblica web table with
+                            the official payslips table across all years (from
+                            2021 to current). This may take a while.
+                        </p>
+                        <ImportPubblicaWebPayslipsButton />
+                    </BrutalCard>
+
+                    <BrutalCard className="space-y-3">
+                        <h2 className={brutalTheme.typography.subheading}>
+                            Re-Sync all payrolls
+                        </h2>
+                        <p className="text-sm text-muted-foreground">
+                            Parse again all employees payslips. Handy if you
+                            changed the payslips tables. It may take a while.
+                        </p>
+                        <ReparsePubblicaWebPayslipsButton />
+                    </BrutalCard>
+
+                    <BrutalCard className="col-span-2">
+                        <SyncTimesheets />
+                    </BrutalCard>
+                </div>
+            </div>
+        </BrutalContainer>
+    );
 }
 
 export default async function () {
-  return await AuthenticatedPageWrapper(Page);
+    return await AuthenticatedPageWrapper(Page);
 }
 
 export const dynamic = "force-dynamic";

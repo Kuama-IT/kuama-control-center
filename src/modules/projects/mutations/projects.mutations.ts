@@ -1,9 +1,17 @@
 "use client";
 
 import { useMutation } from "@tanstack/react-query";
-import { projectAddImagesAction } from "../projects.actions";
+import {
+    projectAddImagesAction,
+    projectsUpsertFromYouTrackAction,
+} from "../projects.actions";
 
 export const useProjectAddImagesMutation = () =>
-  useMutation({
-    mutationFn: projectAddImagesAction,
-  });
+    useMutation({
+        mutationFn: projectAddImagesAction,
+    });
+
+export const useProjectUpsertFromYouTrackMutation = () =>
+    useMutation({
+        mutationFn: projectsUpsertFromYouTrackAction,
+    });

@@ -39,7 +39,8 @@ MEDIUM And we should add-in stats for each employee (tasks done over the month, 
 MEDIUM rationalize modules following code project guidelines and renaming re-organizing which feature should live in which folder
 MEDIUM introduce usequery/usemutation where is beneficial not to wait for the server to compute everything before delivering the page
 MEDIUM apply the brutal theme to all UI
-LOW Switch prettier with biome
+LOW: handle "missing employees" from payslips: do create and entry for them as "fired" or "dismissed". This is needed to handle both
+old project teams and balances/stats, that needs to be split by the correct number of employees for its given time period.
 
 ## DONE
 
@@ -54,3 +55,4 @@ payrolls, counting for december that we should have double payrolls.
 We should have a quick summary for employees
 Finally, for a correct cash flow history, we should parse the monthly extract from the bank, we should be able to
 categorize each row, both for incoming and for outgoing transactions.
+LOW Switch prettier with biome

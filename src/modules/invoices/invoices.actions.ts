@@ -8,11 +8,13 @@ const BATCH_SIZE = 100;
 type KInvoiceInsert = typeof invoices.$inferInsert;
 
 export const createInvoices = handleServerErrors(
-  async (fattureInCloudInvoices: IssuedDocument[]) => {
-    await invoicesService.createFromFattureInCloudDtos(fattureInCloudInvoices);
-    return {
-      success: true,
-      message: "Invoices created successfully",
-    };
-  }
+    async (fattureInCloudInvoices: IssuedDocument[]) => {
+        await invoicesService.createFromFattureInCloudDtos(
+            fattureInCloudInvoices,
+        );
+        return {
+            success: true,
+            message: "Invoices created successfully",
+        };
+    },
 );

@@ -7,34 +7,34 @@ import { routes } from "@/modules/ui/routes";
 import { IoMdSettings } from "react-icons/io";
 
 export const NavBar = async () => {
-  const session = await auth();
-  if (!session?.user) {
-    return null;
-  }
+    const session = await auth();
+    if (!session?.user) {
+        return null;
+    }
 
-  return (
-    <div className="hidden-print bg-foreground text-background flex gap-4 rounded-full fixed bottom-2 right-8 md:right-1/3 left-8 md:left-1/3 p-4 uppercase items-center justify-center">
-      <Link href={routes.dashboard()}>
-        <AiFillHome aria-label="Dashboard" />
-      </Link>
+    return (
+        <div className="hidden-print bg-foreground text-background flex gap-4 rounded-full fixed bottom-2 right-8 md:right-1/3 left-8 md:left-1/3 p-4 uppercase items-center justify-center">
+            <Link href={routes.dashboard()}>
+                <AiFillHome aria-label="Dashboard" />
+            </Link>
 
-      {session.user.isAdmin && (
-        <Link href={routes.clients()}>
-          <MdOutlineWork aria-label="Clients" />
-        </Link>
-      )}
+            {session.user.isAdmin && (
+                <Link href={routes.clients()}>
+                    <MdOutlineWork aria-label="Clients" />
+                </Link>
+            )}
 
-      {session.user.isAdmin && (
-        <Link href={routes.employees()}>
-          <FaUserGroup aria-label="EmployeeList" />
-        </Link>
-      )}
+            {session.user.isAdmin && (
+                <Link href={routes.employees()}>
+                    <FaUserGroup aria-label="EmployeeList" />
+                </Link>
+            )}
 
-      {session.user.isAdmin && (
-        <Link href={routes.settings()}>
-          <IoMdSettings aria-label="Settings" />
-        </Link>
-      )}
-    </div>
-  );
+            {session.user.isAdmin && (
+                <Link href={routes.settings()}>
+                    <IoMdSettings aria-label="Settings" />
+                </Link>
+            )}
+        </div>
+    );
 };

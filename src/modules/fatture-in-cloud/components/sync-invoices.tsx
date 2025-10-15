@@ -10,27 +10,27 @@ import { FaSync } from "react-icons/fa";
 import { notifyError, notifySuccess } from "@/modules/ui/components/notify";
 
 export const SyncInvoices = () => {
-  const router = useRouter();
-  const [isPending, startTransition] = useTransition();
+    const router = useRouter();
+    const [isPending, startTransition] = useTransition();
 
-  return (
-    <Button
-      disabled={isPending}
-      size="lg"
-      onClick={() =>
-        startTransition(async () => {
-          const res = await syncFattureInCloudInvoicesAction();
-          if (isFailure(res)) {
-            notifyError("Error while syncing invoices");
-            return;
-          }
-          notifySuccess("Invoices synced");
-          router.refresh();
-        })
-      }
-    >
-      <FaSync className={cn({ "animate-spin": isPending })} />
-      Sync invoices
-    </Button>
-  );
+    return (
+        <Button
+            disabled={isPending}
+            size="lg"
+            onClick={() =>
+                startTransition(async () => {
+                    const res = await syncFattureInCloudInvoicesAction();
+                    if (isFailure(res)) {
+                        notifyError("Error while syncing invoices");
+                        return;
+                    }
+                    notifySuccess("Invoices synced");
+                    router.refresh();
+                })
+            }
+        >
+            <FaSync className={cn({ "animate-spin": isPending })} />
+            Sync invoices
+        </Button>
+    );
 };

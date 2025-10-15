@@ -7,8 +7,8 @@ export const createAccessToken = handleServerErrors(accessTokensServer.create);
 export const deleteAccessToken = handleServerErrors(accessTokensServer.remove);
 export const listAccessTokens = handleServerErrors(accessTokensServer.list);
 export const getUnlimitedAccessToken = handleServerErrors(
-  accessTokensServer.getUnlimitedToken
+    accessTokensServer.getUnlimitedToken,
 );
 export const manageAccessTokenUsage = handleServerErrors(
-  accessTokensServer.manage
+    accessTokensServer.manage,
 );

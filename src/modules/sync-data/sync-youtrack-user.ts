@@ -13,81 +13,88 @@ import { ProjectRead } from "@/modules/projects/schemas/projects.read.schema";
  * @param projects
  */
 export const syncYouTrackUser = async (
-  user: ReducedUser & { employeeId: number },
-  projects: ProjectRead[]
+    user: ReducedUser & { employeeId: number },
+    projects: ProjectRead[],
 ) => {
-  const employeeId = user.employeeId;
+    const employeeId = user.employeeId;
 
-  // TODO we should probably sync just this month
+    // TODO we should probably sync just this month
 
-  console.log(`fetching work items for ${user.email}`);
-  console.time(`fetching work items for ${user.email}`);
+    console.log(`fetching work items for ${user.email}`);
+    console.time(`fetching work items for ${user.email}`);
 
-  const workItems = (await youtrackApiClient.getWorkItems(user.email!)) ?? [];
+    const workItems = (await youtrackApiClient.getWorkItems(user.email!)) ?? [];
 
-  for (const relatedEmail in user.relatedUserEmails) {
-    console.log(`fetching work items for ${relatedEmail}`);
-    const relatedWorkItems =
-      (await youtrackApiClient.getWorkItems(relatedEmail)) ?? [];
-    workItems.push(...relatedWorkItems);
-  }
-  if (workItems.length === 0) {
-    console.log(`no work items for ${user.email}`);
-    return;
-  }
-
-  console.timeEnd(`fetching work items for ${user.email}`);
-
-  // db.select({workItems: kTasks}) // select all
-
-  // upsert tasks
-
-  console.log(`syncing tasks for ${user.email}`);
-  console.time(`syncing tasks for ${user.email}`);
-  const tasks = await syncYouTrackIssuesFromWorkItems(
-    workItems,
-    projects,
-    employeeId
-  );
-  console.timeEnd(`syncing tasks for ${user.email}`);
-  // const tasks = await db
-  //   .select()
-  //   .from(kTasks)
-  //   .where(eq(kTasks.employeeId, employeeId));
-
-  console.log(`syncing work items -> ${user.email}`);
-  console.time(`syncing work items -> ${user.email}`);
-
-  await db.transaction(async (tx) => {
-    for (const workItem of workItems) {
-      const project = projects.find(
-        (it) => it.youTrackRingId === workItem.issue.project.ringId
-      );
-
-      if (!project) {
-        throw new Error(`Project not found for work item ${workItem.id}`);
-      }
-
-      const task = tasks.find((it) => it.youTrackId === workItem.issue.id);
-
-      if (!task) {
-        throw new Error(`Task not found for work item ${workItem.id}`);
-      }
-
-      const spentTimePayload: typeof spentTimes.$inferInsert = {
-        duration: `${workItem.duration.minutes} minutes`,
-        date: format(new Date(workItem.date), "yyyy-MM-dd"),
-        taskId: task?.id,
-        externalTrackerId: workItem.id,
-        platform: "youtrack",
-      };
-
-      await tx.insert(spentTimes).values(spentTimePayload).onConflictDoUpdate({
-        target: spentTimes.externalTrackerId,
-        set: spentTimePayload,
-      });
+    for (const relatedEmail in user.relatedUserEmails) {
+        console.log(`fetching work items for ${relatedEmail}`);
+        const relatedWorkItems =
+            (await youtrackApiClient.getWorkItems(relatedEmail)) ?? [];
+        workItems.push(...relatedWorkItems);
     }
-  });
-  console.timeEnd(`syncing work items -> ${user.email}`);
-  console.log(`synced work items -> ${user.email}`);
+    if (workItems.length === 0) {
+        console.log(`no work items for ${user.email}`);
+        return;
+    }
+
+    console.timeEnd(`fetching work items for ${user.email}`);
+
+    // db.select({workItems: kTasks}) // select all
+
+    // upsert tasks
+
+    console.log(`syncing tasks for ${user.email}`);
+    console.time(`syncing tasks for ${user.email}`);
+    const tasks = await syncYouTrackIssuesFromWorkItems(
+        workItems,
+        projects,
+        employeeId,
+    );
+    console.timeEnd(`syncing tasks for ${user.email}`);
+    // const tasks = await db
+    //   .select()
+    //   .from(kTasks)
+    //   .where(eq(kTasks.employeeId, employeeId));
+
+    console.log(`syncing work items -> ${user.email}`);
+    console.time(`syncing work items -> ${user.email}`);
+
+    await db.transaction(async (tx) => {
+        for (const workItem of workItems) {
+            const project = projects.find(
+                (it) => it.youTrackRingId === workItem.issue.project.ringId,
+            );
+
+            if (!project) {
+                throw new Error(
+                    `Project not found for work item ${workItem.id}`,
+                );
+            }
+
+            const task = tasks.find(
+                (it) => it.youTrackId === workItem.issue.id,
+            );
+
+            if (!task) {
+                throw new Error(`Task not found for work item ${workItem.id}`);
+            }
+
+            const spentTimePayload: typeof spentTimes.$inferInsert = {
+                duration: `${workItem.duration.minutes} minutes`,
+                date: format(new Date(workItem.date), "yyyy-MM-dd"),
+                taskId: task?.id,
+                externalTrackerId: workItem.id,
+                platform: "youtrack",
+            };
+
+            await tx
+                .insert(spentTimes)
+                .values(spentTimePayload)
+                .onConflictDoUpdate({
+                    target: spentTimes.externalTrackerId,
+                    set: spentTimePayload,
+                });
+        }
+    });
+    console.timeEnd(`syncing work items -> ${user.email}`);
+    console.log(`synced work items -> ${user.email}`);
 };

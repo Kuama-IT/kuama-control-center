@@ -1,34 +1,14 @@
-import type { VatRead } from "./schemas/clients-schemas";
-import type { EmployeeRead } from "@/modules/employees/schemas/employee-read";
-import { db } from "@/drizzle/drizzle-db";
-import {
-  clients,
-  clientsVats,
-  employees,
-  invoices,
-  organizations,
-  projects as projectsTable,
-  spentTimes,
-  teams,
-  vats,
-  tasks,
-} from "@/drizzle/schema";
-import { and, asc, eq, gte, lte, sum, ne, desc } from "drizzle-orm";
+import { asc, eq } from "drizzle-orm";
 import { inArray } from "drizzle-orm/sql/expressions/conditions";
-// Error handling is done in .actions; keep .server methods plain
-import { firstOrThrow } from "@/utils/array-utils";
-import { endOfMonth, format, startOfMonth } from "date-fns";
-import parsePostgresInterval from "postgres-interval";
-import { unstable_cache } from "next/cache";
-import { auth } from "@/modules/auth/auth";
+import { db } from "@/drizzle/drizzle-db";
+import { clients, clientsVats, organizations, vats } from "@/drizzle/schema";
+import { type ClientRead } from "@/modules/clients/schemas/client-read";
+import { type ClientReadExtended } from "@/modules/clients/schemas/client-read-extended";
+import { type OrganizationSuggestionRead } from "@/modules/clients/schemas/organization-suggestion-read";
 import { fattureInCloudApiClient } from "@/modules/fatture-in-cloud/fatture-in-cloud-api";
-import { clientsDb } from "./clients.db";
-import { distance as levenshteinDistance } from "fastest-levenshtein";
-import { ClientReadExtended } from "@/modules/clients/schemas/client-read-extended";
-import { ClientRead } from "@/modules/clients/schemas/client-read";
-import { OrganizationRead } from "@/modules/you-track/schemas/organization-read";
-import { OrganizationSuggestionRead } from "@/modules/clients/schemas/organization-suggestion-read";
+import { type OrganizationRead } from "@/modules/you-track/schemas/organization-read";
 import { similarityUtils } from "@/utils/similarityUtils";
+import { clientsDb } from "./clients.db";
 //
 // export type ProjectWithTeam = {
 //   id: number;
@@ -415,144 +395,150 @@ import { similarityUtils } from "@/utils/similarityUtils";
 // };
 
 export const clientsServer = {
-  async importFromFattureInCloud() {
-    const ficClients = await fattureInCloudApiClient.getClients();
-    let vatCount = 0;
-    await db.transaction(async (tx) => {
-      for (const c of ficClients) {
-        if (!c.name) continue;
+    async importFromFattureInCloud() {
+        const ficClients = await fattureInCloudApiClient.getClients();
+        let vatCount = 0;
+        await db.transaction(async (tx) => {
+            for (const c of ficClients) {
+                if (!c.name) continue;
 
-        // Ensure client exists
-        const clientRow = await clientsDb.upsertByName(c.name);
-        if (!clientRow?.id) continue;
+                // Ensure client exists
+                const clientRow = await clientsDb.upsertByName(c.name);
+                if (!clientRow?.id) continue;
 
-        // Upsert VAT when available and link to client
-        if (c.vat_number) {
-          vatCount++;
-          const vatRecords = await tx
-            .insert(vats)
-            .values({
-              vat: c.vat_number,
-              companyName: c.name,
-              fattureInCloudId: c.id?.toString(),
-            })
-            .onConflictDoUpdate({
-              target: vats.vat,
-              set: { companyName: c.name, fattureInCloudId: c.id?.toString() },
-            })
-            .returning({ vatId: vats.id });
-          const vatId = vatRecords[0]?.vatId;
-          if (vatId) {
-            await tx
-              .insert(clientsVats)
-              .values({ clientId: clientRow.id, vatId })
-              .onConflictDoNothing({
-                target: [clientsVats.vatId, clientsVats.clientId],
-              });
-          }
+                // Upsert VAT when available and link to client
+                if (c.vat_number) {
+                    vatCount++;
+                    const vatRecords = await tx
+                        .insert(vats)
+                        .values({
+                            vat: c.vat_number,
+                            companyName: c.name,
+                            fattureInCloudId: c.id?.toString(),
+                        })
+                        .onConflictDoUpdate({
+                            target: vats.vat,
+                            set: {
+                                companyName: c.name,
+                                fattureInCloudId: c.id?.toString(),
+                            },
+                        })
+                        .returning({ vatId: vats.id });
+                    const vatId = vatRecords[0]?.vatId;
+                    if (vatId) {
+                        await tx
+                            .insert(clientsVats)
+                            .values({ clientId: clientRow.id, vatId })
+                            .onConflictDoNothing({
+                                target: [
+                                    clientsVats.vatId,
+                                    clientsVats.clientId,
+                                ],
+                            });
+                    }
+                }
+            }
+        });
+
+        return {
+            message: `Imported ${ficClients.length} clients from Fatture in Cloud, with ${vatCount} VATs`,
+        };
+    },
+
+    async findOrganizationSuggestionById(
+        id: number,
+    ): Promise<OrganizationSuggestionRead[]> {
+        const client = await clientsDb.getById(id);
+
+        const orgs = await db.select().from(organizations);
+
+        const suggestions: OrganizationSuggestionRead[] = [];
+
+        for (const org of orgs) {
+            if (client.organizationId && org.id) {
+                continue;
+            }
+            const score = similarityUtils.similarity(client.name, org.name);
+            if (score > 0.2) {
+                suggestions.push({ ...org, score });
+            }
         }
-      }
-    });
 
-    return {
-      message: `Imported ${ficClients.length} clients from Fatture in Cloud, with ${vatCount} VATs`,
-    };
-  },
+        return suggestions.sort((a, b) => b.score - a.score);
+    },
 
-  async findOrganizationSuggestionById(
-    id: number,
-  ): Promise<OrganizationSuggestionRead[]> {
-    const client = await clientsDb.getById(id);
+    async allOrganizations(): Promise<OrganizationRead[]> {
+        return db.select().from(organizations).orderBy(asc(organizations.name));
+    },
 
-    const orgs = await db.select().from(organizations);
+    async allUnlinkedExtended(): Promise<ClientReadExtended[]> {
+        const dtos = await clientsDb.allWhereOrganizationIdIsNull();
+        return await _extend(dtos);
+    },
 
-    const suggestions: OrganizationSuggestionRead[] = [];
+    async linkOrganization({
+        organizationId,
+        clientId,
+    }: {
+        organizationId: number;
+        clientId: number;
+    }) {
+        const rows = await db
+            .update(clients)
+            .set({ organizationId })
+            .where(eq(clients.id, clientId))
+            .returning();
+        return rows[0] ?? null;
+    },
 
-    for (const org of orgs) {
-      if (client.organizationId && org.id) {
-        continue;
-      }
-      const score = similarityUtils.similarity(client.name, org.name);
-      if (score > 0.2) {
-        suggestions.push({ ...org, score });
-      }
-    }
-
-    return suggestions.sort((a, b) => b.score - a.score);
-  },
-
-  async allOrganizations(): Promise<OrganizationRead[]> {
-    return db.select().from(organizations).orderBy(asc(organizations.name));
-  },
-
-  async allUnlinkedExtended(): Promise<ClientReadExtended[]> {
-    const dtos = await clientsDb.allWhereOrganizationIdIsNull();
-    return await _extend(dtos);
-  },
-
-  async linkOrganization({
-    organizationId,
-    clientId,
-  }: {
-    organizationId: number;
-    clientId: number;
-  }) {
-    const rows = await db
-      .update(clients)
-      .set({ organizationId })
-      .where(eq(clients.id, clientId))
-      .returning();
-    return rows[0] ?? null;
-  },
-
-  async unlinkOrganization({ id }: { id: number }) {
-    const rows = await db
-      .update(clients)
-      .set({ organizationId: null })
-      .where(eq(clients.id, id))
-      .returning();
-    return rows[0] ?? null;
-  },
+    async unlinkOrganization({ id }: { id: number }) {
+        const rows = await db
+            .update(clients)
+            .set({ organizationId: null })
+            .where(eq(clients.id, id))
+            .returning();
+        return rows[0] ?? null;
+    },
 };
 
 async function _extend(dtos: ClientRead[]): Promise<ClientReadExtended[]> {
-  const result: ClientReadExtended[] = [];
-  for (const dto of dtos) {
-    const dtoVats = await db
-      .select({ vatId: clientsVats.vatId })
-      .from(clientsVats)
-      .where(eq(clientsVats.clientId, dto.id));
+    const result: ClientReadExtended[] = [];
+    for (const dto of dtos) {
+        const dtoVats = await db
+            .select({ vatId: clientsVats.vatId })
+            .from(clientsVats)
+            .where(eq(clientsVats.clientId, dto.id));
 
-    const vatList = await db
-      .select()
-      .from(vats)
-      .where(
-        inArray(
-          vats.id,
-          dtoVats.map((it) => it.vatId),
-        ),
-      );
+        const vatList = await db
+            .select()
+            .from(vats)
+            .where(
+                inArray(
+                    vats.id,
+                    dtoVats.map((it) => it.vatId),
+                ),
+            );
 
-    const dtoOrganizations = dto.organizationId
-      ? await db
-          .select()
-          .from(organizations)
-          .where(eq(organizations.id, dto.organizationId))
-      : [];
+        const dtoOrganizations = dto.organizationId
+            ? await db
+                  .select()
+                  .from(organizations)
+                  .where(eq(organizations.id, dto.organizationId))
+            : [];
 
-    if (dtoOrganizations.length > 1) {
-      // client should have 1 organization top
-      throw new Error(
-        `${dto.name} is linked to multiple organizations: ${dtoOrganizations.map((it) => it.name).join(", ")}`,
-      );
+        if (dtoOrganizations.length > 1) {
+            // client should have 1 organization top
+            throw new Error(
+                `${dto.name} is linked to multiple organizations: ${dtoOrganizations.map((it) => it.name).join(", ")}`,
+            );
+        }
+
+        result.push({
+            ...dto,
+            vats: vatList,
+            organization: dtoOrganizations[0],
+        });
     }
 
-    result.push({
-      ...dto,
-      vats: vatList,
-      organization: dtoOrganizations[0],
-    });
-  }
-
-  return result;
+    return result;
 }

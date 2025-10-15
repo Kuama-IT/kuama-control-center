@@ -7,20 +7,20 @@ import { useImportEmployeesMutation } from "../mutations/employees.mutations";
 import { BrutalButton } from "@/modules/ui";
 
 export function ImportEmployeesButton() {
-  const { mutateAsync, isPending } = useImportEmployeesMutation();
+    const { mutateAsync, isPending } = useImportEmployeesMutation();
 
-  const onClick = async () => {
-    const res = await mutateAsync();
-    if (isFailure(res)) {
-      notifyError(res.message ?? "Failed to import employees");
-      return;
-    }
-    notifySuccess("EmployeeList imported successfully");
-  };
+    const onClick = async () => {
+        const res = await mutateAsync();
+        if (isFailure(res)) {
+            notifyError(res.message ?? "Failed to import employees");
+            return;
+        }
+        notifySuccess("EmployeeList imported successfully");
+    };
 
-  return (
-    <BrutalButton onClick={onClick} disabled={isPending}>
-      {isPending ? "Syncing..." : "Sync employees (DIC + YT)"}
-    </BrutalButton>
-  );
+    return (
+        <BrutalButton onClick={onClick} disabled={isPending}>
+            {isPending ? "Syncing..." : "Sync employees (DIC + YT)"}
+        </BrutalButton>
+    );
 }

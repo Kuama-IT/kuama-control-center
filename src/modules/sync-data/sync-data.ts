@@ -10,27 +10,27 @@ import { syncYouTrackOrganizations } from "@/modules/sync-data/sync-youtrack-org
 import { syncYoutrackUsers } from "@/modules/sync-data/sync-youtrack-users";
 
 export const syncData = async () => {
-  const organizations = await youtrackApiClient.getOrganizations();
+    const organizations = await youtrackApiClient.getOrganizations();
 
-  const projectsOrganizationMap =
-    await syncYouTrackOrganizations(organizations);
+    const projectsOrganizationMap =
+        await syncYouTrackOrganizations(organizations);
 
-  const projects = await syncYouTrackProjects(projectsOrganizationMap);
+    const projects = await syncYouTrackProjects(projectsOrganizationMap);
 
-  const users = await syncYoutrackUsers();
+    const users = await syncYoutrackUsers();
 
-  for (const user of users) {
-    if (!user.email) {
-      console.log("skipping user", user);
-      continue;
+    for (const user of users) {
+        if (!user.email) {
+            console.log("skipping user", user);
+            continue;
+        }
+
+        await syncYouTrackUser(user, projects);
     }
 
-    await syncYouTrackUser(user, projects);
-  }
+    // we have time spent, we have tasks, we have projects, we have organizations, we have employees
 
-  // we have time spent, we have tasks, we have projects, we have organizations, we have employees
-
-  // TODO - sync employees information
-  // TODO - sync clients information
-  // TODO - sync code stats
+    // TODO - sync employees information
+    // TODO - sync clients information
+    // TODO - sync code stats
 };

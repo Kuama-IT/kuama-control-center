@@ -4,7 +4,7 @@ import { and, eq, gte, lte } from "drizzle-orm";
 import { format } from "date-fns";
 
 export const timesheetsAbsenceDb = {
-  selectAbsenceReasons() {
-    return db.select().from(absenceReasons);
-  },
+    selectAbsenceReasons() {
+        return db.select().from(absenceReasons);
+    },
 };

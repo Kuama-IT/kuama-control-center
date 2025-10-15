@@ -1,238 +1,247 @@
 import { serverEnv } from "@/env/server-env";
 import {
-  OrganizationListResponse,
-  organizationListResponseSchema,
-  projectListResponseSchema,
-  projectTeamUserListResponseSchema,
-  projectWithTeamUsersListResponseSchema,
-  ProjectWithUsersListResponse,
-  rawReducedUserListResponseSchema,
-  ReducedUser,
-  reducedUserListResponseSchema,
-  sourcedProjectRolesListResponseSchema,
-  WorkTimeListResponse,
-  workTimeListResponseSchema,
+    OrganizationListResponse,
+    organizationListResponseSchema,
+    projectListResponseSchema,
+    projectTeamUserListResponseSchema,
+    projectWithTeamUsersListResponseSchema,
+    ProjectWithUsersListResponse,
+    rawReducedUserListResponseSchema,
+    ReducedUser,
+    reducedUserListResponseSchema,
+    sourcedProjectRolesListResponseSchema,
+    WorkTimeListResponse,
+    workTimeListResponseSchema,
 } from "@/modules/you-track/schemas/youtrack-schemas";
 
 class YoutrackApiClient {
-  private static readonly workItemFields: string =
-    "id,date,duration(presentation,minutes),type(name),issue(project(ringId),id,idReadable,summary,created)";
+    private static readonly workItemFields: string =
+        "id,date,duration(presentation,minutes),type(name),issue(project(ringId),id,idReadable,summary,created)";
 
-  private static readonly projectFields: string =
-    "$type,archived,ringId,id,leader($type,id,login,ringId),name,shortName,iconUrl,team(id,ringId)";
+    private static readonly projectFields: string =
+        "$type,archived,ringId,id,leader($type,id,login,ringId),name,shortName,iconUrl,team(id,ringId)";
 
-  private static readonly organizationFields: string = `id,ringId,name,description,iconUrl,projects(${YoutrackApiClient.projectFields}),projectsCount`;
+    private static readonly organizationFields: string =
+        `id,ringId,name,description,iconUrl,projects(${YoutrackApiClient.projectFields}),projectsCount`;
 
-  private static readonly sourcedProjectRolesFields: string = `id,role(id,name,key),project(id,name,global)&top=-1`;
+    private static readonly sourcedProjectRolesFields: string =
+        `id,role(id,name,key),project(id,name,global)&top=-1`;
 
-  private static readonly userFields: string =
-    "id,login,email,fullName,ringId,avatarUrl,banned";
+    private static readonly userFields: string =
+        "id,login,email,fullName,ringId,avatarUrl,banned";
 
-  private static readonly loginsToIgnore = [
-    "giomorris",
-    "guest",
-    "andrea.svegliado",
-  ];
+    private static readonly loginsToIgnore = [
+        "giomorris",
+        "guest",
+        "andrea.svegliado",
+    ];
 
-  private static readonly adminLogins = ["Dan", "marco.marti"];
+    private static readonly adminLogins = ["Dan", "marco.marti"];
 
-  private static readonly loginsToAssociate: { [key in string]: string[] } = {
-    "daniele@kuama.net": [
-      "Daniele.De.Matteo",
-      "d.dematteo@portit.io",
-      "daniele.dematteo",
-    ],
-    "simone@kuama.net": ["s.bressan@portit.io"],
-    "andrea.p@kuama.net": ["a.pasquetto@portit.io"],
-    "marco@kuama.it": ["Marco.Martini"],
-    "francesco@kuama.net": ["Francesco.Fortin"],
-    "elhan@kuama.net": ["Elhan.Emrovski"],
-    "matteo@kuama.net": ["Matteo.Valerio"],
-    "mario@kuama.net": ["mario.kuama"],
-  };
+    private static readonly loginsToAssociate: { [key in string]: string[] } = {
+        "daniele@kuama.net": [
+            "Daniele.De.Matteo",
+            "d.dematteo@portit.io",
+            "daniele.dematteo",
+        ],
+        "simone@kuama.net": ["s.bressan@portit.io"],
+        "andrea.p@kuama.net": ["a.pasquetto@portit.io"],
+        "marco@kuama.it": ["Marco.Martini"],
+        "francesco@kuama.net": ["Francesco.Fortin"],
+        "elhan@kuama.net": ["Elhan.Emrovski"],
+        "matteo@kuama.net": ["Matteo.Valerio"],
+        "mario@kuama.net": ["mario.kuama"],
+    };
 
-  constructor(
-    public readonly endpoint: string,
-    public readonly token: string,
-  ) {}
+    constructor(
+        public readonly endpoint: string,
+        public readonly token: string,
+    ) {}
 
-  private get baseEndpoint() {
-    return `${this.endpoint}youtrack`;
-  }
-
-  private get hubEndpoint() {
-    return `${this.endpoint}hub`;
-  }
-
-  async getWorkItems(
-    email: string,
-    startDate: string | undefined = undefined, // YYYY-MM-DD
-    endDate: string | undefined = undefined, // YYYY-MM-DD
-  ): Promise<undefined | WorkTimeListResponse> {
-    const users = await this.getUsers();
-
-    const user = users.find((it) => it.email === email);
-
-    if (!user) {
-      return;
-    }
-    const params = ["$top=-1"];
-    if (startDate) {
-      params.push(`startDate=${startDate}`);
+    private get baseEndpoint() {
+        return `${this.endpoint}youtrack`;
     }
 
-    if (endDate) {
-      params.push(`endDate=${endDate}`);
+    private get hubEndpoint() {
+        return `${this.endpoint}hub`;
     }
 
-    params.push(`author=${user.login}`);
-    params.push(`fields=${YoutrackApiClient.workItemFields}`);
+    async getWorkItems(
+        email: string,
+        startDate: string | undefined = undefined, // YYYY-MM-DD
+        endDate: string | undefined = undefined, // YYYY-MM-DD
+    ): Promise<undefined | WorkTimeListResponse> {
+        const users = await this.getUsers();
 
-    // sadly, the client does not support asking for issue's work field
-    const workItemsJson = await this.fetchWithAuth(
-      `${this.baseEndpoint}/api/workItems?${params.join("&")}`,
-    );
-    return workTimeListResponseSchema.parse(workItemsJson);
-  }
+        const user = users.find((it) => it.email === email);
 
-  async getUsers(): Promise<ReducedUser[]> {
-    const usersJson = await this.fetchWithAuth(
-      `${this.baseEndpoint}/api/users?fields=${YoutrackApiClient.userFields}&$top=-1`,
-    );
-    const allUsers = rawReducedUserListResponseSchema.parse(usersJson);
+        if (!user) {
+            return;
+        }
+        const params = ["$top=-1"];
+        if (startDate) {
+            params.push(`startDate=${startDate}`);
+        }
 
-    const loginsToAssociate = Object.values(
-      YoutrackApiClient.loginsToAssociate,
-    ).flat();
-    const activeUsers = allUsers.filter(
-      ({ banned, login, email }) =>
-        !banned &&
-        !YoutrackApiClient.loginsToIgnore.includes(login) &&
-        !loginsToAssociate.includes(login) &&
-        !loginsToAssociate.includes(email ?? ""),
-    );
-    const inactiveUsers = allUsers.filter(
-      ({ banned, login, email }) =>
-        banned ||
-        YoutrackApiClient.loginsToIgnore.includes(login) ||
-        loginsToAssociate.includes(login) ||
-        loginsToAssociate.includes(email ?? "") ||
-        email === undefined,
-    );
+        if (endDate) {
+            params.push(`endDate=${endDate}`);
+        }
 
-    const activeUsersWithRelatedUsers = activeUsers.map((user) => {
-      let relatedUserEmails: string[] = [];
-      if (user.email && YoutrackApiClient.loginsToAssociate[user.email]) {
-        const relatedLogins = YoutrackApiClient.loginsToAssociate[user.email];
-        relatedUserEmails = inactiveUsers
-          .filter(
-            (it) =>
-              relatedLogins.includes(it.login) ||
-              relatedLogins.includes(it.email ?? ""),
-          )
-          .filter((it) => it.email)
-          .map(({ email }) => email!);
-      }
+        params.push(`author=${user.login}`);
+        params.push(`fields=${YoutrackApiClient.workItemFields}`);
 
-      return {
-        ...user,
-        relatedUserEmails,
-      };
-    });
+        // sadly, the client does not support asking for issue's work field
+        const workItemsJson = await this.fetchWithAuth(
+            `${this.baseEndpoint}/api/workItems?${params.join("&")}`,
+        );
+        return workTimeListResponseSchema.parse(workItemsJson);
+    }
 
-    return reducedUserListResponseSchema.parse(activeUsersWithRelatedUsers);
-  }
+    async getUsers(): Promise<ReducedUser[]> {
+        const usersJson = await this.fetchWithAuth(
+            `${this.baseEndpoint}/api/users?fields=${YoutrackApiClient.userFields}&$top=-1`,
+        );
+        const allUsers = rawReducedUserListResponseSchema.parse(usersJson);
 
-  async getProjects(): Promise<ProjectWithUsersListResponse> {
-    // again, the client will not return us all the data we need
-    const projectsJson = await this.fetchWithAuth(
-      `${this.baseEndpoint}/api/admin/projects?fields=${YoutrackApiClient.projectFields}&$top=-1`,
-    );
-
-    const projects = projectListResponseSchema.parse(projectsJson);
-
-    const projectsWithUsersRaw = await Promise.all(
-      projects.map(async (p) => {
-        const teamJson = await this.fetchWithAuth(
-          `${this.hubEndpoint}/api/rest/projectteams/${p.team.ringId}/users`,
+        const loginsToAssociate = Object.values(
+            YoutrackApiClient.loginsToAssociate,
+        ).flat();
+        const activeUsers = allUsers.filter(
+            ({ banned, login, email }) =>
+                !banned &&
+                !YoutrackApiClient.loginsToIgnore.includes(login) &&
+                !loginsToAssociate.includes(login) &&
+                !loginsToAssociate.includes(email ?? ""),
+        );
+        const inactiveUsers = allUsers.filter(
+            ({ banned, login, email }) =>
+                banned ||
+                YoutrackApiClient.loginsToIgnore.includes(login) ||
+                loginsToAssociate.includes(login) ||
+                loginsToAssociate.includes(email ?? "") ||
+                email === undefined,
         );
 
-        const { users: projectTeam } =
-          projectTeamUserListResponseSchema.parse(teamJson);
+        const activeUsersWithRelatedUsers = activeUsers.map((user) => {
+            let relatedUserEmails: string[] = [];
+            if (user.email && YoutrackApiClient.loginsToAssociate[user.email]) {
+                const relatedLogins =
+                    YoutrackApiClient.loginsToAssociate[user.email];
+                relatedUserEmails = inactiveUsers
+                    .filter(
+                        (it) =>
+                            relatedLogins.includes(it.login) ||
+                            relatedLogins.includes(it.email ?? ""),
+                    )
+                    .filter((it) => it.email)
+                    .map(({ email }) => email!);
+            }
 
-        return {
-          ...p,
-          team: {
-            ...p.team,
-            users: projectTeam.filter(
-              (it) => !YoutrackApiClient.adminLogins.includes(it.login),
-            ),
-          },
-        };
-      }),
-    );
+            return {
+                ...user,
+                relatedUserEmails,
+            };
+        });
 
-    const projectsWithUsers =
-      projectWithTeamUsersListResponseSchema.parse(projectsWithUsersRaw);
-
-    return projectsWithUsers.filter((it) => !it.archived);
-  }
-
-  async getOrganizations(): Promise<OrganizationListResponse> {
-    const organizationJson = await this.fetchWithAuth(
-      `${this.baseEndpoint}/api/admin/organizations?fields=${YoutrackApiClient.organizationFields}&$top=-1`,
-    );
-
-    return organizationListResponseSchema.parse(organizationJson);
-  }
-
-  async checkIsAdmin(email: string | null | undefined): Promise<boolean> {
-    if (!email) {
-      return false;
-    }
-    const users = await this.getUsers();
-    const user = users.find((u) => u.email === email);
-    if (!user || !user.ringId) {
-      return false;
+        return reducedUserListResponseSchema.parse(activeUsersWithRelatedUsers);
     }
 
-    const url = `${this.hubEndpoint}/api/rest/users/${user.ringId}/sourcedprojectroles?fields=${YoutrackApiClient.sourcedProjectRolesFields}`;
+    async getProjects(): Promise<ProjectWithUsersListResponse> {
+        // again, the client will not return us all the data we need
+        const projectsJson = await this.fetchWithAuth(
+            `${this.baseEndpoint}/api/admin/projects?fields=${YoutrackApiClient.projectFields}&$top=-1`,
+        );
 
-    const sourcedProjectRolesJson = await this.fetchWithAuth(url);
+        const projects = projectListResponseSchema.parse(projectsJson);
 
-    const { sourcedprojectroles: sourcedProjectRoles } =
-      sourcedProjectRolesListResponseSchema.parse(sourcedProjectRolesJson);
+        const projectsWithUsersRaw = await Promise.all(
+            projects.map(async (p) => {
+                const teamJson = await this.fetchWithAuth(
+                    `${this.hubEndpoint}/api/rest/projectteams/${p.team.ringId}/users`,
+                );
 
-    const globalSourcedProjectRoles = sourcedProjectRoles.filter(
-      (it) => it.project.global,
-    );
+                const { users: projectTeam } =
+                    projectTeamUserListResponseSchema.parse(teamJson);
 
-    return (
-      globalSourcedProjectRoles.find((it) => it.role.key === "system-admin") !==
-      undefined
-    );
-  }
+                return {
+                    ...p,
+                    team: {
+                        ...p.team,
+                        users: projectTeam.filter(
+                            (it) =>
+                                !YoutrackApiClient.adminLogins.includes(
+                                    it.login,
+                                ),
+                        ),
+                    },
+                };
+            }),
+        );
 
-  private async fetchWithAuth(endpoint: string): Promise<unknown> {
-    const request = await fetch(endpoint, {
-      headers: {
-        Authorization: `Bearer ${this.token}`,
-      },
-    });
-    if (!request.ok) {
-      console.log(await request.text());
-      throw new Error(`Failed to fetch ${endpoint}`);
+        const projectsWithUsers =
+            projectWithTeamUsersListResponseSchema.parse(projectsWithUsersRaw);
+
+        return projectsWithUsers.filter((it) => !it.archived);
     }
 
-    try {
-      return await request.json();
-    } catch (e) {
-      throw new Error(`Failed to parse ${endpoint} response`);
+    async getOrganizations(): Promise<OrganizationListResponse> {
+        const organizationJson = await this.fetchWithAuth(
+            `${this.baseEndpoint}/api/admin/organizations?fields=${YoutrackApiClient.organizationFields}&$top=-1`,
+        );
+
+        return organizationListResponseSchema.parse(organizationJson);
     }
-  }
+
+    async checkIsAdmin(email: string | null | undefined): Promise<boolean> {
+        if (!email) {
+            return false;
+        }
+        const users = await this.getUsers();
+        const user = users.find((u) => u.email === email);
+        if (!user || !user.ringId) {
+            return false;
+        }
+
+        const url = `${this.hubEndpoint}/api/rest/users/${user.ringId}/sourcedprojectroles?fields=${YoutrackApiClient.sourcedProjectRolesFields}`;
+
+        const sourcedProjectRolesJson = await this.fetchWithAuth(url);
+
+        const { sourcedprojectroles: sourcedProjectRoles } =
+            sourcedProjectRolesListResponseSchema.parse(
+                sourcedProjectRolesJson,
+            );
+
+        const globalSourcedProjectRoles = sourcedProjectRoles.filter(
+            (it) => it.project.global,
+        );
+
+        return (
+            globalSourcedProjectRoles.find(
+                (it) => it.role.key === "system-admin",
+            ) !== undefined
+        );
+    }
+
+    private async fetchWithAuth(endpoint: string): Promise<unknown> {
+        const request = await fetch(endpoint, {
+            headers: {
+                Authorization: `Bearer ${this.token}`,
+            },
+        });
+        if (!request.ok) {
+            console.log(await request.text());
+            throw new Error(`Failed to fetch ${endpoint}`);
+        }
+
+        try {
+            return await request.json();
+        } catch (e) {
+            throw new Error(`Failed to parse ${endpoint} response`);
+        }
+    }
 }
 
 export const youtrackApiClient = new YoutrackApiClient(
-  serverEnv.youtrackApiEndpoint,
-  serverEnv.youtrackPersistentToken,
+    serverEnv.youtrackApiEndpoint,
+    serverEnv.youtrackPersistentToken,
 );

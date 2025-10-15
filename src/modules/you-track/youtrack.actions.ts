@@ -3,7 +3,7 @@
 import { serverActionUtils } from "@/utils/server-actions.utils";
 import { youTrackServer } from "./youtrack.server";
 
-export const importYouTrackOrganizationsAction =
-  serverActionUtils.createSafeAction(youTrackServer.importAllOrganizations, [
-    "/clients/settings/mappings",
-  ]);
+export const importYouTrackProjectsAction = serverActionUtils.createSafeAction(
+    youTrackServer.importAllProjects,
+    ["/clients/settings/mappings"],
+);

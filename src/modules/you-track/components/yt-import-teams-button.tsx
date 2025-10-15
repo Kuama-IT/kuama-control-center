@@ -9,26 +9,26 @@ import { isFailure } from "@/utils/server-action-utils";
 import { notifyError, notifySuccess } from "@/modules/ui/components/notify";
 
 export const YtImportTeamsButton = () => {
-  const [isPending, startTransition] = useTransition();
+    const [isPending, startTransition] = useTransition();
 
-  const onSyncClick = () => {
-    startTransition(async () => {
-      const result = await ytImportTeams();
+    const onSyncClick = () => {
+        startTransition(async () => {
+            const result = await ytImportTeams();
 
-      if (isFailure(result)) {
-        notifyError("Error while importing teams");
+            if (isFailure(result)) {
+                notifyError("Error while importing teams");
 
-        return;
-      }
+                return;
+            }
 
-      notifySuccess(result.message);
-    });
-  };
+            notifySuccess(result.message);
+        });
+    };
 
-  return (
-    <Button disabled={isPending} onClick={onSyncClick}>
-      <FaSync className={cn({ "animate-spin": isPending })} />
-      Import teams
-    </Button>
-  );
+    return (
+        <Button disabled={isPending} onClick={onSyncClick}>
+            <FaSync className={cn({ "animate-spin": isPending })} />
+            Import teams
+        </Button>
+    );
 };

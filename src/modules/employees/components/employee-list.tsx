@@ -8,40 +8,40 @@ import Link from "next/link";
 import { ReceiptEuro, SettingsIcon } from "lucide-react";
 
 export default async function EmployeeList() {
-  const employees = await employeesServer.allExtended();
+    const employees = await employeesServer.allExtended();
 
-  return (
-    <>
-      <div className="flex items-center justify-between">
-        <Title>Employees ({employees.length})</Title>
+    return (
+        <>
+            <div className="flex items-center justify-between">
+                <Title>Employees ({employees.length})</Title>
 
-        <div className="flex items-center gap-4">
-          <Link
-            href="/employees/payslips"
-            className={brutalTheme.typography.caption}
-          >
-            <ReceiptEuro />
-          </Link>
-          <Link
-            href="/employees/settings/imports"
-            className={brutalTheme.typography.caption}
-          >
-            <SettingsIcon />
-          </Link>
-        </div>
-      </div>
+                <div className="flex items-center gap-4">
+                    <Link
+                        href="/employees/payslips"
+                        className={brutalTheme.typography.caption}
+                    >
+                        <ReceiptEuro />
+                    </Link>
+                    <Link
+                        href="/employees/settings/imports"
+                        className={brutalTheme.typography.caption}
+                    >
+                        <SettingsIcon />
+                    </Link>
+                </div>
+            </div>
 
-      <BrutalSeparator />
+            <BrutalSeparator />
 
-      <div className="grid gap-12 sm:grid-cols-1 md:grid-cols-3 py-8 items-center">
-        {employees.map((employee, index) => (
-          <EmployeeCard
-            key={employee.id}
-            employee={employee}
-            index={index / 10}
-          />
-        ))}
-      </div>
-    </>
-  );
+            <div className="grid gap-12 sm:grid-cols-1 md:grid-cols-3 py-8 items-center">
+                {employees.map((employee, index) => (
+                    <EmployeeCard
+                        key={employee.id}
+                        employee={employee}
+                        index={index / 10}
+                    />
+                ))}
+            </div>
+        </>
+    );
 }

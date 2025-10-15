@@ -1,5 +1,5 @@
 export type CashFlowCategoryRead = {
-  id: number;
-  name: string;
-  type: "income" | "expense";
+    id: number;
+    name: string;
+    type: "income" | "expense";
 };

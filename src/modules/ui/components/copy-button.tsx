@@ -4,24 +4,24 @@ import { Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export const CopyButton = ({
-  className = "",
-  contentToCopy,
-  successMessage,
+    className = "",
+    contentToCopy,
+    successMessage,
 }: {
-  className?: string;
-  contentToCopy: string;
-  successMessage: string;
+    className?: string;
+    contentToCopy: string;
+    successMessage: string;
 }) => {
-  return (
-    <Button
-      size="icon"
-      className={`cursor-pointer ${className}`}
-      onClick={() => {
-        copyToClipboard(contentToCopy);
-        notifySuccess(successMessage);
-      }}
-    >
-      <Copy />
-    </Button>
-  );
+    return (
+        <Button
+            size="icon"
+            className={`cursor-pointer ${className}`}
+            onClick={() => {
+                copyToClipboard(contentToCopy);
+                notifySuccess(successMessage);
+            }}
+        >
+            <Copy />
+        </Button>
+    );
 };

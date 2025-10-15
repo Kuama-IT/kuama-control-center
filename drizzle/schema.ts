@@ -251,10 +251,12 @@ export const projects = pgTable("projects", {
   name: varchar({ length: 256 }),
   description: text(),
   youTrackRingId: varchar({ length: 256 }).unique(),
-  clientId: serial().references(() => clients.id),
+  organizationId: integer().references(() => organizations.id).notNull(),
   endDate: date(),
   startDate: date(),
   salePrice: real().default(0),
+    createdAt: timestamp().notNull().defaultNow(),
+    updatedAt: timestamp().notNull().defaultNow(),
 });
 
 // Payment schedule for projects - tracks how the total project price will be divided over future months

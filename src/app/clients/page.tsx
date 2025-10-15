@@ -3,20 +3,20 @@ import type { Metadata } from "next";
 import { AuthenticatedPageWrapper } from "@/modules/auth/authenticated-page-wrapper";
 
 export const metadata: Metadata = {
-  title: "Clients | K1 App",
-  description: "Clients | Kuama Control Center",
+    title: "Clients | K1 App",
+    description: "Clients | Kuama Control Center",
 };
 
 async function Page() {
-  return (
-    <div className="max-w-(--breakpoint-lg) mx-auto">
-  <ClientsList />
-    </div>
-  );
+    return (
+        <div className="max-w-(--breakpoint-lg) mx-auto">
+            <ClientsList />
+        </div>
+    );
 }
 
 export default async function () {
-  return await AuthenticatedPageWrapper(Page);
+    return await AuthenticatedPageWrapper(Page);
 }
 
 export const dynamic = "force-dynamic"; // opt-out of static rendering

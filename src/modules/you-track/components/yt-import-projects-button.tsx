@@ -8,26 +8,26 @@ import { isFailure } from "@/utils/server-action-utils";
 import { notifyError, notifySuccess } from "@/modules/ui/components/notify";
 
 export const YtImportProjectsButton = () => {
-  const [isPending, startTransition] = useTransition();
+    const [isPending, startTransition] = useTransition();
 
-  const onImportProjectsClick = () => {
-    startTransition(async () => {
-      const result = await ytImportProjects();
+    const onImportProjectsClick = () => {
+        startTransition(async () => {
+            const result = await ytImportProjects();
 
-      if (isFailure(result)) {
-        notifyError(result.message);
+            if (isFailure(result)) {
+                notifyError(result.message);
 
-        return;
-      }
+                return;
+            }
 
-      notifySuccess(result.message);
-    });
-  };
+            notifySuccess(result.message);
+        });
+    };
 
-  return (
-    <Button disabled={isPending} onClick={onImportProjectsClick}>
-      <FaSync className={cn({ "animate-spin": isPending })} />
-      Import projects
-    </Button>
-  );
+    return (
+        <Button disabled={isPending} onClick={onImportProjectsClick}>
+            <FaSync className={cn({ "animate-spin": isPending })} />
+            Import projects
+        </Button>
+    );
 };

@@ -1,37 +1,39 @@
 import { revalidatePath } from "next/cache";
-import { isFailure, Failure } from "./failures.utils";
+import { type Failure, isFailure } from "./failures.utils";
+
+export type ServerActionResult = { message: string } | undefined;
 
 export const serverActionUtils = {
-  createSafeAction: <ReturnType, ArgsType extends unknown[]>(
-    serverAction: (...args: ArgsType) => Promise<ReturnType>,
-    revalidatePaths?: string[],
-  ): ((...args: ArgsType) => Promise<ReturnType | Failure>) => {
-    return async (...args: ArgsType) => {
-      try {
-        const result = await serverAction(...args);
+    createSafeAction: <ReturnType, ArgsType extends unknown[]>(
+        serverAction: (...args: ArgsType) => Promise<ReturnType>,
+        revalidatePaths?: string[],
+    ): ((...args: ArgsType) => Promise<ReturnType | Failure>) => {
+        return async (...args: ArgsType) => {
+            try {
+                const result = await serverAction(...args);
 
-        if (revalidatePaths && revalidatePaths?.length > 0) {
-          for (const path of revalidatePaths) {
-            revalidatePath(path);
-          }
-        }
+                if (revalidatePaths && revalidatePaths?.length > 0) {
+                    for (const path of revalidatePaths) {
+                        revalidatePath(path);
+                    }
+                }
 
-        return result;
-      } catch (error) {
-        console.error(error);
-        return _formatErrorForClient(error);
-      }
-    };
-  },
+                return result;
+            } catch (error) {
+                console.error(error);
+                return _formatErrorForClient(error);
+            }
+        };
+    },
 };
 
 function _formatErrorForClient(error: unknown): Failure {
-  if (isFailure(error)) {
-    return error;
-  }
+    if (isFailure(error)) {
+        return error;
+    }
 
-  return {
-    type: "__failure__",
-    message: JSON.stringify(error, null, 2),
-  };
+    return {
+        type: "__failure__",
+        message: JSON.stringify(error, null, 2),
+    };
 }

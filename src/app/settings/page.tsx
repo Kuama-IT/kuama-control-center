@@ -9,32 +9,32 @@ import { BackButton } from "@/modules/ui/components/back-button";
 import { AuthenticatedPageWrapper } from "@/modules/auth/authenticated-page-wrapper";
 
 export const metadata: Metadata = {
-  title: "Settings | K1 App",
-  description: "Settings | Kuama Control Center",
+    title: "Settings | K1 App",
+    description: "Settings | Kuama Control Center",
 };
 
 async function Page() {
-  return (
-    <div className="px-8 pt-8 flex flex-col gap-8">
-      <div className="flex gap-4 items-center">
-        <BackButton /> <Title icon={<IoMdSettings />}>Settings</Title>
-      </div>
-      <div className="grid grid-cols-4 gap-4">
-        <div className="col-span-4">
-          <PlatformCredentialsList />
+    return (
+        <div className="px-8 pt-8 flex flex-col gap-8">
+            <div className="flex gap-4 items-center">
+                <BackButton /> <Title icon={<IoMdSettings />}>Settings</Title>
+            </div>
+            <div className="grid grid-cols-4 gap-4">
+                <div className="col-span-4">
+                    <PlatformCredentialsList />
+                </div>
+                <SyncYoutrack />
+                <SyncFattureInCloud />
+                <div className="col-span-4">
+                    <AccessTokenManagement />
+                </div>
+            </div>
         </div>
-        <SyncYoutrack />
-        <SyncFattureInCloud />
-        <div className="col-span-4">
-          <AccessTokenManagement />
-        </div>
-      </div>
-    </div>
-  );
+    );
 }
 
 export const dynamic = "force-dynamic"; // opt-out of static rendering
 
 export default async function () {
-  return await AuthenticatedPageWrapper(Page);
+    return await AuthenticatedPageWrapper(Page);
 }
