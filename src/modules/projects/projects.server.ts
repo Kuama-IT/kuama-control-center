@@ -1,8 +1,8 @@
 import { eq } from "drizzle-orm";
 import { db } from "@/drizzle/drizzle-db";
-import { projects as projectsTable, teams } from "@/drizzle/schema";
+import { projects, teams } from "@/drizzle/schema";
 import { organizationsDb } from "@/modules/clients/organizations.db";
-import { type ProjectRead } from "@/modules/projects/schemas/projects.read.schema";
+import { employeesDb } from "@/modules/employees/employees.db";
 import { youtrackApiClient } from "@/modules/you-track/youtrack-api-client";
 import { type ServerActionResult } from "@/utils/server-actions.utils";
 import { projectsDb } from "./projects.db";
@@ -57,7 +57,7 @@ export const projectsServer = {
         const ytProjects = await youtrackApiClient.getProjects();
         const ytOrganizations = await youtrackApiClient.getOrganizations();
 
-        return await db.transaction(async (tx) => {
+        await db.transaction(async (tx) => {
             for (const ytProject of ytProjects) {
                 const ytOrganization = ytOrganizations.find((it) =>
                     it.projects.map((p) => p.ringId === ytProject.ringId),
@@ -84,7 +84,69 @@ export const projectsServer = {
                     youTrackRingId: ytProject.ringId,
                     organizationId: organization.id,
                 };
+
+                await tx
+                    .insert(projects)
+                    .values(upsertValue)
+                    .onConflictDoUpdate({
+                        target: projects.youTrackRingId,
+                        set: {
+                            name: ytProject.name,
+                            organizationId: organization.id,
+                        },
+                    });
             }
         });
+
+        const projectRecords = await db.select().from(projects);
+
+        // for each project, upsert the team with current employees
+        for (const projectRecord of projectRecords) {
+            const ytProject = ytProjects.find(
+                (it) => it.ringId === projectRecord.youTrackRingId,
+            );
+
+            const ytTeam = ytProject?.team?.users;
+            if (ytTeam === undefined) {
+                // biome-ignore lint/suspicious/noConsole: I want to see what gets skipped
+                console.log(
+                    `Skipping team creation for ${projectRecord.name} since there is no YT team`,
+                );
+                continue;
+            }
+
+            // drop current team for project
+            await db.transaction(async (tx) => {
+                await tx
+                    .delete(teams)
+                    .where(eq(teams.projectId, projectRecord.id));
+
+                for (const ytTeamMember of ytTeam) {
+                    // find employee by youTrackId
+                    const employee = await employeesDb.tryGetByEmail(
+                        ytTeamMember.profile?.email?.email ?? "",
+                    );
+                    if (!employee) {
+                        // biome-ignore lint/suspicious/noConsole: <explanation>
+                        console.log(
+                            `Could not find employee in ${projectRecord.name} team with email ${ytTeamMember.profile?.email?.email}`,
+                        );
+                        continue;
+                    }
+
+                    await tx
+                        .insert(teams)
+                        .values({
+                            employeeId: employee.id,
+                            projectId: projectRecord.id,
+                        })
+                        .onConflictDoNothing();
+                }
+            });
+        }
+
+        return {
+            message: `Now you have ${projectRecords?.length ?? 0} projects`,
+        };
     },
 };

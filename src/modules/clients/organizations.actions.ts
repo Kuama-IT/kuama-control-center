@@ -1,3 +1,4 @@
+"use server";
 import { organizationsServer } from "@/modules/clients/organizations.server";
 import { serverActionUtils } from "@/utils/server-actions.utils";
 

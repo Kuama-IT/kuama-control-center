@@ -1,6 +1,6 @@
-import { db, Transaction } from "@/drizzle/drizzle-db";
-import { absenceDays, employees, presenceDays, teams } from "@/drizzle/schema";
 import { asc, eq, ilike } from "drizzle-orm";
+import { db, type Transaction } from "@/drizzle/drizzle-db";
+import { absenceDays, employees, presenceDays, teams } from "@/drizzle/schema";
 
 export const employeesDb = {
     listAll(tx?: Transaction) {
@@ -12,6 +12,16 @@ export const employeesDb = {
 
     getById(id: number, tx?: Transaction) {
         return (tx ?? db).select().from(employees).where(eq(employees.id, id));
+    },
+
+    async tryGetByEmail(email: string) {
+        const res = await db
+            .select()
+            .from(employees)
+            .where(eq(employees.email, email))
+            .limit(1);
+
+        return res[0] ?? null;
     },
 
     async findByFullName(fullName: string, tx?: Transaction) {

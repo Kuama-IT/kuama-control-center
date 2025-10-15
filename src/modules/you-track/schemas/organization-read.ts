@@ -1,3 +1,3 @@
-import { organizations } from "@/drizzle/schema";
+import { type organizations } from "@/drizzle/schema";
 
 export type OrganizationRead = typeof organizations.$inferSelect;
