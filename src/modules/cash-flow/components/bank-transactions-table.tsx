@@ -1,27 +1,30 @@
 "use client";
 
-import React, { useState, useMemo, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useId, useMemo, useState } from "react";
 import {
-    LineChart,
+    CartesianGrid,
     Line,
+    LineChart,
+    ResponsiveContainer,
+    Tooltip,
     XAxis,
     YAxis,
-    CartesianGrid,
-    Tooltip,
-    ResponsiveContainer,
 } from "recharts";
-import { Transaction } from "../schemas/bank-statement-read";
-import { CashFlowCategoryRead } from "../schemas/cash-flow-category-read";
-import { CashFlowEntryRead } from "../schemas/cash-flow-entry-read";
-import { CategorySelector } from "./category-selector";
-import { handledCreateCashFlowEntriesFromTransactions } from "../cash-flow.actions";
 import { Button } from "@/components/ui/button";
+import { useFlagCashFlowImportAsImportedMutation } from "@/modules/cash-flow/mutations/cash-flow-import.mutations";
 import { notifyError, notifySuccess } from "@/modules/ui/components/notify";
+import { isFailure } from "@/utils/failures.utils";
+import { handledCreateCashFlowEntriesFromTransactions } from "../cash-flow.actions";
+import { type Transaction } from "../schemas/bank-statement-read";
+import { type CashFlowCategoryRead } from "../schemas/cash-flow-category-read";
+import { type CashFlowEntryRead } from "../schemas/cash-flow-entry-read";
+import { CategorySelector } from "./category-selector";
 
 type TransactionFilter = "all" | "incoming" | "outgoing";
 
-interface BankTransactionsTableProps {
+type BankTransactionsTableProps = {
+    cashFlowImportId: number;
     cashFlowCategories: CashFlowCategoryRead[];
     transactions: Transaction[];
     existingCashFlowEntries: CashFlowEntryRead[];
@@ -29,13 +32,14 @@ interface BankTransactionsTableProps {
         name: string;
         type: "income" | "expense";
     }) => Promise<CashFlowCategoryRead>;
-}
+};
 
 export default function BankTransactionsTable({
     transactions,
     cashFlowCategories,
     existingCashFlowEntries,
     onCategoryCreate,
+    cashFlowImportId,
 }: BankTransactionsTableProps) {
     const router = useRouter();
     const [filter, setFilter] = useState<TransactionFilter>("all");
@@ -66,8 +70,10 @@ export default function BankTransactionsTable({
         (transaction: Transaction) => {
             // Safety check for existingCashFlowEntries
             if (
-                !existingCashFlowEntries ||
-                !Array.isArray(existingCashFlowEntries)
+                !(
+                    existingCashFlowEntries &&
+                    Array.isArray(existingCashFlowEntries)
+                )
             ) {
                 return false;
             }
@@ -105,7 +111,7 @@ export default function BankTransactionsTable({
                         sameExtendedDescription
                     );
                 } catch (error) {
-                    console.warn(
+                    console.error(
                         "Error comparing transaction with existing entry:",
                         error,
                     );
@@ -172,12 +178,7 @@ export default function BankTransactionsTable({
                 categoryAssignments,
             });
 
-            if (
-                result &&
-                typeof result === "object" &&
-                "type" in result &&
-                result.type === "__failure__"
-            ) {
+            if (isFailure(result)) {
                 throw new Error(result.message);
             }
 
@@ -330,7 +331,7 @@ export default function BankTransactionsTable({
         setTransactionCategories((prev) => {
             const newMap = new Map(prev);
 
-            selectedRows.forEach((index) => {
+            for (const index of selectedRows) {
                 const transaction = filteredTransactions[index];
                 // Only assign to non-imported transactions
                 if (!isTransactionImported(transaction)) {
@@ -340,7 +341,7 @@ export default function BankTransactionsTable({
                         newMap.set(index, categoryId);
                     }
                 }
-            });
+            }
 
             return newMap;
         });
@@ -353,13 +354,31 @@ export default function BankTransactionsTable({
         selectedRows.size > 0 &&
         selectedRows.size < filteredTransactions.length;
 
+    const hideImportedInputId = useId();
+
+    const mutation = useFlagCashFlowImportAsImportedMutation();
+
+    // biome-ignore lint/correctness/useExhaustiveDependencies: no need to put mutation as dep
+    useEffect(() => {
+        if (mutation.isPending) {
+            return;
+        }
+        const transactionsNotImportedCount = transactions.filter(
+            (t) => !isTransactionImported(t),
+        ).length;
+
+        if (transactionsNotImportedCount === 0) {
+            mutation.mutate({ id: cashFlowImportId });
+        }
+    }, [transactions, cashFlowImportId]);
+
     return (
-        <div className="text-sm mt-6">
+        <div className="mt-6 text-sm">
             {/* Balance Chart */}
             {balanceData.length > 0 && (
                 <div className="mb-6">
-                    <h3 className="text-lg font-semibold mb-4">
-                        Balance Over Time
+                    <h3 className="mb-4 font-semibold text-lg">
+                        {"Balance Over Time"}
                     </h3>
                     <div className="h-64 w-full">
                         <ResponsiveContainer width="100%" height="100%">
@@ -413,76 +432,52 @@ export default function BankTransactionsTable({
             )}
 
             {/* Filter and Search Controls */}
-            <div className="flex flex-col gap-4 mb-4">
-                <div className="flex justify-between items-center">
-                    <h3 className="text-lg font-semibold">Transactions</h3>
+            <div className="mb-4 flex flex-col gap-4">
+                <div className="flex items-center justify-between">
+                    <h3 className="font-semibold text-lg">{"Transactions"}</h3>
                     <div className="flex gap-2">
                         <button
                             onClick={() => setFilter("all")}
-                            className={`px-3 py-1 rounded text-sm ${
+                            className={`rounded px-3 py-1 text-sm ${
                                 filter === "all"
                                     ? "bg-blue-500 text-white"
                                     : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                             }`}
                         >
-                            All ({transactions.length})
+                            {`All (${transactions.length})`}
                             {hideImported && (
                                 <span className="ml-1 text-xs opacity-75">
-                                    (
-                                    {
-                                        transactions.filter(
-                                            (t) => !isTransactionImported(t),
-                                        ).length
-                                    }{" "}
-                                    available)
+                                    {`(${transactions.filter((t) => !isTransactionImported(t)).length} available)`}
                                 </span>
                             )}
                         </button>
                         <button
                             onClick={() => setFilter("incoming")}
-                            className={`px-3 py-1 rounded text-sm ${
+                            className={`rounded px-3 py-1 text-sm ${
                                 filter === "incoming"
                                     ? "bg-green-500 text-white"
                                     : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                             }`}
                         >
-                            Incoming (
-                            {transactions.filter((t) => t.amount > 0).length})
+                            {`Incoming (${transactions.filter((t) => t.amount > 0).length})`}
                             {hideImported && (
                                 <span className="ml-1 text-xs opacity-75">
-                                    (
-                                    {
-                                        transactions.filter(
-                                            (t) =>
-                                                t.amount > 0 &&
-                                                !isTransactionImported(t),
-                                        ).length
-                                    }{" "}
-                                    available)
+                                    {`(${transactions.filter((t) => t.amount > 0 && !isTransactionImported(t)).length} available)`}
                                 </span>
                             )}
                         </button>
                         <button
                             onClick={() => setFilter("outgoing")}
-                            className={`px-3 py-1 rounded text-sm ${
+                            className={`rounded px-3 py-1 text-sm ${
                                 filter === "outgoing"
                                     ? "bg-red-500 text-white"
                                     : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                             }`}
                         >
-                            Outgoing (
-                            {transactions.filter((t) => t.amount < 0).length})
+                            {`Outgoing(${transactions.filter((t) => t.amount < 0).length})`}
                             {hideImported && (
                                 <span className="ml-1 text-xs opacity-75">
-                                    (
-                                    {
-                                        transactions.filter(
-                                            (t) =>
-                                                t.amount < 0 &&
-                                                !isTransactionImported(t),
-                                        ).length
-                                    }{" "}
-                                    available)
+                                    {`(${transactions.filter((t) => t.amount < 0 && !isTransactionImported(t)).length} available)`}
                                 </span>
                             )}
                         </button>
@@ -490,29 +485,29 @@ export default function BankTransactionsTable({
                 </div>
 
                 {/* Search Input and Hide Imported Filter */}
-                <div className="flex justify-between items-center">
+                <div className="flex items-center justify-between">
                     <div className="w-full max-w-md">
                         <input
                             type="text"
                             placeholder="Search by description..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                     </div>
                     <div className="flex items-center gap-2">
                         <input
                             type="checkbox"
-                            id="hideImported"
+                            id={hideImportedInputId}
                             checked={hideImported}
                             onChange={(e) => setHideImported(e.target.checked)}
                             className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                         />
                         <label
-                            htmlFor="hideImported"
-                            className="text-sm text-gray-700 cursor-pointer select-none"
+                            htmlFor={hideImportedInputId}
+                            className="cursor-pointer select-none text-gray-700 text-sm"
                         >
-                            Hide imported transactions
+                            {"Hide imported transactions"}
                         </label>
                     </div>
                 </div>
@@ -521,7 +516,7 @@ export default function BankTransactionsTable({
                 <table className="min-w-full border border-gray-300">
                     <thead className="bg-gray-50">
                         <tr>
-                            <th className="px-4 py-2 text-left border-b w-12">
+                            <th className="w-12 border-b px-4 py-2 text-left">
                                 <input
                                     type="checkbox"
                                     checked={isAllSelected}
@@ -534,20 +529,20 @@ export default function BankTransactionsTable({
                                     className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                                 />
                             </th>
-                            <th className="px-4 py-2 text-left border-b">
-                                Date
+                            <th className="border-b px-4 py-2 text-left">
+                                {"Date"}
                             </th>
-                            <th className="px-4 py-2 text-left border-b">
-                                Description
+                            <th className="border-b px-4 py-2 text-left">
+                                {"Description"}
                             </th>
-                            <th className="px-4 py-2 text-left border-b">
-                                Extended Description
+                            <th className="border-b px-4 py-2 text-left">
+                                {"Extended Description"}
                             </th>
-                            <th className="px-4 py-2 text-left border-b">
-                                Category
+                            <th className="border-b px-4 py-2 text-left">
+                                {"Category"}
                             </th>
-                            <th className="px-4 py-2 text-right border-b">
-                                Amount
+                            <th className="border-b px-4 py-2 text-right">
+                                {"Amount"}
                             </th>
                         </tr>
                     </thead>
@@ -557,11 +552,11 @@ export default function BankTransactionsTable({
                                 isTransactionImported(transaction);
                             return (
                                 <tr
-                                    key={index}
+                                    key={`${index}-${transaction.amount}-${transaction.date}`}
                                     className={`${
                                         isImported
-                                            ? "bg-gray-100 cursor-not-allowed opacity-60"
-                                            : `hover:bg-gray-50 cursor-pointer ${selectedRows.has(index) ? "bg-blue-50" : ""}`
+                                            ? "cursor-not-allowed bg-gray-100 opacity-60"
+                                            : `cursor-pointer hover:bg-gray-50 ${selectedRows.has(index) ? "bg-blue-50" : ""}`
                                     } select-none`}
                                     onClick={
                                         isImported
@@ -570,7 +565,7 @@ export default function BankTransactionsTable({
                                                   handleRowClick(index, event)
                                     }
                                 >
-                                    <td className="px-4 py-2 border-b w-12">
+                                    <td className="w-12 border-b px-4 py-2">
                                         <input
                                             type="checkbox"
                                             checked={
@@ -584,22 +579,22 @@ export default function BankTransactionsTable({
                                                     handleRowSelect(index);
                                                 }
                                             }}
-                                            className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                                            className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
                                         />
                                     </td>
-                                    <td className="px-4 py-2 border-b">
+                                    <td className="border-b px-4 py-2">
                                         {formatDate(transaction.date)}
                                     </td>
-                                    <td className="px-4 py-2 border-b">
+                                    <td className="border-b px-4 py-2">
                                         {transaction.description}
                                     </td>
-                                    <td className="px-4 py-2 border-b">
+                                    <td className="border-b px-4 py-2">
                                         {transaction.extendedDescription}
                                     </td>
-                                    <td className="px-4 py-2 border-b">
+                                    <td className="border-b px-4 py-2">
                                         {isImported ? (
-                                            <span className="text-gray-500 text-xs bg-gray-100 px-2 py-1 rounded">
-                                                Already imported
+                                            <span className="rounded bg-gray-100 px-2 py-1 text-gray-500 text-xs">
+                                                {"Already imported"}
                                             </span>
                                         ) : (
                                             <div
@@ -636,13 +631,13 @@ export default function BankTransactionsTable({
                                         )}
                                     </td>
                                     <td
-                                        className={`px-4 py-2 border-b text-right font-medium ${
+                                        className={`border-b px-4 py-2 text-right font-medium ${
                                             transaction.amount >= 0
                                                 ? "text-green-600"
                                                 : "text-red-600"
                                         }`}
                                     >
-                                        €{transaction.amount.toFixed(2)}
+                                        {`€${transaction.amount.toFixed(2)}`}
                                     </td>
                                 </tr>
                             );
@@ -650,11 +645,10 @@ export default function BankTransactionsTable({
                     </tbody>
                 </table>
             </div>
-            <div className="mt-4 text-sm text-gray-600 flex justify-between">
+            <div className="mt-4 flex justify-between text-gray-600 text-sm">
                 <div className="flex gap-4">
                     <span>
-                        Showing {filteredTransactions.length} of{" "}
-                        {transactions.length} transactions
+                        {`Showing ${filteredTransactions.length} of ${transactions.length} transactions`}
                     </span>
                     {(() => {
                         const importedCount = filteredTransactions.filter(
@@ -669,16 +663,15 @@ export default function BankTransactionsTable({
                         ) {
                             return (
                                 <span className="text-orange-600">
-                                    {importedCount} imported, {availableCount}{" "}
-                                    available
+                                    {`${importedCount} imported, ${availableCount} available`}
                                 </span>
                             );
                         }
                         return null;
                     })()}
                     {selectedRows.size > 0 && (
-                        <span className="text-blue-600 font-medium">
-                            {selectedRows.size} selected
+                        <span className="font-medium text-blue-600">
+                            {`${selectedRows.size} selected`}
                         </span>
                     )}
                 </div>
@@ -698,13 +691,13 @@ export default function BankTransactionsTable({
 
             {/* Bulk Actions for Selected Rows */}
             {selectedRows.size > 0 && (
-                <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <div className="mt-4 rounded-lg border border-blue-200 bg-blue-50 p-4">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4">
-                            <span className="text-sm font-medium text-blue-800">
-                                {selectedRows.size} transaction(s) selected
+                            <span className="font-medium text-blue-800 text-sm">
+                                {`${selectedRows.size} transaction(s) selected`}
                             </span>
-                            <div className="text-sm text-blue-600">
+                            <div className="text-blue-600 text-sm">
                                 {(() => {
                                     const selectedNonImported = Array.from(
                                         selectedRows,
@@ -725,8 +718,8 @@ export default function BankTransactionsTable({
                             </div>
                         </div>
                         <div className="flex items-center gap-3">
-                            <span className="text-sm text-blue-800">
-                                Assign category to selected:
+                            <span className="text-blue-800 text-sm">
+                                {"Assign category to selected:"}
                             </span>
                             <div className="min-w-48">
                                 <CategorySelector
@@ -741,6 +734,7 @@ export default function BankTransactionsTable({
                                                 (index) =>
                                                     filteredTransactions[index],
                                             )
+                                            .filter((t) => !!t)
                                             .filter(
                                                 (t) =>
                                                     !isTransactionImported(t),
@@ -773,7 +767,7 @@ export default function BankTransactionsTable({
                                 size="sm"
                                 className="text-xs"
                             >
-                                Clear selection
+                                {"Clear selection"}
                             </Button>
                         </div>
                     </div>
@@ -801,15 +795,15 @@ export default function BankTransactionsTable({
                         size="sm"
                         className="text-xs"
                     >
-                        Select all available transactions
+                        {"Select all available transactions"}
                     </Button>
                 </div>
             )}
 
             {/* Create Cash Flow Entries Button */}
             <div className="mt-4 border-t pt-4">
-                <div className="flex justify-between items-center">
-                    <div className="text-sm text-gray-600">
+                <div className="flex items-center justify-between">
+                    <div className="text-gray-600 text-sm">
                         {(() => {
                             const categorizedCount = Array.from(
                                 transactionCategories.entries(),

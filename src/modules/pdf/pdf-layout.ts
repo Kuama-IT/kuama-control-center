@@ -14,6 +14,7 @@
 
 import { getDocument, Util } from "pdfjs-dist";
 import "pdfjs-dist/build/pdf.worker.min.mjs";
+import {type TextItem} from "pdfjs-dist/types/src/display/api";
 
 export type PdfTextItem = {
     page: number; // 1-based page index
@@ -45,7 +46,7 @@ export async function extractTextItems(
         const page = await doc.getPage(pageNum);
         const viewport = page.getViewport({ scale: 1.0 });
         const content = await page.getTextContent();
-        for (const item of content.items as any[]) {
+        for (const item of content.items as TextItem[]) {
             // item.transform is a 6-element matrix; combine with viewport.transform
             const m = Util.transform(viewport.transform, item.transform);
             const x = m[4];

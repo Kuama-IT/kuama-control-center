@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { BankStatementForm } from "../schemas/bank-statement-form.schema";
+import { type BankStatementForm } from "../schemas/bank-statement-form.schema";
 
 export const useCreateBankStatementMutation = () => {
     const [progress, setProgress] = useState<number>(0);
@@ -38,7 +38,7 @@ export const useCreateBankStatementMutation = () => {
                         try {
                             onSuccess();
                             resolve();
-                        } catch (e) {
+                        } catch (_e) {
                             reject(new Error("Failed to parse response"));
                         }
                     } else {

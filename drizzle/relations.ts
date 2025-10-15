@@ -1,23 +1,23 @@
 import { relations } from "drizzle-orm/relations";
 import {
-  employees,
-  teams,
-  projects,
-  projectMedias,
-  payslips,
-  tasks,
-  spentTimes,
-  clients,
-  absenceDays,
-  vats,
-  invoices,
-  platformCredentialsToEmployeesAndProjects,
-  platformCredentials,
-  invoiceProjects,
-  presenceDays,
-  projectDailyRates,
-  projectMonthlyRates,
-  clientsVats,
+    employees,
+    teams,
+    projects,
+    projectMedias,
+    payslips,
+    tasks,
+    spentTimes,
+    clients,
+    absenceDays,
+    vats,
+    invoices,
+    platformCredentialsToEmployeesAndProjects,
+    platformCredentials,
+    invoiceProjects,
+    presenceDays,
+    projectDailyRates,
+    projectMonthlyRates,
+    clientsVats, organizations,
 } from "./schema";
 
 export const teamRelations = relations(teams, ({ one }) => ({
@@ -46,9 +46,9 @@ export const employeesRelations = relations(employees, ({ many }) => ({
 export const projectRelations = relations(projects, ({ one, many }) => ({
   teams: many(teams),
   projectMedias: many(projectMedias),
-  client: one(clients, {
-    fields: [projects.clientId],
-    references: [clients.id],
+  organziation: one(organizations, {
+    fields: [projects.organizationId],
+    references: [organizations.id],
   }),
   tasks: many(tasks),
   platformCredentialsToEmployeesAndProjects: many(

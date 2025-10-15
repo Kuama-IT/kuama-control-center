@@ -1,13 +1,11 @@
-import React from "react";
 import { cashFlowService } from "../cash-flow.service";
 import { cashFlowCategoryServer } from "../cash-flow-category.server";
 import CashFlowImportPreview from "./cash-flow-import-preview";
 
-interface CashFlowImportPreviewServerProps {
+type CashFlowImportPreviewServerProps = {
     id: string;
-}
+};
 
-// Server component wrapper that fetches initial data
 export default async function CashFlowImportPreviewServer({
     id,
 }: CashFlowImportPreviewServerProps) {
@@ -36,7 +34,7 @@ export default async function CashFlowImportPreviewServer({
 
     return (
         <CashFlowImportPreview
-            id={id}
+            id={parseInt(id)}
             initialCashFlowImport={cashFlowImport}
             initialCashFlowCategories={cashFlowCategories}
             initialBankStatement={bankStatement}

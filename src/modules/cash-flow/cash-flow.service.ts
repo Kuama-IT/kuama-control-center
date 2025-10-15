@@ -1,12 +1,14 @@
+import { and, eq, gte, lte } from "drizzle-orm";
 import { db } from "@/drizzle/drizzle-db";
-import { bankStatementUtils } from "./bank-statement.utils";
-import { BankStatementRead, Transaction } from "./schemas/bank-statement-read";
-import { cashFlowImport, cashFlowEntry } from "@/drizzle/schema";
-import { CashFlowImportRead } from "./schemas/cash-flow-import-read";
-import { eq, gte, lte, and } from "drizzle-orm";
-import { CashFlowImportReadExtended } from "./schemas/cash-flow-import-read-extended";
-import { CashFlowEntryRead } from "./schemas/cash-flow-entry-read";
+import { cashFlowEntry, cashFlowImport } from "@/drizzle/schema";
 import { firstOrThrow } from "@/utils/array-utils";
+import { bankStatementUtils } from "./bank-statement.utils";
+import {
+    type BankStatementRead,
+    type Transaction,
+} from "./schemas/bank-statement-read";
+import { type CashFlowEntryRead } from "./schemas/cash-flow-entry-read";
+import { type CashFlowImportReadExtended } from "./schemas/cash-flow-import-read-extended";
 
 export const cashFlowService = {
     async parseBankStatementXlsx(bytes: Buffer): Promise<BankStatementRead> {
@@ -64,29 +66,6 @@ export const cashFlowService = {
             fileBase64: buffer.toString("base64"),
             fileName,
         });
-    },
-
-    async getCashFlowImports(): Promise<CashFlowImportRead[]> {
-        const cashFlowImports = await db
-            .select({
-                id: cashFlowImport.id,
-                createdAt: cashFlowImport.createdAt,
-                importedAt: cashFlowImport.importedAt,
-                fileBase64: cashFlowImport.fileBase64,
-                fileName: cashFlowImport.fileName,
-            })
-            .from(cashFlowImport);
-        return cashFlowImports.map((cashFlowImport) => ({
-            id: cashFlowImport.id,
-            createdAt: cashFlowImport.createdAt,
-            importedAt: cashFlowImport.importedAt,
-            fileName: cashFlowImport.fileName,
-            fileSizeInKB: (
-                (cashFlowImport.fileBase64.length * 3) /
-                4 /
-                1024
-            ).toFixed(2),
-        }));
     },
 
     async deleteCashFlowImport(id: number): Promise<void> {
