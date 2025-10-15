@@ -59,7 +59,7 @@ export function CashFlowImportEntry({
                     {`File Size: ${entry.fileSizeInKB} KB`}
                 </div>
                 <Link
-                    href={`/cash-flow/imports/${entry.id}/preview`}
+                    href={`/cash-flows/imports/${entry.id}/preview`}
                     className="text-blue-600 text-sm hover:underline"
                 >
                     {"Preview import"}

@@ -1,23 +1,23 @@
 "use client";
 
-import { useEmittedInvoicesQuery } from "@/modules/fatture-in-cloud/queries/fatture-in-cloud.queries";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { DateRangePicker } from "@/components/ui/date-range-picker";
 import { format } from "date-fns";
-import { useState } from "react";
 import {
     Building2,
-    Hash,
-    Euro,
-    Clock,
-    TrendingUp,
-    FileText,
     Calculator,
     Calendar as CalendarIcon,
+    Clock,
+    Euro,
+    FileText,
+    Hash,
+    TrendingUp,
 } from "lucide-react";
-import { useCreateInvoicesByFattureInCloudDtosMutation } from "@/modules/invoices/mutations/invoices.mutations";
+import { useState } from "react";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { DateRangePicker } from "@/components/ui/date-range-picker";
+import { Separator } from "@/components/ui/separator";
+import { useEmittedInvoicesQuery } from "@/modules/fatture-in-cloud/queries/fatture-in-cloud.queries";
+import { useCreateInvoicesByFattureInCloudDtosMutation } from "@/modules/invoices/mutations/invoices.mutations";
 
 export function EmittedInvoicesList({ from, to }: { from: Date; to: Date }) {
     const [selectedFrom, setSelectedFrom] = useState<Date>(from);
@@ -34,7 +34,7 @@ export function EmittedInvoicesList({ from, to }: { from: Date; to: Date }) {
         return (
             <div className="flex items-center justify-center p-8">
                 <div className="text-muted-foreground">
-                    Loading emitted invoices...
+                    {"Loading emitted invoices..."}
                 </div>
             </div>
         );
@@ -44,7 +44,7 @@ export function EmittedInvoicesList({ from, to }: { from: Date; to: Date }) {
         return (
             <div className="flex items-center justify-center p-8">
                 <div className="text-destructive">
-                    Error loading emitted invoices: {String(query.error)}
+                    {`Error loading emitted invoices: ${String(query.error)}`}
                 </div>
             </div>
         );
@@ -63,7 +63,7 @@ export function EmittedInvoicesList({ from, to }: { from: Date; to: Date }) {
                 />
                 <div className="flex items-center justify-center p-8">
                     <div className="text-muted-foreground">
-                        No invoices found for this period.
+                        {"No invoices found for this period."}
                     </div>
                 </div>
             </div>
@@ -84,7 +84,7 @@ export function EmittedInvoicesList({ from, to }: { from: Date; to: Date }) {
 
     return (
         <div className="space-y-6 p-8">
-            <div className="flex gap-4 items-center">
+            <div className="flex items-center gap-4">
                 <DateRangePicker
                     from={selectedFrom}
                     to={selectedTo}
@@ -108,50 +108,50 @@ export function EmittedInvoicesList({ from, to }: { from: Date; to: Date }) {
                 </Button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
                 <div className="rounded-lg border bg-card p-4 shadow-sm">
-                    <div className="flex items-center gap-2 mb-2">
+                    <div className="mb-2 flex items-center gap-2">
                         <FileText className="h-5 w-5 text-blue-500" />
-                        <p className="text-sm font-medium text-muted-foreground">
-                            Total Invoices
+                        <p className="font-medium text-muted-foreground text-sm">
+                            {"Total Invoices"}
                         </p>
                     </div>
-                    <p className="text-2xl font-bold">{totals.count}</p>
+                    <p className="font-bold text-2xl">{totals.count}</p>
                 </div>
 
                 <div className="rounded-lg border bg-card p-4 shadow-sm">
-                    <div className="flex items-center gap-2 mb-2">
+                    <div className="mb-2 flex items-center gap-2">
                         <Calculator className="h-5 w-5 text-green-500" />
-                        <p className="text-sm font-medium text-muted-foreground">
-                            Total Net
+                        <p className="font-medium text-muted-foreground text-sm">
+                            {"Total Net"}
                         </p>
                     </div>
-                    <p className="text-2xl font-bold text-green-600">
-                        €{totals.totalNet.toFixed(2)}
+                    <p className="font-bold text-2xl text-green-600">
+                        {`€${totals.totalNet.toFixed(2)}`}
                     </p>
                 </div>
 
                 <div className="rounded-lg border bg-card p-4 shadow-sm">
-                    <div className="flex items-center gap-2 mb-2">
+                    <div className="mb-2 flex items-center gap-2">
                         <Euro className="h-5 w-5 text-orange-500" />
-                        <p className="text-sm font-medium text-muted-foreground">
-                            Total VAT
+                        <p className="font-medium text-muted-foreground text-sm">
+                            {"Total VAT"}
                         </p>
                     </div>
-                    <p className="text-2xl font-bold text-orange-600">
-                        €{totals.totalVat.toFixed(2)}
+                    <p className="font-bold text-2xl text-orange-600">
+                        {`€${totals.totalVat.toFixed(2)}`}
                     </p>
                 </div>
 
                 <div className="rounded-lg border bg-card p-4 shadow-sm">
-                    <div className="flex items-center gap-2 mb-2">
+                    <div className="mb-2 flex items-center gap-2">
                         <TrendingUp className="h-5 w-5 text-purple-500" />
-                        <p className="text-sm font-medium text-muted-foreground">
-                            Total Gross
+                        <p className="font-medium text-muted-foreground text-sm">
+                            {"Total Gross"}
                         </p>
                     </div>
-                    <p className="text-2xl font-bold text-purple-600">
-                        €{totals.totalGross.toFixed(2)}
+                    <p className="font-bold text-2xl text-purple-600">
+                        {`{€${totals.totalGross.toFixed(2)}}`}
                     </p>
                 </div>
             </div>
@@ -164,7 +164,7 @@ export function EmittedInvoicesList({ from, to }: { from: Date; to: Date }) {
                         key={invoice.id}
                         className="rounded-lg border bg-card p-6 shadow-sm transition-shadow hover:shadow-md"
                     >
-                        <div className="flex items-start justify-between mb-4">
+                        <div className="mb-4 flex items-start justify-between">
                             <div className="space-y-1">
                                 <div className="flex items-center gap-2">
                                     <Building2 className="h-4 w-4 text-muted-foreground" />
@@ -174,13 +174,13 @@ export function EmittedInvoicesList({ from, to }: { from: Date; to: Date }) {
                                     </h3>
                                 </div>
                                 {invoice.entity?.vat_number && (
-                                    <p className="text-sm text-muted-foreground">
-                                        VAT: {invoice.entity.vat_number}
+                                    <p className="text-muted-foreground text-sm">
+                                        {`VAT: ${invoice.entity.vat_number}`}
                                     </p>
                                 )}
                             </div>
                             <div className="text-right">
-                                <div className="flex items-center gap-2 mb-1">
+                                <div className="mb-1 flex items-center gap-2">
                                     <Hash className="h-4 w-4 text-muted-foreground" />
                                     <Badge
                                         variant="outline"
@@ -190,7 +190,7 @@ export function EmittedInvoicesList({ from, to }: { from: Date; to: Date }) {
                                     </Badge>
                                 </div>
                                 {invoice.date && (
-                                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                    <div className="flex items-center gap-2 text-muted-foreground text-sm">
                                         <CalendarIcon className="h-4 w-4" />
                                         {format(
                                             new Date(invoice.date),
@@ -204,7 +204,7 @@ export function EmittedInvoicesList({ from, to }: { from: Date; to: Date }) {
                         <Separator className="my-4" />
 
                         <div
-                            className={`grid grid-cols-1 gap-4 mb-4 ${
+                            className={`mb-4 grid grid-cols-1 gap-4 ${
                                 invoice.amount_vat !== null &&
                                 invoice.amount_vat !== undefined
                                     ? "md:grid-cols-3"
@@ -212,8 +212,8 @@ export function EmittedInvoicesList({ from, to }: { from: Date; to: Date }) {
                             }`}
                         >
                             <div className="space-y-1">
-                                <p className="text-sm font-medium text-muted-foreground">
-                                    Net Amount
+                                <p className="font-medium text-muted-foreground text-sm">
+                                    {"Net Amount"}
                                 </p>
                                 <div className="flex items-center gap-1">
                                     <Euro className="h-4 w-4 text-muted-foreground" />
@@ -228,20 +228,20 @@ export function EmittedInvoicesList({ from, to }: { from: Date; to: Date }) {
                             {invoice.amount_vat !== null &&
                                 invoice.amount_vat !== undefined && (
                                     <div className="space-y-1">
-                                        <p className="text-sm font-medium text-muted-foreground">
-                                            VAT Amount
+                                        <p className="font-medium text-muted-foreground text-sm">
+                                            {"VAT Amount"}
                                         </p>
                                         <div className="flex items-center gap-1">
                                             <Euro className="h-4 w-4 text-muted-foreground" />
                                             <span className="font-semibold">
-                                                €{invoice.amount_vat.toFixed(2)}
+                                                {`€${invoice.amount_vat.toFixed(2)}`}
                                             </span>
                                         </div>
                                     </div>
                                 )}
                             <div className="space-y-1">
-                                <p className="text-sm font-medium text-muted-foreground">
-                                    Total Amount
+                                <p className="font-medium text-muted-foreground text-sm">
+                                    {"Total Amount"}
                                 </p>
                                 <div className="flex items-center gap-1">
                                     <Euro className="h-4 w-4 text-muted-foreground" />
@@ -261,7 +261,7 @@ export function EmittedInvoicesList({ from, to }: { from: Date; to: Date }) {
                                 <div className="flex items-center gap-2 text-sm">
                                     <Clock className="h-4 w-4 text-orange-500" />
                                     <span className="text-muted-foreground">
-                                        Due date:
+                                        {"Due date:"}
                                     </span>
                                     <Badge variant="secondary">
                                         {format(

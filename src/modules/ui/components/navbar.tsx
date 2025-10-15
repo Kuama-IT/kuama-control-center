@@ -1,11 +1,14 @@
-import { auth } from "@/modules/auth/auth";
 import Link from "next/link";
-import { FaUserGroup } from "react-icons/fa6";
 import { AiFillHome } from "react-icons/ai";
-import { MdOutlineWork } from "react-icons/md";
-import { routes } from "@/modules/ui/routes";
+import { BiSolidBank } from "react-icons/bi";
+import { FaUserGroup } from "react-icons/fa6";
 import { IoMdSettings } from "react-icons/io";
+import { MdOutlineWork } from "react-icons/md";
+import { auth } from "@/modules/auth/auth";
+import { BrutalCard } from "@/modules/ui";
+import { routes } from "@/modules/ui/routes";
 
+const iconSize = 28;
 export const NavBar = async () => {
     const session = await auth();
     if (!session?.user) {
@@ -13,28 +16,50 @@ export const NavBar = async () => {
     }
 
     return (
-        <div className="hidden-print bg-foreground text-background flex gap-4 rounded-full fixed bottom-2 right-8 md:right-1/3 left-8 md:left-1/3 p-4 uppercase items-center justify-center">
-            <Link href={routes.dashboard()}>
-                <AiFillHome aria-label="Dashboard" />
-            </Link>
+        <div className="hidden-print fixed right-8 bottom-2 left-8 bg-background md:right-1/3 md:left-1/3">
+            <BrutalCard>
+                <div className="flex items-center justify-center gap-4">
+                    <Link href={routes.dashboard()}>
+                        <AiFillHome size={iconSize} aria-label="Dashboard" />
+                    </Link>
 
-            {session.user.isAdmin && (
-                <Link href={routes.clients()}>
-                    <MdOutlineWork aria-label="Clients" />
-                </Link>
-            )}
+                    {session.user.isAdmin && (
+                        <Link href={routes.clients()}>
+                            <MdOutlineWork
+                                size={iconSize}
+                                aria-label="Clients"
+                            />
+                        </Link>
+                    )}
 
-            {session.user.isAdmin && (
-                <Link href={routes.employees()}>
-                    <FaUserGroup aria-label="EmployeeList" />
-                </Link>
-            )}
+                    {session.user.isAdmin && (
+                        <Link href={routes.employees()}>
+                            <FaUserGroup
+                                size={iconSize}
+                                aria-label="EmployeeList"
+                            />
+                        </Link>
+                    )}
 
-            {session.user.isAdmin && (
-                <Link href={routes.settings()}>
-                    <IoMdSettings aria-label="Settings" />
-                </Link>
-            )}
+                    {session.user.isAdmin && (
+                        <Link href={routes.cashFlows()}>
+                            <BiSolidBank
+                                size={iconSize}
+                                aria-label="CashFlow"
+                            />
+                        </Link>
+                    )}
+
+                    {session.user.isAdmin && (
+                        <Link href={routes.settings()}>
+                            <IoMdSettings
+                                size={iconSize}
+                                aria-label="Settings"
+                            />
+                        </Link>
+                    )}
+                </div>
+            </BrutalCard>
         </div>
     );
 };
