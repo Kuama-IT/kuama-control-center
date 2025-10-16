@@ -1,5 +1,5 @@
+import { type NextRequest } from "next/server";
 import { cashFlowService } from "@/modules/cash-flow/cash-flow.service";
-import { NextRequest } from "next/server";
 
 export async function GET(request: NextRequest) {
     try {
@@ -23,7 +23,10 @@ export async function GET(request: NextRequest) {
         const dateFrom = new Date(dateFromParam);
         const dateTo = new Date(dateToParam);
 
-        if (isNaN(dateFrom.getTime()) || isNaN(dateTo.getTime())) {
+        if (
+            Number.isNaN(dateFrom.getTime()) ||
+            Number.isNaN(dateTo.getTime())
+        ) {
             return Response.json(
                 {
                     error: "Invalid date format",

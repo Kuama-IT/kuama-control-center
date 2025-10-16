@@ -1,6 +1,6 @@
-import ClientsList from "@/modules/clients/components/clients-list";
-import type { Metadata } from "next";
+import { type Metadata } from "next";
 import { AuthenticatedPageWrapper } from "@/modules/auth/authenticated-page-wrapper";
+import ClientsList from "@/modules/clients/components/clients-list";
 
 export const metadata: Metadata = {
     title: "Clients | K1 App",
@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 async function Page() {
     return (
-        <div className="max-w-(--breakpoint-lg) mx-auto">
+        <div className="mx-auto max-w-(--breakpoint-lg)">
             <ClientsList />
         </div>
     );

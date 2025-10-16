@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import { type Metadata } from "next";
 import { AuthenticatedPageWrapper } from "@/modules/auth/authenticated-page-wrapper";
 import EmployeeList from "@/modules/employees/components/employee-list";
 
@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 async function Page() {
     return (
-        <div className="max-w-(--breakpoint-lg) mx-auto pt-4">
+        <div className="mx-auto max-w-(--breakpoint-lg) pt-4">
             <EmployeeList />
         </div>
     );

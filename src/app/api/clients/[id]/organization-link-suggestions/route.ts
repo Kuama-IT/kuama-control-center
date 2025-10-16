@@ -1,17 +1,17 @@
-import { clientsServer } from "@/modules/clients/clients.server";
+import { type NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { NextRequest, NextResponse } from "next/server";
+import { clientsServer } from "@/modules/clients/clients.server";
 
 const paramSchema = z.object({ id: z.string() });
 // TODO: ensure auth
 export async function GET(
-    req: NextRequest,
+    _req: NextRequest,
     { params }: { params: Promise<{ id: string }> },
 ) {
     try {
         const parsedRequest = paramSchema.parse(await params);
         const clientId = parseInt(parsedRequest.id);
-        if (isNaN(clientId)) {
+        if (Number.isNaN(clientId)) {
             NextResponse.json(
                 { error: "improper data provided" },
                 { status: 400 },
@@ -22,7 +22,7 @@ export async function GET(
             parseInt(parsedRequest.id),
         );
         return NextResponse.json(result);
-    } catch (err) {
+    } catch (_err) {
         NextResponse.json({ error: "failed to load data" }, { status: 500 });
     }
 }

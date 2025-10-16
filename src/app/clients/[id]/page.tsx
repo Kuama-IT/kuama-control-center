@@ -1,7 +1,7 @@
-import ClientDetail from "@/modules/clients/components/client-detail";
-import { AuthenticatedPageWrapper } from "@/modules/auth/authenticated-page-wrapper";
-import { PageParams } from "@/modules/routing/schemas/routing-schemas";
 import { z } from "zod";
+import { AuthenticatedPageWrapper } from "@/modules/auth/authenticated-page-wrapper";
+import ClientDetail from "@/modules/clients/components/client-detail";
+import { type PageParams } from "@/modules/routing/schemas/routing-schemas";
 import { ErrorMessage } from "@/modules/ui/components/error-message";
 
 const paramsSchema = z.object({
@@ -33,5 +33,3 @@ async function Page(pageParams: PageParams | undefined) {
 export default async function (params: PageParams) {
     return await AuthenticatedPageWrapper(Page, params);
 }
-
-// export const dynamic = "force-dynamic"; // opt-out of static rendering

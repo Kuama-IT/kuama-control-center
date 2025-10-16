@@ -1,8 +1,8 @@
-import { extractTextItems, PdfTextItem } from "@/modules/pdf/pdf-layout";
 import { parse } from "date-fns/parse";
-import { Page } from "pdf2json";
+import { type Page } from "pdf2json";
+import { extractTextItems, type PdfTextItem } from "@/modules/pdf/pdf-layout";
+import { type PubblicaWebEmployeeMonthlyCost } from "@/modules/pubblica-web/schemas/pubblica-web-employee-monthly-cost-read";
 import { pdfUtils } from "../pdf/pdf.utils";
-import { PubblicaWebEmployeeMonthlyCost } from "@/modules/pubblica-web/schemas/pubblica-web-employee-monthly-cost-read";
 
 type LabelDefinition = {
     type: "text" | "italian_date" | "italian_number" | "number";
@@ -223,7 +223,9 @@ export const pubblicaWebUtils = {
                 const dipendente =
                     rawValues.find((r) => r.label === "dipendente")?.value ??
                     "";
-                const payrollRegistrationNumber = isNaN(parseInt(dipendente))
+                const payrollRegistrationNumber = Number.isNaN(
+                    parseInt(dipendente),
+                )
                     ? 0
                     : parseInt(dipendente);
 
@@ -336,7 +338,7 @@ async function readTotalBusinessCostFromPage(page: Page) {
         const amountMatch = rawContent.match(ITALIAN_AMOUNT_REGEX);
         if (amountMatch) {
             const parsed = parseItalianNumber(amountMatch[0]);
-            if (!isNaN(parsed)) {
+            if (!Number.isNaN(parsed)) {
                 parsedAmounts.push({
                     parsed,
                 });
@@ -388,7 +390,7 @@ function findByTextNearestTo(
     }
 
     // return the nearest textItem to item
-    let nearestTextItem: PdfTextItem | undefined = undefined;
+    let nearestTextItem: PdfTextItem | undefined;
     let minDistance = Number.MAX_SAFE_INTEGER;
     for (const equalTextItem of equalTextItems) {
         const dx = item.x - equalTextItem.x;

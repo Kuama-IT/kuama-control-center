@@ -1,38 +1,11 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-    platformCredentialsFormSchema,
-    KSupportedPlatforms,
-    type PlatformCredentialsValidForm,
-} from "../schemas/platform-credentials.schemas";
-import { Button } from "@/components/ui/button";
-import {
-    Select,
-    SelectContent,
-    SelectGroup,
-    SelectItem,
-    SelectLabel,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import {
-    Form,
-    FormControl,
-    FormDescription,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from "@/components/ui/form";
-import { useForm } from "react-hook-form";
-import { createAction } from "../platform-credentials.actions";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { notifyError, notifySuccess } from "@/modules/ui/components/notify";
-import { useServerActionMutation } from "@/modules/ui/hooks/use-server-action-mutation";
 import { Check, ChevronsUpDown } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { FaSync } from "react-icons/fa";
+import { Button } from "@/components/ui/button";
 import {
     Command,
     CommandEmpty,
@@ -42,12 +15,39 @@ import {
     CommandList,
 } from "@/components/ui/command";
 import {
+    Form,
+    FormControl,
+    FormDescription,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import {
     Popover,
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover";
-import type { ClientListItem } from "@/modules/clients/clients.server";
-import { FaSync } from "react-icons/fa";
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import { cn } from "@/lib/utils";
+import { type ClientListItem } from "@/modules/clients/clients.server";
+import { notifyError, notifySuccess } from "@/modules/ui/components/notify";
+import { useServerActionMutation } from "@/modules/ui/hooks/use-server-action-mutation";
+import { createAction } from "../platform-credentials.actions";
+import {
+    KSupportedPlatforms,
+    type PlatformCredentialsValidForm,
+    platformCredentialsFormSchema,
+} from "../schemas/platform-credentials.schemas";
 
 type Props = {
     clientId?: number;
@@ -102,13 +102,13 @@ export default function PlatformCredentialsForm({
     return (
         <Form {...form}>
             <form
-                className="flex flex-col gap-4 min-w-48 p-8 bg-accent rounded text-foreground"
+                className="flex min-w-48 flex-col gap-4 rounded bg-accent p-8 text-foreground"
                 onSubmit={form.handleSubmit(
                     onCredentialsValidAction,
                     console.error,
                 )}
             >
-                <p className="text-2xl uppercase font-bold">
+                <p className="font-bold text-2xl uppercase">
                     Add new credentials
                 </p>
                 <FormField

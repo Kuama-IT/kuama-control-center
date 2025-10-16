@@ -1,8 +1,8 @@
-import { AuthenticatedPageWrapper } from "@/modules/auth/authenticated-page-wrapper";
-import { PageParams } from "@/modules/routing/schemas/routing-schemas";
 import { z } from "zod";
-import { ErrorMessage } from "@/modules/ui/components/error-message";
+import { AuthenticatedPageWrapper } from "@/modules/auth/authenticated-page-wrapper";
 import CashFlowImportPreviewServer from "@/modules/cash-flow/components/cash-flow-import-preview-server";
+import { type PageParams } from "@/modules/routing/schemas/routing-schemas";
+import { ErrorMessage } from "@/modules/ui/components/error-message";
 
 const paramsSchema = z.object({
     id: z.string(),

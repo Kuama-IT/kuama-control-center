@@ -1,5 +1,5 @@
+import { type NextRequest } from "next/server";
 import { cashFlowService } from "@/modules/cash-flow/cash-flow.service";
-import { NextRequest } from "next/server";
 
 export async function POST(request: NextRequest) {
     const formData = await request.formData();

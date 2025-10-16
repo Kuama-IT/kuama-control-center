@@ -1,10 +1,8 @@
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AuthenticatedPageWrapper } from "@/modules/auth/authenticated-page-wrapper";
-import WeeklyAbsence from "@/modules/timesheets/components/weekly-absence";
-// import PubblicaWebFolders from "@/modules/pubblica-web/components/pubblica-web-folders";
-
 import { CashFlowImports } from "@/modules/cash-flow/components/cash-flow-imports";
+import WeeklyAbsence from "@/modules/timesheets/components/weekly-absence";
 
 async function Page() {
     return (
@@ -15,7 +13,6 @@ async function Page() {
             >
                 <WeeklyAbsence />
             </Suspense>
-            {/*<PubblicaWebFolders />*/}
         </div>
     );
 }

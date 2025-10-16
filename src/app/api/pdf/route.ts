@@ -1,4 +1,4 @@
-import { NextRequest } from "next/server";
+import { type NextRequest } from "next/server";
 import puppeteer from "puppeteer-core";
 import { serverEnv } from "@/env/server-env";
 import { accessTokensServer } from "@/modules/access-tokens/access-tokens.server";
@@ -16,10 +16,10 @@ export async function GET(request: NextRequest) {
         );
     }
 
-    let parsedUri;
+    let parsedUri: URL;
     try {
         parsedUri = new URL(url);
-    } catch (e) {
+    } catch (_e) {
         return Response.json(
             { message: `Invalid url provided` },
             { status: 400 },
@@ -50,7 +50,6 @@ export async function GET(request: NextRequest) {
 
     parsedUri.searchParams.set("accessToken", accessToken);
 
-    console.log(`Generating PDF for ${parsedUri.toString()}`);
     const page = await browser.newPage();
     await page.goto(parsedUri.toString());
 

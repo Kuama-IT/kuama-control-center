@@ -1,5 +1,5 @@
+import { type NextRequest, NextResponse } from "next/server";
 import { fattureInCloudApiClient } from "@/modules/fatture-in-cloud/fatture-in-cloud-api";
-import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
     const { searchParams } = request.nextUrl;

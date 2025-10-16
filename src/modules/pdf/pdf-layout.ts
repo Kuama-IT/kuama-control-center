@@ -14,7 +14,7 @@
 
 import { getDocument, Util } from "pdfjs-dist";
 import "pdfjs-dist/build/pdf.worker.min.mjs";
-import {type TextItem} from "pdfjs-dist/types/src/display/api";
+import { type TextItem } from "pdfjs-dist/types/src/display/api";
 
 export type PdfTextItem = {
     page: number; // 1-based page index

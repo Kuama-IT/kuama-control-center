@@ -1,10 +1,9 @@
+import { endOfMonth, parse, startOfMonth, subMonths } from "date-fns";
 import { EmittedInvoicesImport } from "@/modules/cash-flow/components/emitted-invoices-import";
 import {
     datePeriodParamsSchema,
-    PageParams,
+    type PageParams,
 } from "@/modules/routing/schemas/routing-schemas";
-import { ErrorMessage } from "@/modules/ui/components/error-message";
-import { parse, startOfMonth, endOfMonth, subMonths, format } from "date-fns";
 
 export default async function Page({ searchParams }: PageParams) {
     const parsedParams = datePeriodParamsSchema.safeParse(await searchParams);

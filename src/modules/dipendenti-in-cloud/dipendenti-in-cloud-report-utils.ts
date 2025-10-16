@@ -157,37 +157,40 @@ export const getDataForReport = ({
     });
     const rows: ReportRow[] = [];
 
-    const absencesByEmployee = absences.reduce((acc, absence) => {
-        const employeeId = absence.employees?.id;
-        if (!employeeId) {
+    const absencesByEmployee = absences.reduce(
+        (acc, absence) => {
+            const employeeId = absence.employees?.id;
+            if (!employeeId) {
+                return acc;
+            }
+            if (!acc.has(employeeId)) {
+                acc.set(employeeId, []);
+            }
+
+            const { hours, minutes } = parsePostgresInterval(
+                absence.absence_days?.duration ?? "",
+            );
+
+            acc.get(employeeId)?.push({
+                duration: absence.absence_days?.duration ?? "",
+                hours,
+                minutes,
+                reasonCode: absence.absence_days?.reasonCode ?? "",
+                date: absence.absence_days?.date ?? "",
+            });
             return acc;
-        }
-        if (!acc.has(employeeId)) {
-            acc.set(employeeId, []);
-        }
-
-        const { hours, minutes } = parsePostgresInterval(
-            absence.absence_days?.duration ?? "",
-        );
-
-        acc.get(employeeId)?.push({
-            duration: absence.absence_days?.duration ?? "",
-            hours,
-            minutes,
-            reasonCode: absence.absence_days?.reasonCode ?? "",
-            date: absence.absence_days?.date ?? "",
-        });
-        return acc;
-    }, new Map<
-        number,
-        {
-            date: string;
-            hours: number;
-            minutes: number;
-            duration: string;
-            reasonCode: string;
-        }[]
-    >());
+        },
+        new Map<
+            number,
+            {
+                date: string;
+                hours: number;
+                minutes: number;
+                duration: string;
+                reasonCode: string;
+            }[]
+        >(),
+    );
 
     for (const employee of employees) {
         const item: ReportRow = {

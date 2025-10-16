@@ -1,6 +1,5 @@
-import type { Metadata } from "next";
+import { type Metadata } from "next";
 import { AuthenticatedPageWrapper } from "@/modules/auth/authenticated-page-wrapper";
-import EmployeeList from "@/modules/employees/components/employee-list";
 import { EmployeesWithPayslips } from "@/modules/employees/components/employees-with-payslips";
 import { employeesServer } from "@/modules/employees/employees.server";
 
