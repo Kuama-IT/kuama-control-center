@@ -1,10 +1,10 @@
 import { redirect } from "next/navigation";
+import { type JSX } from "react";
 import { auth } from "@/modules/auth/auth";
-import { JSX } from "react";
-import { PageParams } from "@/modules/routing/schemas/routing-schemas";
+import { type PageParams } from "@/modules/routing/schemas/routing-schemas";
 
 export async function AuthenticatedPageWrapper(
-    pageComponent: (params: PageParams | undefined) => Promise<JSX.Element>,
+    pageComponent: (pageParams: PageParams | undefined) => Promise<JSX.Element>,
     params: PageParams | undefined = undefined,
 ) {
     const session = await auth();

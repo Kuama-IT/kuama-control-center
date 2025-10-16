@@ -1,14 +1,14 @@
-import WeeklyAbsence from "@/modules/timesheets/components/weekly-absence";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Suspense } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { AuthenticatedPageWrapper } from "@/modules/auth/authenticated-page-wrapper";
+import WeeklyAbsence from "@/modules/timesheets/components/weekly-absence";
 // import PubblicaWebFolders from "@/modules/pubblica-web/components/pubblica-web-folders";
 
 import { CashFlowImports } from "@/modules/cash-flow/components/cash-flow-imports";
 
 async function Page() {
     return (
-        <div className="pt-4 px-4">
+        <div className="px-4 pt-4">
             <CashFlowImports />
             <Suspense
                 fallback={<Skeleton className="h-[200px] w-full rounded-xl" />}
