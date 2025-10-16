@@ -1,9 +1,10 @@
 "use client";
 
-import { useMutation } from "@tanstack/react-query";
+import { useServerActionMutation } from "@/modules/ui/hooks/use-server-action-mutation";
 import { createInvoices } from "../invoices.actions";
+
 export const useCreateInvoicesByFattureInCloudDtosMutation = () => {
-    return useMutation({
-        mutationFn: createInvoices,
+    return useServerActionMutation({
+        action: createInvoices,
     });
 };

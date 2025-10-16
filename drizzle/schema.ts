@@ -87,7 +87,29 @@ export const invoices = pgTable("invoices", {
   updatedAt: timestamp().notNull().defaultNow(),
 });
 
-export const invoiceProjects = pgTable("invoice_projects", {
+export const suppliers = pgTable("suppliers", {
+    id: serial().primaryKey(),
+    vatId: serial()
+        .references(() => vats.id)
+        .notNull(),
+    name: varchar({ length: 512 }).notNull(),
+    email: varchar({ length: 512 }),
+    phone: varchar({ length: 512 }),
+    externalId: varchar({ length: 256 }).notNull().unique(), // id from fatture in cloud
+    createdAt: timestamp().notNull().defaultNow(),
+    updatedAt: timestamp().notNull().defaultNow(),
+})
+
+export const invoicesSuppliers = pgTable("invoices_suppliers", {
+    invoiceId: integer()
+        .references(() => invoices.id)
+        .notNull(),
+    supplierId: integer()
+        .references(() => suppliers.id)
+        .notNull(),
+})
+
+export const invoicesProjects = pgTable("invoices_projects", {
   invoiceId: integer()
     .references(() => invoices.id)
     .notNull(),

@@ -1,7 +1,7 @@
-import { IssuedDocument } from "@fattureincloud/fattureincloud-ts-sdk";
+import { type IssuedDocument } from "@fattureincloud/fattureincloud-ts-sdk";
+import { eq, inArray, sql } from "drizzle-orm";
 import { db } from "@/drizzle/drizzle-db";
 import { invoices, vats } from "@/drizzle/schema";
-import { eq, inArray, sql } from "drizzle-orm";
 import { firstOrThrow } from "@/utils/array-utils";
 
 export const invoicesService = {
@@ -10,17 +10,19 @@ export const invoicesService = {
         const invoicesByVat = new Map<string, IssuedDocument[]>();
         for (const fattureInCloudInvoice of issuedDocuments) {
             // for some reason we are not receiving vat for Nimika...
-            if (
-                fattureInCloudInvoice.entity?.name ===
-                "Ennkaye Consulting Limited"
-            ) {
-                fattureInCloudInvoice.entity.vat_number = "13352539";
-            }
+            // if (
+            //     fattureInCloudInvoice.entity?.name ===
+            //     "Ennkaye Consulting Limited"
+            // ) {
+            //     fattureInCloudInvoice.entity.vat_number = "13352539";
+            // }
 
             const vat = fattureInCloudInvoice.entity?.vat_number;
 
             if (!vat) {
-                continue;
+                throw new Error(
+                    "Found fatture in cloud invoice w/o vat number",
+                );
             }
             if (!invoicesByVat.has(vat)) {
                 invoicesByVat.set(vat, []);
@@ -101,7 +103,7 @@ export const invoicesService = {
                         `Invoice entity VAT number is missing for ${fattureInCloudInvoice.number} - ${fattureInCloudInvoice.entity?.name}`,
                     );
                 }
-                const vatRecord = await firstOrThrow(
+                const vatRecord = firstOrThrow(
                     await tx.select().from(vats).where(eq(vats.vat, vat)),
                 );
 

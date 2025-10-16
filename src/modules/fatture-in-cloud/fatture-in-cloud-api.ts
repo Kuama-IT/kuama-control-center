@@ -1,28 +1,21 @@
-import { serverEnv } from "@/env/server-env";
 import {
-    ClientsApi,
-    Configuration,
-    IssuedDocument,
-    IssuedDocumentsApi,
-    ListIssuedDocumentsResponse,
-    ListSuppliersResponse,
-    ReceivedDocument,
-    Supplier,
-    SuppliersApi,
+    type IssuedDocument,
+    type ListIssuedDocumentsResponse,
+    type ListReceivedDocumentsResponse,
+    type ListSuppliersResponse,
+    type ReceivedDocument,
+    type Supplier,
 } from "@fattureincloud/fattureincloud-ts-sdk";
-import type { ListClientsResponse } from "@fattureincloud/fattureincloud-ts-sdk/src/models";
-import type { Client } from "@fattureincloud/fattureincloud-ts-sdk/src/models/client";
+import { type ListClientsResponse } from "@fattureincloud/fattureincloud-ts-sdk/src/models";
+import { type Client } from "@fattureincloud/fattureincloud-ts-sdk/src/models/client";
+import { format } from "date-fns";
+import { serverEnv } from "@/env/server-env";
 
-const formatDate = (date: Date) => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
+const _formatDate = (date: Date) => {
+    return format(date, "yyyy-MM-dd");
 };
 
 export class FattureInCloudApi {
-    private readonly suppliersApi: SuppliersApi;
-    private readonly clientsApi: ClientsApi;
     private readonly baseEndpoint = "https://api-v2.fattureincloud.it/c/";
     private readonly baseHeaders: Headers;
 
@@ -30,11 +23,6 @@ export class FattureInCloudApi {
         public readonly apiToken: string,
         public readonly companyId: string,
     ) {
-        const apiConfig = new Configuration({
-            accessToken: apiToken,
-        });
-        this.suppliersApi = new SuppliersApi(apiConfig);
-        this.clientsApi = new ClientsApi(apiConfig);
         this.baseHeaders = new Headers({
             "Content-Type": "application/json",
             Authorization: `Bearer ${this.apiToken}`,
@@ -80,12 +68,11 @@ export class FattureInCloudApi {
     async getIssuedInvoices(params?: {
         date_from?: Date;
         date_to?: Date;
-    }): Promise<Array<IssuedDocument>> {
-        const invoices: Array<IssuedDocument> = [];
+    }): Promise<IssuedDocument[]> {
+        const invoices: IssuedDocument[] = [];
 
         // format dates: YYYY-MM-DD
 
-        const p = new IssuedDocumentsApi();
         // Build query parameters (note: issued documents API doesn't support date filtering)
         const queryParams = new URLSearchParams({
             type: "invoice",
@@ -95,7 +82,7 @@ export class FattureInCloudApi {
         if (params?.date_from && params?.date_to) {
             queryParams.append(
                 "q",
-                `date>='${formatDate(params.date_from)}' AND date<='${formatDate(params.date_to)}'`,
+                `date>='${_formatDate(params.date_from)}' AND date<='${_formatDate(params.date_to)}'`,
             );
         }
 
@@ -137,16 +124,23 @@ export class FattureInCloudApi {
     }
 
     async getReceivedInvoices(params?: {
-        date_from?: string;
-        date_to?: string;
-    }): Promise<Array<ReceivedDocument>> {
-        const receivedInvoices: Array<ReceivedDocument> = [];
+        date_from?: Date;
+        date_to?: Date;
+    }): Promise<ReceivedDocument[]> {
+        const receivedInvoices: ReceivedDocument[] = [];
 
         // Build query parameters (note: received documents API doesn't support date filtering)
         const queryParams = new URLSearchParams({
             type: "expense",
             per_page: "100",
         });
+
+        if (params?.date_from && params?.date_to) {
+            queryParams.append(
+                "q",
+                `date>='${_formatDate(params.date_from)}' AND date<='${_formatDate(params.date_to)}'`,
+            );
+        }
 
         let url: string | undefined | null =
             `${this.baseEndpoint}${this.companyId}/received_documents?${queryParams.toString()}`;
@@ -156,7 +150,7 @@ export class FattureInCloudApi {
                 method: "GET",
                 headers: this.baseHeaders,
             });
-            const data: any = await res.json();
+            const data: ListReceivedDocumentsResponse = await res.json();
             receivedInvoices.push(...(data.data ?? []));
             url = data.next_page_url;
         }

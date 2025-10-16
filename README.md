@@ -41,7 +41,11 @@ MEDIUM introduce usequery/usemutation where is beneficial not to wait for the se
 MEDIUM apply the brutal theme to all UI
 LOW: handle "missing employees" from payslips: do create and entry for them as "fired" or "dismissed". This is needed to handle both
 old project teams and balances/stats, that needs to be split by the correct number of employees for its given time period.
+client -> invoices
+supplier -> invoices
+cashflow -> cashflow entry / bank statement
 
+maybe a correct idea: we should associate a given project with N clients and N employee and N suppliers?
 ## DONE
 
 while parsing payrolls can be "handy", we need to parse the "bilancino" to retrieve the total

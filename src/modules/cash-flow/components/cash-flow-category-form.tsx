@@ -1,20 +1,9 @@
 "use client";
 
-import { useForm, Controller } from "react-hook-form";
-import { useTransition } from "react";
-import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-    cashFlowCategoryFormSchema,
-    type CashFlowCategoryForm,
-} from "../schemas/cash-flow-catefory-form.schema";
-import { type CashFlowCategoryRead } from "../schemas/cash-flow-category-read";
-import {
-    handledCreateCashFlowCategory,
-    handledUpdateCashFlowCategory,
-} from "../cash-flow-categories.actions";
-import { isFailure } from "@/utils/server-action-utils";
-import { notifyError, notifySuccess } from "@/modules/ui/components/notify";
+import { useRouter } from "next/navigation";
+import { useTransition } from "react";
+import { Controller, useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -25,10 +14,21 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import { notifyError, notifySuccess } from "@/modules/ui/components/notify";
+import { isFailure } from "@/utils/server-action-utils";
+import {
+    handledCreateCashFlowCategory,
+    handledUpdateCashFlowCategory,
+} from "../cash-flow-categories.actions";
+import {
+    type CashFlowCategoryForm,
+    cashFlowCategoryFormSchema,
+} from "../schemas/cash-flow-catefory-form.schema";
+import { type CashFlowCategoryRead } from "../schemas/cash-flow-category-read";
 
-interface CashFlowCategoryFormProps {
+type CashFlowCategoryFormProps = {
     category?: CashFlowCategoryRead;
-}
+};
 
 export function CashFlowCategoryForm({ category }: CashFlowCategoryFormProps) {
     const [isPending, startTransition] = useTransition();
@@ -88,7 +88,7 @@ export function CashFlowCategoryForm({ category }: CashFlowCategoryFormProps) {
                     className="mt-1"
                 />
                 {errors.name && (
-                    <p className="text-sm text-red-600 mt-1">
+                    <p className="mt-1 text-red-600 text-sm">
                         {errors.name.message}
                     </p>
                 )}
@@ -115,7 +115,7 @@ export function CashFlowCategoryForm({ category }: CashFlowCategoryFormProps) {
                     )}
                 />
                 {errors.type && (
-                    <p className="text-sm text-red-600 mt-1">
+                    <p className="mt-1 text-red-600 text-sm">
                         {errors.type.message}
                     </p>
                 )}
