@@ -2,7 +2,6 @@ import { drizzle } from "drizzle-orm/postgres-js";
 import { serverEnv } from "@/env/server-env";
 import postgres from "postgres";
 import * as schema from "./schema";
-import * as relations from "./relations";
 
 // TODO switch over pools
 
@@ -14,7 +13,7 @@ export const db = drizzle({
   casing: "snake_case",
   client,
   logger: serverEnv.showDatabaseLogs,
-  schema: { ...schema, ...relations },
+  schema
 });
 
 // Transaction type inferred from db.transaction callback parameter

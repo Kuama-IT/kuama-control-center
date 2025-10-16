@@ -2,7 +2,11 @@ import { AuthenticatedPageWrapper } from "@/modules/auth/authenticated-page-wrap
 import { SupplierList } from "@/modules/suppliers/components/suppliers-list";
 
 async function Page() {
-    return <SupplierList />;
+    return (
+        <div className="mx-auto max-w-(--breakpoint-lg) pt-4">
+            <SupplierList />
+        </div>
+    );
 }
 
 export default async function () {

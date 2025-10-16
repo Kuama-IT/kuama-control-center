@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { AiFillHome } from "react-icons/ai";
 import { BiSolidBank } from "react-icons/bi";
-import { FaUserGroup } from "react-icons/fa6";
+import { FaShop, FaUserGroup } from "react-icons/fa6";
 import { IoMdSettings } from "react-icons/io";
 import { MdOutlineWork } from "react-icons/md";
 import { auth } from "@/modules/auth/auth";
@@ -47,6 +47,12 @@ export const NavBar = async () => {
                                 size={iconSize}
                                 aria-label="CashFlow"
                             />
+                        </Link>
+                    )}
+
+                    {session.user.isAdmin && (
+                        <Link href={routes.suppliers()}>
+                            <FaShop size={iconSize} aria-label="CashFlow" />
                         </Link>
                     )}
 

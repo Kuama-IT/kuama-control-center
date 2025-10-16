@@ -5,5 +5,6 @@ export const routes = {
     employee: (id: number) => `/employees/${id}`,
     dashboard: () => "/k-dashboard",
     settings: () => "/settings",
+    suppliers: () => "/suppliers",
     cashFlows: () => "/cash-flows",
 };
