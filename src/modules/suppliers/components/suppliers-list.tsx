@@ -18,7 +18,7 @@ export async function SupplierList() {
                     <SettingsIcon />
                 </Link>
             </div>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 {suppliers.map((supplier) => (
                     <SupplierCard key={supplier.id} supplier={supplier} />
                 ))}

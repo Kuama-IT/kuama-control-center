@@ -82,16 +82,16 @@ export const invoices = pgTable("invoices", {
   date: date().notNull(),
   dueDate: date().notNull(),
   externalId: varchar({ length: 256 }).notNull().unique(), // id from fatture in cloud
-  number: integer().notNull(),
+     type: varchar({ length: 256 }).notNull().default("invoice"),
+  number: varchar().notNull(),
   createdAt: timestamp().notNull().defaultNow(),
   updatedAt: timestamp().notNull().defaultNow(),
 });
 
 export const suppliers = pgTable("suppliers", {
     id: serial().primaryKey(),
-    vatId: serial()
-        .references(() => vats.id)
-        .notNull(),
+    vatId: integer()
+        .references(() => vats.id),
     name: varchar({ length: 512 }).notNull(),
     email: varchar({ length: 512 }),
     phone: varchar({ length: 512 }),

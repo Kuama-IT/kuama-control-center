@@ -7,7 +7,7 @@
     },
     "files": {
         "ignoreUnknown": true,
-        "includes": ["src/**", "tests-e2e/**", "tests/**"]
+        "includes": ["src/**", "drizzle/**", "tests-e2e/**", "tests/**"]
     },
     "formatter": {
         "enabled": true,

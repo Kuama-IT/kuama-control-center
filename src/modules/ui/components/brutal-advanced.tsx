@@ -1,4 +1,6 @@
-import React from "react";
+import type React from "react";
+import { type DateRange } from "react-day-picker";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Calendar } from "@/components/ui/calendar";
 import { Command, CommandInput, CommandItem } from "@/components/ui/command";
 import {
@@ -10,6 +12,14 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog";
 import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
     HoverCard,
     HoverCardContent,
     HoverCardTrigger,
@@ -19,33 +29,23 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { brutalTheme, cn } from "@/modules/ui";
-import { DateRange } from "react-day-picker";
 
 // Brutal Calendar Component
-export interface BrutalCalendarProps {
+export type BrutalCalendarProps = {
     selected?: Date;
     onSelect?: (date: Date | undefined) => void;
     className?: string;
-}
+};
 // Brutal Calendar Component
-export interface BrutalCalendarRangeProps {
+export type BrutalCalendarRangeProps = {
     selected?: DateRange;
     onSelect?: (date: DateRange | undefined) => void;
     className?: string;
     today?: Date | undefined;
     defaultMonth?: Date | undefined;
     numberOfMonths?: number;
-}
+};
 
 export const BrutalCalendar: React.FC<BrutalCalendarProps> = ({
     selected,
@@ -116,14 +116,14 @@ export const BrutalCalendarRange: React.FC<BrutalCalendarRangeProps> = ({
         container: cn(
             brutalTheme.borders.medium,
             brutalTheme.shadows.lg,
-            "bg-white p-4",
+            "bg-white p-4 flex gap-8",
             brutalTheme.base.sharp,
         ),
-        months: "space-y-4",
+        // months: "space-y-4",
         month: "space-y-4",
         caption: "flex justify-center pt-1 relative items-center",
         caption_label: "font-black text-lg uppercase tracking-wider",
-        nav: "space-x-1 flex items-center",
+        // nav: "space-x-1 flex items-center",
         nav_button: cn(
             "h-10 w-10 bg-white hover:bg-black hover:text-white",
             "border-2 border-black font-bold",
@@ -131,20 +131,20 @@ export const BrutalCalendarRange: React.FC<BrutalCalendarRangeProps> = ({
             brutalTheme.base.sharp,
             "cursor-pointer flex items-center justify-center",
         ),
-        nav_button_previous: "absolute left-1",
-        nav_button_next: "absolute right-1",
+        // nav_button_previous: "absolute left-1",
+        // nav_button_next: "absolute right-1",
         table: "w-full border-collapse",
         head_row: "",
         head_cell: "text-black font-black uppercase text-sm text-center p-2",
         row: "",
         cell: "text-center p-0 relative",
-        day: cn(
-            "h-12 w-12 border-2 border-black font-bold",
-            "hover:bg-black hover:text-white",
-            brutalTheme.transitions.fast,
-            brutalTheme.base.sharp,
-            "cursor-pointer text-center leading-12",
-        ),
+        // day: cn(
+        //     "h-12 w-12 border-2 border-black font-bold border-r-0",
+        //     "hover:bg-black hover:text-white",
+        //     brutalTheme.transitions.fast,
+        //     brutalTheme.base.sharp,
+        //     "cursor-pointer text-center leading-12",
+        // ),
         day_selected: "bg-black text-white border-black",
         day_today: "bg-red-500 text-white border-red-500",
         day_outside: "text-gray-400 opacity-50",
@@ -168,10 +168,10 @@ export const BrutalCalendarRange: React.FC<BrutalCalendarRangeProps> = ({
 };
 
 // Brutal Command Component
-export interface BrutalCommandProps {
+export type BrutalCommandProps = {
     children: React.ReactNode;
     className?: string;
-}
+};
 
 export const BrutalCommand: React.FC<BrutalCommandProps> = ({
     children,
@@ -200,7 +200,7 @@ export const BrutalCommandInput: React.FC<{
         <CommandInput
             placeholder={placeholder}
             className={cn(
-                "border-0 border-b-4 border-black px-6 py-4 font-bold text-lg",
+                "border-0 border-black border-b-4 px-6 py-4 font-bold text-lg",
                 "focus:outline-none",
                 brutalTheme.base.sharp,
                 "bg-white",
@@ -218,9 +218,9 @@ export const BrutalCommandItem: React.FC<{
     return (
         <CommandItem
             className={cn(
-                "px-6 py-4 font-bold hover:bg-black hover:text-white cursor-pointer",
+                "cursor-pointer px-6 py-4 font-bold hover:bg-black hover:text-white",
                 brutalTheme.transitions.fast,
-                "border-b-2 border-gray-200 last:border-b-0",
+                "border-gray-200 border-b-2 last:border-b-0",
                 className,
             )}
             {...props}
@@ -231,12 +231,12 @@ export const BrutalCommandItem: React.FC<{
 };
 
 // Brutal Dialog Components
-export interface BrutalDialogProps {
+export type BrutalDialogProps = {
     children: React.ReactNode;
     trigger: React.ReactNode;
     title: string;
     description?: string;
-}
+};
 
 export const BrutalDialog: React.FC<BrutalDialogProps> = ({
     children,
@@ -256,11 +256,11 @@ export const BrutalDialog: React.FC<BrutalDialogProps> = ({
                 )}
             >
                 <DialogHeader>
-                    <DialogTitle className="font-black text-3xl uppercase tracking-wider mb-4">
+                    <DialogTitle className="mb-4 font-black text-3xl uppercase tracking-wider">
                         {title}
                     </DialogTitle>
                     {description && (
-                        <DialogDescription className="font-bold text-lg text-gray-700 mb-6">
+                        <DialogDescription className="mb-6 font-bold text-gray-700 text-lg">
                             {description}
                         </DialogDescription>
                     )}
@@ -272,11 +272,11 @@ export const BrutalDialog: React.FC<BrutalDialogProps> = ({
 };
 
 // Brutal Popover Component
-export interface BrutalPopoverProps {
+export type BrutalPopoverProps = {
     children: React.ReactNode;
     trigger: React.ReactNode;
     className?: string;
-}
+};
 
 export const BrutalPopover: React.FC<BrutalPopoverProps> = ({
     children,
@@ -290,7 +290,7 @@ export const BrutalPopover: React.FC<BrutalPopoverProps> = ({
                     brutalTheme.borders.medium,
                     "font-bold hover:bg-black hover:text-white",
                     brutalTheme.transitions.fast,
-                    "px-4 py-2 cursor-pointer",
+                    "cursor-pointer px-4 py-2",
                     brutalTheme.base.sharp,
                 )}
             >
@@ -312,11 +312,11 @@ export const BrutalPopover: React.FC<BrutalPopoverProps> = ({
 };
 
 // Brutal Hover Card Component
-export interface BrutalHoverCardProps {
+export type BrutalHoverCardProps = {
     children: React.ReactNode;
     trigger: React.ReactNode;
     className?: string;
-}
+};
 
 export const BrutalHoverCard: React.FC<BrutalHoverCardProps> = ({
     children,
@@ -327,7 +327,7 @@ export const BrutalHoverCard: React.FC<BrutalHoverCardProps> = ({
         <HoverCard>
             <HoverCardTrigger
                 className={cn(
-                    "border-b-2 border-black font-bold cursor-pointer",
+                    "cursor-pointer border-black border-b-2 font-bold",
                     "hover:bg-black hover:text-white",
                     brutalTheme.transitions.fast,
                     "px-2 py-1",
@@ -351,11 +351,11 @@ export const BrutalHoverCard: React.FC<BrutalHoverCardProps> = ({
 };
 
 // Brutal Dropdown Menu Component
-export interface BrutalDropdownMenuProps {
+export type BrutalDropdownMenuProps = {
     children: React.ReactNode;
     trigger: React.ReactNode;
     className?: string;
-}
+};
 
 export const BrutalDropdownMenu: React.FC<BrutalDropdownMenuProps> = ({
     children,
@@ -369,7 +369,7 @@ export const BrutalDropdownMenu: React.FC<BrutalDropdownMenuProps> = ({
                     brutalTheme.borders.medium,
                     "font-bold hover:bg-black hover:text-white",
                     brutalTheme.transitions.fast,
-                    "px-4 py-2 cursor-pointer",
+                    "cursor-pointer px-4 py-2",
                     brutalTheme.base.sharp,
                 )}
             >
@@ -398,7 +398,7 @@ export const BrutalDropdownMenuItem: React.FC<{
     return (
         <DropdownMenuItem
             className={cn(
-                "px-4 py-3 font-bold hover:bg-black hover:text-white cursor-pointer",
+                "cursor-pointer px-4 py-3 font-bold hover:bg-black hover:text-white",
                 brutalTheme.transitions.fast,
                 "uppercase",
                 className,
@@ -417,7 +417,7 @@ export const BrutalDropdownMenuLabel: React.FC<{
     return (
         <DropdownMenuLabel
             className={cn(
-                "px-4 py-2 font-black uppercase text-sm tracking-wider bg-gray-100",
+                "bg-gray-100 px-4 py-2 font-black text-sm uppercase tracking-wider",
                 className,
             )}
         >
@@ -431,19 +431,19 @@ export const BrutalDropdownMenuSeparator: React.FC<{
 }> = ({ className }) => {
     return (
         <DropdownMenuSeparator
-            className={cn("border-t-2 border-black my-2", className)}
+            className={cn("my-2 border-black border-t-2", className)}
         />
     );
 };
 
 // Brutal Avatar Component
-export interface BrutalAvatarProps {
+export type BrutalAvatarProps = {
     src?: string;
     alt?: string;
     fallback: string;
     size?: "sm" | "md" | "lg";
     className?: string;
-}
+};
 
 export const BrutalAvatar: React.FC<BrutalAvatarProps> = ({
     src,
@@ -470,7 +470,7 @@ export const BrutalAvatar: React.FC<BrutalAvatarProps> = ({
             )}
         >
             {src && <AvatarImage src={src} alt={alt} />}
-            <AvatarFallback className="bg-black text-white font-black text-xl">
+            <AvatarFallback className="bg-black font-black text-white text-xl">
                 {fallback}
             </AvatarFallback>
         </Avatar>

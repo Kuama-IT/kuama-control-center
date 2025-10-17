@@ -1,3 +1,3 @@
 import { type vats } from "@/drizzle/schema";
 
-export type VatRead = typeof vats.$inferInsert;
+export type VatReadDto = typeof vats.$inferInsert;

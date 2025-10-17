@@ -1,3 +1,4 @@
+"use client";
 import { useUpsertAllSuppliersFromFattureInCloudMutation } from "@/modules/suppliers/mutations/suppliers.mutations";
 import { BrutalButton } from "@/modules/ui";
 import { notifyError, notifySuccess } from "@/modules/ui/components/notify";

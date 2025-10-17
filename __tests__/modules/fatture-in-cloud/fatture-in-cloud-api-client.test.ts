@@ -1,6 +1,6 @@
 import { fattureInCloudApiClient } from "@/modules/fatture-in-cloud/fatture-in-cloud-api";
 import { describe, expect, test } from "vitest";
-import { invoicesService } from "@/modules/invoices/invoices.service";
+import { invoicesServer } from "@/modules/invoices/invoices.server";
 
 describe("fatture-in-cloud-api", () => {
   test("fake test", () => {
@@ -20,12 +20,20 @@ describe("fatture-in-cloud-api", () => {
   // });
   test("get issued invoices with date range", async () => {
     const invoices = await fattureInCloudApiClient.getIssuedInvoices({
-      date_from: new Date("2024-01-01"),
-      date_to: new Date("2024-12-31"),
+      date_from: new Date("2025-09-01"),
+      date_to: new Date("2025-09-31"),
     });
 
-    await invoicesService.createFromFattureInCloudDtos(invoices);
+    expect(invoices.length).eq(6);
+  });
+  test("get received invoices with date range", async () => {
+          const invoices = await fattureInCloudApiClient.getReceivedInvoices({
+              date_from: new Date("2025-09-01"),
+              date_to: new Date("2025-09-31"),
+          });
 
-    expect(invoices.length).gt(0);
+          expect(invoices.length).eq(20);
+
+
   });
 });

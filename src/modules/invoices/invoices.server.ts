@@ -2,9 +2,11 @@ import { type IssuedDocument } from "@fattureincloud/fattureincloud-ts-sdk";
 import { eq, inArray, sql } from "drizzle-orm";
 import { db } from "@/drizzle/drizzle-db";
 import { invoices, vats } from "@/drizzle/schema";
+import { fattureInCloudApiClient } from "@/modules/fatture-in-cloud/fatture-in-cloud-api";
 import { firstOrThrow } from "@/utils/array-utils";
+import { type ServerActionResult } from "@/utils/server-actions.utils";
 
-export const invoicesService = {
+export const invoicesServer = {
     async createFromFattureInCloudDtos(issuedDocuments: IssuedDocument[]) {
         // group invoices by vat
         const invoicesByVat = new Map<string, IssuedDocument[]>();
@@ -119,7 +121,9 @@ export const invoicesService = {
                     date: fattureInCloudInvoice.date ?? "",
                     dueDate: fattureInCloudInvoice.payments_list[0].due_date,
                     externalId: fattureInCloudInvoice.id?.toString() || "",
-                    number: fattureInCloudInvoice.number ?? 0,
+                    number:
+                        fattureInCloudInvoice.number?.toString() ?? "UNKNOWN",
+                    type: fattureInCloudInvoice.type,
                 };
 
                 insertValues.push(record);
@@ -129,5 +133,55 @@ export const invoicesService = {
 
             return { success: true, message: "Invoices created successfully" };
         });
+    },
+
+    async importReceivedInvoicesByDateFromFattureInCloud(dto: {
+        from: Date;
+        to: Date;
+    }): Promise<ServerActionResult> {
+        const fattureInCloudReceivedInvoices =
+            await fattureInCloudApiClient.getReceivedInvoices({
+                date_from: dto.from,
+                date_to: dto.to,
+            });
+
+        const insertValues: (typeof invoices.$inferInsert)[] = [];
+
+        for (const fattureInCloudInvoice of fattureInCloudReceivedInvoices) {
+            const vat = fattureInCloudInvoice.entity?.vat_number;
+            if (!vat) {
+                console.error(fattureInCloudInvoice.entity);
+                throw new Error(
+                    `Invoice entity VAT number is missing for ${fattureInCloudInvoice.invoice_number} - ${fattureInCloudInvoice.entity?.name}`,
+                );
+            }
+            const vatRecord = firstOrThrow(
+                await db.select().from(vats).where(eq(vats.vat, vat)),
+            );
+
+            if (!fattureInCloudInvoice.payments_list?.[0]?.due_date) {
+                throw new Error("Invoice due date is missing");
+            }
+            const record: typeof invoices.$inferInsert = {
+                vat: vatRecord.id,
+                subject: fattureInCloudInvoice.description ?? "UNKNOWN",
+                amountNet: fattureInCloudInvoice.amount_net ?? 0,
+                amountGross: fattureInCloudInvoice.amount_gross ?? 0,
+                amountVat: fattureInCloudInvoice.amount_vat ?? 0,
+                date: fattureInCloudInvoice.date ?? "",
+                dueDate: fattureInCloudInvoice.payments_list[0].due_date,
+                externalId: fattureInCloudInvoice.id?.toString() || "",
+                number: fattureInCloudInvoice.invoice_number ?? "",
+                type: fattureInCloudInvoice.type,
+            };
+
+            insertValues.push(record);
+        }
+
+        await db.insert(invoices).values(insertValues);
+
+        return {
+            message: `Imported ${insertValues.length} invoices`,
+        };
     },
 };

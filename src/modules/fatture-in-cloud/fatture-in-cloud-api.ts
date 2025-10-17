@@ -1,9 +1,12 @@
 import {
+    Configuration,
     type IssuedDocument,
     type ListIssuedDocumentsResponse,
     type ListReceivedDocumentsResponse,
+    type ListReceivedDocumentsTypeEnum,
     type ListSuppliersResponse,
     type ReceivedDocument,
+    ReceivedDocumentsApi,
     type Supplier,
 } from "@fattureincloud/fattureincloud-ts-sdk";
 import { type ListClientsResponse } from "@fattureincloud/fattureincloud-ts-sdk/src/models";
@@ -99,40 +102,76 @@ export class FattureInCloudApi {
             url = data.next_page_url;
         }
 
-        // Filter by date after fetching (since API doesn't support date filtering)
-        if (params?.date_from || params?.date_to) {
-            return invoices.filter((invoice) => {
-                if (!invoice.date) return false;
-
-                const invoiceDate = new Date(invoice.date);
-
-                if (params.date_from) {
-                    const fromDate = new Date(params.date_from);
-                    if (invoiceDate < fromDate) return false;
-                }
-
-                if (params.date_to) {
-                    const toDate = new Date(params.date_to);
-                    if (invoiceDate > toDate) return false;
-                }
-
-                return true;
-            });
-        }
+        // // Filter by date after fetching (since API doesn't support date filtering)
+        // if (params?.date_from || params?.date_to) {
+        //     return invoices.filter((invoice) => {
+        //         if (!invoice.date) return false;
+        //
+        //         const invoiceDate = new Date(invoice.date);
+        //
+        //         if (params.date_from) {
+        //             const fromDate = new Date(params.date_from);
+        //             if (invoiceDate < fromDate) return false;
+        //         }
+        //
+        //         if (params.date_to) {
+        //             const toDate = new Date(params.date_to);
+        //             if (invoiceDate > toDate) return false;
+        //         }
+        //
+        //         return true;
+        //     });
+        // }
 
         return invoices;
     }
 
-    async getReceivedInvoices(params?: {
-        date_from?: Date;
-        date_to?: Date;
+    async getReceivedInvoices(params: {
+        date_from: Date;
+        date_to: Date;
     }): Promise<ReceivedDocument[]> {
         const receivedInvoices: ReceivedDocument[] = [];
 
+        const apiConfig = new Configuration({
+            accessToken: this.apiToken,
+        });
+
+        const api = new ReceivedDocumentsApi(apiConfig);
+
+        const requests = (
+            [
+                "expense",
+                "passive_credit_note",
+                "passive_delivery_note",
+                "self_invoice",
+            ] as ListReceivedDocumentsTypeEnum[]
+        ).map((type) =>
+            api.listReceivedDocuments(
+                Number(this.companyId),
+                type,
+                undefined,
+                undefined,
+                undefined,
+                1,
+                100,
+                `date>='${_formatDate(params.date_from)}' AND date<='${_formatDate(params.date_to)}'`,
+                {
+                    adapter: "fetch",
+                },
+            ),
+        );
+
+        const responses = await Promise.all(requests);
+
+        for (const response of responses) {
+            receivedInvoices.push(...(response.data.data ?? []));
+        }
+
+        return receivedInvoices;
         // Build query parameters (note: received documents API doesn't support date filtering)
         const queryParams = new URLSearchParams({
-            type: "expense",
             per_page: "100",
+            type: "expense",
         });
 
         if (params?.date_from && params?.date_to) {
@@ -143,7 +182,7 @@ export class FattureInCloudApi {
         }
 
         let url: string | undefined | null =
-            `${this.baseEndpoint}${this.companyId}/received_documents?${queryParams.toString()}`;
+            `${this.baseEndpoint}${this.companyId}/received_documents?fieldset=detailed&search=&year=2025&selected_months=10`;
 
         while (url) {
             const res = await fetch(url, {
@@ -151,6 +190,7 @@ export class FattureInCloudApi {
                 headers: this.baseHeaders,
             });
             const data: ListReceivedDocumentsResponse = await res.json();
+            console.log(data);
             receivedInvoices.push(...(data.data ?? []));
             url = data.next_page_url;
         }

@@ -1,7 +1,12 @@
 "use server";
 import { serverActionUtils } from "@/utils/server-actions.utils";
-import { invoicesService } from "./invoices.service";
+import { invoicesServer } from "./invoices.server";
 
 export const createInvoices = serverActionUtils.createSafeAction(
-    invoicesService.createFromFattureInCloudDtos,
+    invoicesServer.createFromFattureInCloudDtos,
 );
+
+export const importReceivedInvoicesByDateFromFattureInCloudAction =
+    serverActionUtils.createSafeAction(
+        invoicesServer.importReceivedInvoicesByDateFromFattureInCloud,
+    );

@@ -13,9 +13,7 @@ export function SupplierCard({
         <div onClick={() => onClick?.()}>
             <BrutalCard>
                 <h3 className="font-bold text-lg">{supplier.name}</h3>
-                <p>{`Email: ${supplier.email}`}</p>
-                <p>{`Phone: ${supplier.phone}`}</p>
-                <p>{`VAT / TAX CODE: ${supplier.vat.vat}`}</p>
+                <p>{`VAT / TAX CODE: ${supplier.vat?.vat ?? "N/A"}`}</p>
             </BrutalCard>
         </div>
     );

@@ -2,9 +2,9 @@ import { db } from "@/drizzle/drizzle-db";
 import { suppliers, vats } from "@/drizzle/schema";
 import { fattureInCloudApiClient } from "@/modules/fatture-in-cloud/fatture-in-cloud-api";
 import { type VatCreateDto } from "@/modules/invoices/schemas/vat.create";
+import { type VatReadDto } from "@/modules/invoices/schemas/vat.read";
 import { vatsDb } from "@/modules/invoices/vats.db";
 import { type SupplierCreateDto } from "@/modules/suppliers/schemas/supplier.create";
-import { type SupplierRead } from "@/modules/suppliers/schemas/supplier.read";
 import { type SupplierReadExtended } from "@/modules/suppliers/schemas/supplier-read-extended";
 import { suppliersDb } from "@/modules/suppliers/suppliers.db";
 import { type ServerActionResult } from "@/utils/server-actions.utils";
@@ -13,7 +13,8 @@ export const suppliersServer = {
     async upsertAllFromFattureInCloud(): Promise<ServerActionResult> {
         const ficSuppliers = await fattureInCloudApiClient.getSuppliers();
 
-        return await db.transaction(async (tx) => {
+        const supplierValues = await db.transaction(async (tx) => {
+            const values: SupplierCreateDto[] = [];
             for (const ficSupplier of ficSuppliers) {
                 if (!ficSupplier.id) {
                     throw new Error(
@@ -27,60 +28,72 @@ export const suppliersServer = {
                 }
 
                 const vat = ficSupplier.vat_number ?? ficSupplier.tax_code;
-                if (!vat) {
-                    throw new Error(
-                        `Found fatture in cloud supplier w/o both vat number and tax code ${ficSupplier.name}`,
-                    );
+                let vatRecord: VatReadDto | undefined;
+                if (vat) {
+                    const vatValue: VatCreateDto = {
+                        vat,
+                        companyName: ficSupplier.name,
+                    };
+                    // upsert vat
+                    [vatRecord] = await tx
+                        .insert(vats)
+                        .values(vatValue)
+                        .onConflictDoUpdate({
+                            target: vats.vat,
+                            set: {
+                                companyName: vatValue.companyName,
+                            },
+                        })
+                        .returning();
                 }
 
-                const vatValues: VatCreateDto = {
-                    vat,
-                    companyName: ficSupplier.name,
-                };
-                // upsert vat
-                const [vatRecord] = await tx
-                    .insert(vats)
-                    .values(vatValues)
-                    .onConflictDoUpdate({
-                        target: vats.vat,
-                        set: {
-                            companyName: vatValues.companyName,
-                        },
-                    })
-                    .returning();
-
                 const supplierDto: SupplierCreateDto = {
-                    vatId: vatRecord.id,
+                    vatId: vatRecord?.id,
                     name: ficSupplier.name,
                     email: ficSupplier.email,
                     phone: ficSupplier.phone,
                     externalId: ficSupplier.id?.toString(),
                 };
-                await tx
+
+                values.push(supplierDto);
+            }
+
+            return values;
+        });
+
+        for (const supplierValue of supplierValues) {
+            try {
+                await db
                     .insert(suppliers)
-                    .values(supplierDto)
+                    .values(supplierValue)
                     .onConflictDoUpdate({
                         target: suppliers.externalId,
                         set: {
-                            vatId: vatRecord.id,
-                            name: ficSupplier.name,
-                            email: ficSupplier.email,
-                            phone: ficSupplier.phone,
+                            vatId: supplierValue.vatId,
+                            name: supplierValue.name,
+                            email: supplierValue.email,
+                            phone: supplierValue.phone,
                         },
                     });
+            } catch (e) {
+                console.error(`While creating`, supplierValue);
+                console.error(e);
+                throw e;
             }
+        }
 
-            return {
-                message: `Imported ${ficSuppliers.length} suppliers`,
-            };
-        });
+        return {
+            message: `Imported ${supplierValues.length} suppliers`,
+        };
     },
 
     async allExtended(): Promise<SupplierReadExtended[]> {
         const supplierRecords = await suppliersDb.getAll();
         const res: SupplierReadExtended[] = [];
         for (const supplier of supplierRecords) {
-            const vat = await vatsDb.getById(supplier.vatId);
+            const vat = supplier.vatId
+                ? await vatsDb.getById(supplier.vatId)
+                : undefined;
 
             res.push({
                 ...supplier,
