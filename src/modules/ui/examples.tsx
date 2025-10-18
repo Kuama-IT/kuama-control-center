@@ -3,23 +3,23 @@
  * Examples of how to use the brutal components in your application
  */
 
-import React from "react";
+import type React from "react";
 import {
+    BrutalBadge,
     BrutalButton,
-    BrutalInput,
     BrutalCard,
     BrutalFormField,
-    BrutalBadge,
+    BrutalInput,
     brutalTheme,
 } from "@/modules/ui";
 
 // Example: Contact Form using Brutal components
 export const BrutalContactForm: React.FC = () => {
     return (
-        <BrutalCard className="max-w-md mx-auto">
+        <BrutalCard className="mx-auto max-w-md">
             <h2 className={brutalTheme.typography.heading}>CONTACT US</h2>
 
-            <div className="space-y-6 mt-6">
+            <div className="mt-6 space-y-6">
                 <BrutalFormField label="YOUR NAME">
                     <BrutalInput placeholder="ENTER YOUR NAME" />
                 </BrutalFormField>
@@ -50,7 +50,7 @@ export const BrutalContactForm: React.FC = () => {
 export const BrutalDataCard: React.FC = () => {
     return (
         <BrutalCard>
-            <div className="flex justify-between items-center">
+            <div className="flex items-center justify-between">
                 <h3 className={brutalTheme.typography.title}>SYSTEM STATUS</h3>
                 <BrutalBadge variant="success">ONLINE</BrutalBadge>
             </div>

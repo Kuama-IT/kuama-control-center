@@ -1,17 +1,16 @@
 import { z } from "zod";
-import { handleServerErrors } from "@/utils/server-action-utils";
-import { firstOrThrow } from "@/utils/array-utils";
 import { db } from "@/drizzle/drizzle-db";
-import { platformCredentialsDb } from "./platform-credentials.db";
-import type {
-    PlatformCredentialsFullRead,
-    PlatformCredentialsInsert,
-    PlatformCredentialsValidForm,
-} from "./schemas/platform-credentials.schemas";
-import { platformCredentialsInsertSchema } from "./schemas/platform-credentials.schemas";
-import type { ProjectRead } from "@/modules/projects/schemas/projects.read.schema";
-import type { EmployeeRead } from "@/modules/employees/schemas/employee-read";
 import { auth } from "@/modules/auth/auth";
+import { type EmployeeRead } from "@/modules/employees/schemas/employee-read";
+import { type ProjectRead } from "@/modules/projects/schemas/projects.read.schema";
+import { firstOrThrow } from "@/utils/array-utils";
+import { platformCredentialsDb } from "./platform-credentials.db";
+import {
+    type PlatformCredentialsFullRead,
+    type PlatformCredentialsInsert,
+    type PlatformCredentialsValidForm,
+    platformCredentialsInsertSchema,
+} from "./schemas/platform-credentials.schemas";
 
 const idSchema = z.number().int().positive();
 
@@ -116,7 +115,7 @@ async function create(raw: PlatformCredentialsValidForm) {
     const parsed: PlatformCredentialsInsert =
         platformCredentialsInsertSchema.parse(raw);
     const session = await auth();
-    if (!session || !session.user?.isAdmin) {
+    if (!(session && session.user?.isAdmin)) {
         throw new Error("Only admin is allowed to invoke this action");
     }
     await db.transaction(async (trx) => {
@@ -154,7 +153,7 @@ async function create(raw: PlatformCredentialsValidForm) {
 async function remove(rawId: unknown) {
     const id = idSchema.parse(rawId);
     const session = await auth();
-    if (!session || !session.user?.isAdmin) {
+    if (!(session && session.user?.isAdmin)) {
         throw new Error("Only admin is allowed to invoke this action");
     }
     await db.transaction(async (trx) => {

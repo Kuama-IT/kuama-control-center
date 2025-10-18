@@ -1,4 +1,4 @@
-import { PayslipRead } from "@/modules/payslips/schemas/payslip-read";
+import { type PayslipRead } from "@/modules/payslips/schemas/payslip-read";
 
 export const payslipsUtils = {
     calculateAverageNet(payslips: PayslipRead[]): number {

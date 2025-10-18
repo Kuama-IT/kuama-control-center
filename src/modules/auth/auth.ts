@@ -7,16 +7,16 @@ declare module "next-auth" {
     /**
      * Returned by `auth`, `useSession`, `getSession` and received as a prop on the `SessionProvider` React Context
      */
-    export interface User {
+    export type User = {
         /** Whether the user is admin inside YouTrack. */
         isAdmin: boolean;
-    }
+    };
 }
 
 declare module "next-auth/jwt" {
-    export interface JWT {
+    export type JWT = {
         isAdmin: boolean;
-    }
+    };
 }
 
 export const { handlers, signIn, auth } = NextAuth({

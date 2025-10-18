@@ -1,5 +1,5 @@
+import { type Metadata } from "next";
 import SignIn from "@/modules/auth/components/sign-in";
-import type { Metadata } from "next";
 
 export const metadata: Metadata = {
     title: "Sign in | K1 App",

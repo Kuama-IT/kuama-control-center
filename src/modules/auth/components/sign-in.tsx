@@ -1,7 +1,7 @@
-import { auth, signIn } from "@/modules/auth/auth";
-import { Button } from "@/components/ui/button";
-import { redirect } from "next/navigation";
 import Image from "next/image";
+import { redirect } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { auth, signIn } from "@/modules/auth/auth";
 import { routes } from "@/modules/ui/routes";
 
 export default async function SignIn() {
@@ -10,9 +10,9 @@ export default async function SignIn() {
         redirect(routes.dashboard());
     }
     return (
-        <div className="min-h-[calc(100svh-(--spacing(32)))] flex flex-col items-center justify-center">
-            <div className="p-12 rounded-lg shadow-2xl flex flex-col items-center gap-8">
-                <h1 className="text-2xl font-bold uppercase">
+        <div className="flex min-h-[calc(100svh-(--spacing(32)))] flex-col items-center justify-center">
+            <div className="flex flex-col items-center gap-8 rounded-lg p-12 shadow-2xl">
+                <h1 className="font-bold text-2xl uppercase">
                     Welcome, you are. <br />
                     Sign in, you must.
                 </h1>

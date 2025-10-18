@@ -6,7 +6,7 @@ export async function GET(request: NextRequest) {
     const dateFrom = searchParams.get("date_from");
     const dateTo = searchParams.get("date_to");
 
-    if (!dateFrom || !dateTo) {
+    if (!(dateFrom || dateTo)) {
         return NextResponse.json(
             { error: "date_from and date_to are required" },
             { status: 400 },

@@ -1,4 +1,6 @@
-import { dipendentiInCloudApiClient } from "@/modules/dipendenti-in-cloud/dipendenti-in-cloud-api-client";
+import { eachDayOfInterval, format, parse } from "date-fns";
+import { and, eq, gte, isNotNull, lte } from "drizzle-orm";
+import { z } from "zod";
 import { db } from "@/drizzle/drizzle-db";
 import {
     absenceDays,
@@ -7,13 +9,11 @@ import {
     employees,
     presenceDays,
 } from "@/drizzle/schema";
-import type { AbsenceDaysList } from "@/modules/timesheets/schemas";
-import { and, eq, gte, isNotNull, lte } from "drizzle-orm";
-import { eachDayOfInterval, format, parse } from "date-fns";
+import { dipendentiInCloudApiClient } from "@/modules/dipendenti-in-cloud/dipendenti-in-cloud-api-client";
+import { type AbsenceDaysList } from "@/modules/timesheets/schemas";
 import { timesheetsAbsenceDb } from "@/modules/timesheets/timesheets-absence.db";
 import { timesheetsClosuresDb } from "@/modules/timesheets/timesheets-closures.db";
 import { firstOrThrow } from "@/utils/array-utils";
-import { z } from "zod";
 
 export const timesheetsServer = {
     async absenceDaysAll({
@@ -107,8 +107,6 @@ export const timesheetsServer = {
             .select({ id: employees.dipendentiInCloudId })
             .from(employees)
             .where(isNotNull(employees.dipendentiInCloudId));
-
-        console.log(`syncing ${employeesResult.length}`);
         // remove absenceDays for the given range
         await db
             .delete(absenceDays)
@@ -170,7 +168,6 @@ export const timesheetsServer = {
                                     duration,
                                     duration_pending,
                                 }) => {
-                                    console.log(employeeName, reason.name);
                                     return (
                                         shifts?.map((shift) => {
                                             return {

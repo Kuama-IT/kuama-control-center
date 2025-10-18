@@ -1,6 +1,6 @@
 "use client";
-import { useEffect, useRef } from "react";
 import NextImage from "next/image";
+import { useEffect, useRef } from "react";
 
 export const ImageSlide = ({
     alt,
@@ -26,7 +26,7 @@ export const ImageSlide = ({
         };
 
         img.src = src;
-    }, [ref]);
+    }, [src]);
     return (
         <div className="relative h-full overflow-hidden rounded-xl" ref={ref}>
             <NextImage

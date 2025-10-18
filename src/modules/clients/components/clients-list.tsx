@@ -1,9 +1,9 @@
+import { auth } from "@/modules/auth/auth";
 import { clientsServer } from "@/modules/clients/clients.server";
-import ClientCard from "./client-card";
+import { ErrorMessage } from "@/modules/ui/components/error-message";
 import { Title } from "@/modules/ui/components/title";
 import { isFailure } from "@/utils/server-action-utils";
-import { ErrorMessage } from "@/modules/ui/components/error-message";
-import { auth } from "@/modules/auth/auth";
+import ClientCard from "./client-card";
 
 export default async function ClientsList() {
     const clients = await clientsServer.allOrganizations();
@@ -25,7 +25,7 @@ export default async function ClientsList() {
                 </p>
             )}
 
-            <div className="grid gap-12 sm:grid-cols-1 md:grid-cols-3 py-8 items-center">
+            <div className="grid items-center gap-12 py-8 sm:grid-cols-1 md:grid-cols-3">
                 {clients.map((client, index) => (
                     <ClientCard
                         key={client.id}

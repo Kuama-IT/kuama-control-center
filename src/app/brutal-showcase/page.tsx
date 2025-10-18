@@ -1,8 +1,8 @@
 import { AuthenticatedPageWrapper } from "@/modules/auth/authenticated-page-wrapper";
-import { PageParams } from "@/modules/routing/schemas/routing-schemas";
+import { type PageParams } from "@/modules/routing/schemas/routing-schemas";
 import BrutalUIShowcase from "./brutal-ui-showcase";
 
-async function Page(pageParams: PageParams | undefined) {
+async function Page(_pageParams: PageParams | undefined) {
     return <BrutalUIShowcase />;
 }
 

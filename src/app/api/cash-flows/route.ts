@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
         const dateToParam = searchParams.get("dateTo");
 
         // Validate required parameters
-        if (!dateFromParam || !dateToParam) {
+        if (!(dateFromParam && dateToParam)) {
             return Response.json(
                 {
                     error: "Both dateFrom and dateTo parameters are required",

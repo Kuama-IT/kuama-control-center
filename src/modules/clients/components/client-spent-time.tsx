@@ -1,6 +1,6 @@
 import { clientsServer } from "@/modules/clients/clients.server";
-import { isFailure } from "@/utils/server-action-utils";
 import { ErrorMessage } from "@/modules/ui/components/error-message";
+import { isFailure } from "@/utils/server-action-utils";
 
 export default async function ClientSpentTime({
     date,
@@ -22,7 +22,7 @@ export default async function ClientSpentTime({
         const { humanReadableDuration } = res;
 
         return <div className={className}>{humanReadableDuration}</div>;
-    } catch (e) {
+    } catch (_e) {
         return <div>error</div>;
     }
 }

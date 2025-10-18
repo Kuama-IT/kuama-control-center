@@ -1,7 +1,6 @@
 "use server";
 import { handleServerErrors } from "@/utils/server-action-utils";
 import { platformCredentialsServer } from "./platform-credentials.server";
-import type { PlatformCredentialsValidForm } from "./schemas/platform-credentials.schemas";
 
 export const listAllAction = handleServerErrors(platformCredentialsServer.all);
 export const byClientAction = handleServerErrors(

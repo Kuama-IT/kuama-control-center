@@ -1,11 +1,11 @@
-import { CSSProperties } from "react";
 import Link from "next/link";
+import { type CSSProperties } from "react";
 import { HiArrowSmRight } from "react-icons/hi";
-import { routes } from "@/modules/ui/routes";
-import { brutalTheme } from "@/modules/ui/brutal-theme";
-import { EmployeeReadExtended } from "@/modules/employees/schemas/employee-read-extended";
 import { EmployeeAvatar } from "@/modules/employees/components/employee-avatar";
 import { EmployeeQuotas } from "@/modules/employees/components/employee-quotas";
+import { type EmployeeReadExtended } from "@/modules/employees/schemas/employee-read-extended";
+import { brutalTheme } from "@/modules/ui/brutal-theme";
+import { routes } from "@/modules/ui/routes";
 
 export const EmployeeCard = ({
     employee,
@@ -24,13 +24,13 @@ export const EmployeeCard = ({
             className={brutalTheme.base.interactive}
         >
             <div
-                className={`flex items-center relative group ${brutalTheme.base.sharp}`}
+                className={`group relative flex items-center ${brutalTheme.base.sharp}`}
             >
                 <div
                     style={style}
-                    className={`flex flex-col gap-4 ${brutalTheme.spacing.card} ${brutalTheme.borders.thick} ${brutalTheme.shadows.lg} ${brutalTheme.transitions.normal} bg-white flex-1 relative ${brutalTheme.base.sharp} hover:${brutalTheme.shadows.xl}`}
+                    className={`flex flex-col gap-4 ${brutalTheme.spacing.card} ${brutalTheme.borders.thick} ${brutalTheme.shadows.lg} ${brutalTheme.transitions.normal} relative flex-1 bg-white ${brutalTheme.base.sharp} hover:${brutalTheme.shadows.xl}`}
                 >
-                    <div className="flex gap-4 items-center">
+                    <div className="flex items-center gap-4">
                         <EmployeeAvatar
                             avatarUrl={employee.avatarUrl}
                             fullName={employee.fullName}
@@ -48,7 +48,7 @@ export const EmployeeCard = ({
                     </p>
                     <EmployeeQuotas employee={employee} />
                 </div>
-                <HiArrowSmRight className="pointer-events-none absolute right-0 opacity-0 text-2xl text-gray-300 group-hover:opacity-100 group-hover:right-4 transition-all" />
+                <HiArrowSmRight className="pointer-events-none absolute right-0 text-2xl text-gray-300 opacity-0 transition-all group-hover:right-4 group-hover:opacity-100" />
             </div>
         </Link>
     );

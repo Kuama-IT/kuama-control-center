@@ -1,5 +1,5 @@
-import AccessTokenList from "@/modules/access-tokens/components/access-token-list";
 import { AccessTokenCreateForm } from "@/modules/access-tokens/components/access-token-create-form";
+import AccessTokenList from "@/modules/access-tokens/components/access-token-list";
 import { Title } from "@/modules/ui/components/title";
 
 export default async function AccessTokenManagement() {

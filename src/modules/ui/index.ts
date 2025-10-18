@@ -5,72 +5,68 @@
 
 // Theme and utilities
 export { brutalTheme, brutalUtils, cn } from "./brutal-theme";
-
-// Button Components
-export {
-    BrutalButton,
-    BrutalPrimaryButton,
-    BrutalSecondaryButton,
-    BrutalDangerButton,
-    type BrutalButtonProps,
-} from "./components/brutal-button";
-
-// Form Components
-export {
-    BrutalInput,
-    BrutalLabel,
-    BrutalCheckbox,
-    BrutalBadge,
-    BrutalSelect,
-    BrutalSelectItem,
-    BrutalFormField,
-    type BrutalInputProps,
-    type BrutalLabelProps,
-    type BrutalCheckboxProps,
-    type BrutalBadgeProps,
-    type BrutalSelectProps,
-    type BrutalFormFieldProps,
-} from "./components/brutal-forms";
-
-// Layout Components
-export {
-    BrutalCard,
-    BrutalTable,
-    BrutalTableHeader,
-    BrutalTableRow,
-    BrutalTableHead,
-    BrutalTableCell,
-    BrutalSeparator,
-    BrutalSkeleton,
-    BrutalContainer,
-    BrutalSection,
-    type BrutalCardProps,
-    type BrutalTableProps,
-    type BrutalSeparatorProps,
-    type BrutalSkeletonProps,
-    type BrutalContainerProps,
-    type BrutalSectionProps,
-} from "./components/brutal-layout";
-
 // Advanced Components
 export {
+    BrutalAvatar,
+    type BrutalAvatarProps,
     BrutalCalendar,
+    type BrutalCalendarProps,
     BrutalCommand,
     BrutalCommandInput,
     BrutalCommandItem,
+    type BrutalCommandProps,
     BrutalDialog,
-    BrutalPopover,
-    BrutalHoverCard,
+    type BrutalDialogProps,
     BrutalDropdownMenu,
     BrutalDropdownMenuItem,
     BrutalDropdownMenuLabel,
-    BrutalDropdownMenuSeparator,
-    BrutalAvatar,
-    type BrutalCalendarProps,
-    type BrutalCommandProps,
-    type BrutalDialogProps,
-    type BrutalPopoverProps,
-    type BrutalHoverCardProps,
     type BrutalDropdownMenuProps,
-    type BrutalAvatarProps,
+    BrutalDropdownMenuSeparator,
+    BrutalHoverCard,
+    type BrutalHoverCardProps,
+    BrutalPopover,
+    type BrutalPopoverProps,
 } from "./components/brutal-advanced";
+// Button Components
+export {
+    BrutalButton,
+    type BrutalButtonProps,
+    BrutalDangerButton,
+    BrutalPrimaryButton,
+    BrutalSecondaryButton,
+} from "./components/brutal-button";
+// Form Components
+export {
+    BrutalBadge,
+    type BrutalBadgeProps,
+    BrutalCheckbox,
+    type BrutalCheckboxProps,
+    BrutalFormField,
+    type BrutalFormFieldProps,
+    BrutalInput,
+    type BrutalInputProps,
+    BrutalLabel,
+    type BrutalLabelProps,
+    BrutalSelect,
+    BrutalSelectItem,
+    type BrutalSelectProps,
+} from "./components/brutal-forms";
+// Layout Components
+export {
+    BrutalCard,
+    type BrutalCardProps,
+    BrutalContainer,
+    type BrutalContainerProps,
+    BrutalSection,
+    type BrutalSectionProps,
+    BrutalSeparator,
+    type BrutalSeparatorProps,
+    BrutalSkeleton,
+    type BrutalSkeletonProps,
+    BrutalTable,
+    BrutalTableCell,
+    BrutalTableHead,
+    BrutalTableHeader,
+    type BrutalTableProps,
+    BrutalTableRow,
+} from "./components/brutal-layout";

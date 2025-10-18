@@ -1,4 +1,6 @@
 "use client";
+import { useRouter } from "next/navigation";
+import { FaSync } from "react-icons/fa";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -10,17 +12,14 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
-import { Title } from "@/modules/ui/components/title";
 import {
     deleteAction as deleteEmployee,
     type EmployeeByIdActionResult,
 } from "@/modules/employees/employees.actions";
-import { useRouter } from "next/navigation";
-import { FaSync } from "react-icons/fa";
-import { notifyError, notifySuccess } from "@/modules/ui/components/notify";
-import { useServerActionMutation } from "@/modules/ui/hooks/use-server-action-mutation";
 import { BrutalButton, BrutalCard } from "@/modules/ui";
+import { notifyError, notifySuccess } from "@/modules/ui/components/notify";
+import { Title } from "@/modules/ui/components/title";
+import { useServerActionMutation } from "@/modules/ui/hooks/use-server-action-mutation";
 
 export const EmployeeDangerZone = ({
     employee,
@@ -38,7 +37,7 @@ export const EmployeeDangerZone = ({
                 await mutateAsync(employee.id);
                 notifySuccess(`${employee.fullName} has been deleted`);
                 router.push("/employees");
-            } catch (e) {
+            } catch (_e) {
                 notifyError(
                     "Error during employee deletion, check server logs",
                 );
@@ -49,8 +48,8 @@ export const EmployeeDangerZone = ({
     return (
         <div className="flex flex-col gap-4">
             <Title className="uppercase">Danger zone</Title>
-            <BrutalCard className=" border border-destructive p-4">
-                <div className="flex justify-between items-center">
+            <BrutalCard className="border border-destructive p-4">
+                <div className="flex items-center justify-between">
                     <div>
                         <p className="font-bold">Delete this employee</p>
                         <p>

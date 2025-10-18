@@ -1,15 +1,15 @@
 "use client";
 
+import { format } from "date-fns";
 import { InfinityIcon, TrashIcon } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useTransition } from "react";
+import { Button } from "@/components/ui/button";
 import { deleteAccessToken } from "@/modules/access-tokens/access-tokens.actions";
-import { AccessTokenRead } from "@/modules/access-tokens/schemas/access-token.schema";
+import { type AccessTokenRead } from "@/modules/access-tokens/schemas/access-token.schema";
 import { CopyButton } from "@/modules/ui/components/copy-button";
 import { notifyError, notifySuccess } from "@/modules/ui/components/notify";
 import { isFailure } from "@/utils/server-action-utils";
-import { format } from "date-fns";
 
 export const AccessTokenListItem = ({ token }: { token: AccessTokenRead }) => {
     const [isPending, startTransition] = useTransition();
@@ -30,10 +30,10 @@ export const AccessTokenListItem = ({ token }: { token: AccessTokenRead }) => {
         });
     };
     return (
-        <li className="flex flex-col gap-2 border p-4 rounded relative">
+        <li className="relative flex flex-col gap-2 rounded border p-4">
             <span>{token.purpose}</span>
             <span className="absolute top-2 right-2"></span>
-            <div className="uppercase flex gap-4 items-center text-sm">
+            <div className="flex items-center gap-4 text-sm uppercase">
                 {!token.expiresAt && (
                     <>
                         <span className="flex items-center gap-2">
@@ -41,14 +41,14 @@ export const AccessTokenListItem = ({ token }: { token: AccessTokenRead }) => {
                             {token.allowedUsages === -1 ? (
                                 <InfinityIcon />
                             ) : (
-                                <pre className="mono px-2 bg-gray-300 rounded">
+                                <pre className="mono rounded bg-gray-300 px-2">
                                     {token.allowedUsages}
                                 </pre>
                             )}
                         </span>
-                        <span className="flex gap-2 items-center">
+                        <span className="flex items-center gap-2">
                             Usages:
-                            <pre className="mono px-2 bg-gray-300 rounded">
+                            <pre className="mono rounded bg-gray-300 px-2">
                                 {token.usageCount}
                             </pre>
                         </span>
@@ -71,7 +71,7 @@ export const AccessTokenListItem = ({ token }: { token: AccessTokenRead }) => {
                     <TrashIcon />
                 </Button>
                 <CopyButton
-                    className="cursor-pointer text-white bg-black rounded-md p-3"
+                    className="cursor-pointer rounded-md bg-black p-3 text-white"
                     contentToCopy={token.token}
                     successMessage="Token copied to clipboard"
                 />

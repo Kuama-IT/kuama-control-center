@@ -1,6 +1,6 @@
 "use client";
-import { Area, AreaChart } from "recharts";
 import { useEffect, useRef, useState } from "react";
+import { Area, AreaChart } from "recharts";
 
 export const FillParentAreaChart = ({
     data,
@@ -37,7 +37,7 @@ export const FillParentAreaChart = ({
             width: size.width,
             height: size.height,
         });
-    }, [ref]);
+    }, []);
     return (
         <div className="absolute inset-0 opacity-80" ref={ref}>
             {size && (

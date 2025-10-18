@@ -1,5 +1,20 @@
 "use client";
 
+import { format } from "date-fns";
+import { ChevronDown, ChevronsUpDown, ChevronUp } from "lucide-react";
+import Link from "next/link";
+import { type ReactNode, useState } from "react";
+import {
+    Bar,
+    BarChart,
+    CartesianGrid,
+    Legend,
+    ResponsiveContainer,
+    Text,
+    Tooltip,
+    XAxis,
+    YAxis,
+} from "recharts";
 import {
     Table,
     TableBody,
@@ -8,26 +23,11 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import { format } from "date-fns";
-import { ReactNode, useState } from "react";
-import { ChevronDown, ChevronsUpDown, ChevronUp } from "lucide-react";
-import { EmployeeReadExtended } from "@/modules/employees/schemas/employee-read-extended";
-import { Title } from "@/modules/ui/components/title";
+import { type EmployeeReadExtended } from "@/modules/employees/schemas/employee-read-extended";
 import { BrutalSeparator, brutalTheme } from "@/modules/ui";
-import Link from "next/link";
-import { BrutalCard } from "@/modules/ui/components/brutal-layout";
 import { BrutalButton } from "@/modules/ui/components/brutal-button";
-import {
-    ResponsiveContainer,
-    BarChart,
-    CartesianGrid,
-    XAxis,
-    YAxis,
-    Tooltip,
-    Legend,
-    Bar,
-    Text,
-} from "recharts";
+import { BrutalCard } from "@/modules/ui/components/brutal-layout";
+import { Title } from "@/modules/ui/components/title";
 
 type SortField =
     | "age"
@@ -99,9 +99,8 @@ export const EmployeesWithPayslips = ({
 
         if (sortDirection === "asc") {
             return aValue - bValue;
-        } else {
-            return bValue - aValue;
         }
+        return bValue - aValue;
     });
 
     const getSortIcon = (field: SortField) => {
@@ -150,8 +149,8 @@ export const EmployeesWithPayslips = ({
             <BrutalSeparator />
             {/* Comparative Chart */}
             {employees.length > 0 ? (
-                <div className="w-full bg-white border-4 border-black p-4 overflow-x-auto">
-                    <div className="flex items-center justify-between mb-2">
+                <div className="w-full overflow-x-auto border-4 border-black bg-white p-4">
+                    <div className="mb-2 flex items-center justify-between">
                         <h3 className={brutalTheme.typography.subheading}>
                             Average Net vs Average Cost
                         </h3>
@@ -218,20 +217,20 @@ export const EmployeesWithPayslips = ({
                     </div>
                 </div>
             ) : (
-                <div className="text-center py-8 text-muted-foreground">
+                <div className="py-8 text-center text-muted-foreground">
                     No data to chart.
                 </div>
             )}
 
             <BrutalSeparator />
-            <Table className="w-full border-4 border-black shadow-[8px_8px_0px_0px_#000000] rounded-none bg-white">
-                <TableHeader className="bg-gray-100 border-b-4 border-black">
-                    <TableRow className="border-b-4 border-black">
-                        <TableHead className="text-right font-black uppercase tracking-wide border-r-4 border-black">
+            <Table className="w-full rounded-none border-4 border-black bg-white shadow-[8px_8px_0px_0px_#000000]">
+                <TableHeader className="border-black border-b-4 bg-gray-100">
+                    <TableRow className="border-black border-b-4">
+                        <TableHead className="border-black border-r-4 text-right font-black uppercase tracking-wide">
                             Number
                         </TableHead>
 
-                        <TableHead className="font-black uppercase tracking-wide border-r-4 border-black">
+                        <TableHead className="border-black border-r-4 font-black uppercase tracking-wide">
                             Full Name
                         </TableHead>
 
@@ -241,7 +240,7 @@ export const EmployeesWithPayslips = ({
                             label="Age"
                         />
 
-                        <TableHead className="font-black uppercase tracking-wide border-r-4 border-black">
+                        <TableHead className="border-black border-r-4 font-black uppercase tracking-wide">
                             Hired On
                         </TableHead>
 
@@ -257,7 +256,7 @@ export const EmployeesWithPayslips = ({
                             label="Avg Payslip"
                         />
 
-                        <TableHead className="text-right font-black uppercase tracking-wide border-r-4 border-black">
+                        <TableHead className="border-black border-r-4 text-right font-black uppercase tracking-wide">
                             Average Cost
                         </TableHead>
 
@@ -292,24 +291,24 @@ export const EmployeesWithPayslips = ({
                         return (
                             <TableRow
                                 key={employee.id}
-                                className="border-b-4 border-black"
+                                className="border-black border-b-4"
                             >
-                                <TableCell className="text-right font-mono border-r-4 border-black">
+                                <TableCell className="border-black border-r-4 text-right font-mono">
                                     {employee.payslips.length > 0
                                         ? employee.payslips[0]
                                               .payrollRegistrationNumber
                                         : "N/A"}
                                 </TableCell>
 
-                                <TableCell className="font-bold border-r-4 border-black">
+                                <TableCell className="border-black border-r-4 font-bold">
                                     {fullName}
                                 </TableCell>
-                                <TableCell className="border-r-4 border-black">
+                                <TableCell className="border-black border-r-4">
                                     {employee.age !== null
                                         ? `${employee.age} years`
                                         : "N/A"}
                                 </TableCell>
-                                <TableCell className="border-r-4 border-black">
+                                <TableCell className="border-black border-r-4">
                                     {employee.hiredOn
                                         ? format(
                                               new Date(employee.hiredOn),
@@ -323,30 +322,30 @@ export const EmployeesWithPayslips = ({
                                     )
                                 </TableCell>
 
-                                <TableCell className="text-right font-mono border-r-4 border-black">
+                                <TableCell className="border-black border-r-4 text-right font-mono">
                                     {employee.payslips.length > 0
                                         ? `€${employee.payslips[0].net.toFixed(2)}`
                                         : "N/A"}
                                 </TableCell>
-                                <TableCell className="text-right font-mono border-r-4 border-black">
+                                <TableCell className="border-black border-r-4 text-right font-mono">
                                     €{employee.averageNet.toFixed(2)}
                                 </TableCell>
-                                <TableCell className="text-right font-mono border-r-4 border-black">
+                                <TableCell className="border-black border-r-4 text-right font-mono">
                                     €{employee.averageCost.toFixed(2)}
                                 </TableCell>
-                                <TableCell className="text-right font-mono border-r-4 border-black">
+                                <TableCell className="border-black border-r-4 text-right font-mono">
                                     {employee.payslips.length > 0
                                         ? employee.payslips[0]
                                               .permissionsHoursBalance
                                         : "N/A"}
                                 </TableCell>
-                                <TableCell className="text-right font-mono border-r-4 border-black">
+                                <TableCell className="border-black border-r-4 text-right font-mono">
                                     {employee.payslips.length > 0
                                         ? employee.payslips[0]
                                               .holidaysHoursBalance
                                         : "N/A"}
                                 </TableCell>
-                                <TableCell className="text-right font-mono border-r-4 border-black">
+                                <TableCell className="border-black border-r-4 text-right font-mono">
                                     {employee.payslips.length > 0
                                         ? employee.payslips[0].rolHoursBalance
                                         : "N/A"}
@@ -358,7 +357,7 @@ export const EmployeesWithPayslips = ({
             </Table>
 
             {employees.length === 0 && (
-                <div className="text-center py-8 text-muted-foreground">
+                <div className="py-8 text-center text-muted-foreground">
                     No employees found.
                 </div>
             )}
@@ -397,11 +396,11 @@ const SortableTableHead = ({
     label: ReactNode;
 }) => {
     return (
-        <TableHead className="text-right font-black uppercase tracking-wide border-r-4 border-black">
+        <TableHead className="border-black border-r-4 text-right font-black uppercase tracking-wide">
             <BrutalButton
                 variant="ghost"
                 onClick={onClick}
-                className="h-auto p-0 font-black uppercase tracking-wide flex items-center"
+                className="flex h-auto items-center p-0 font-black uppercase tracking-wide"
                 style={{ fontWeight: 900, fontSize: "inherit" }}
             >
                 {label}

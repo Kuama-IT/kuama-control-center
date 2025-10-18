@@ -1,6 +1,6 @@
+import { eq } from "drizzle-orm";
 import { db } from "@/drizzle/drizzle-db";
 import { accessTokens } from "@/drizzle/schema";
-import { eq } from "drizzle-orm";
 
 export type AccessTokenRecord = typeof accessTokens.$inferSelect;
 export type AccessTokenInsert = typeof accessTokens.$inferInsert;

@@ -1,7 +1,7 @@
+import { desc, eq } from "drizzle-orm";
 import { db } from "@/drizzle/drizzle-db";
 import { cashFlowCategory } from "@/drizzle/schema";
-import { desc, eq } from "drizzle-orm";
-import { CashFlowCategoryRead } from "./schemas/cash-flow-category-read";
+import { type CashFlowCategoryRead } from "./schemas/cash-flow-category-read";
 
 export const cashFlowCategoryDb = {
     async findAll(): Promise<CashFlowCategoryRead[]> {

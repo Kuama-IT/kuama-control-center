@@ -11,6 +11,7 @@ import {
 import { type ListClientsResponse } from "@fattureincloud/fattureincloud-ts-sdk/src/models";
 import { type Client } from "@fattureincloud/fattureincloud-ts-sdk/src/models/client";
 import { format } from "date-fns";
+
 import { serverEnv } from "@/env/server-env";
 
 const _formatDate = (date: Date) => {

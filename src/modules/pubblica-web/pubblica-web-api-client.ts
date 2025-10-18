@@ -1,7 +1,7 @@
 import {
     documentsResponseSchema,
     folderTreeResponseSchema,
-    PubblicaWebAuthenticationResponse,
+    type PubblicaWebAuthenticationResponse,
     pubblicaWebAuthenticationResponseSchema,
     repositoriesResponseSchema,
 } from "@/modules/pubblica-web/schemas/pubblica-web-schemas";

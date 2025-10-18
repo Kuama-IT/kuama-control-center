@@ -280,7 +280,7 @@ export const pubblicaWebUtils = {
                     payrollRegistrationNumber,
                     buffer: Buffer.from(pageAsPdf),
                 });
-            } catch (e) {
+            } catch (_e) {
                 // it's expected that some of the last pages may not be salaries
                 console.error(`Error parsing salary on page ${pageIndex}:`);
             }
@@ -403,9 +403,6 @@ function findByTextNearestTo(
     }
 
     if (nearestTextItem) {
-        console.log(
-            `nearest item to ${item.str}(${item.x}, ${item.y}) is ${nearestTextItem.str}(${nearestTextItem.x}, ${nearestTextItem.y})`,
-        );
         return nearestTextItem;
     }
 
@@ -451,9 +448,6 @@ function findTextItemRelatedToTextItemLabel(
             );
         });
     if (belowItems.length === 0) {
-        console.log(
-            `Could not find cell below item ${item.str} with definition ${JSON.stringify(labelDefinition)}`,
-        );
         throw new Error(
             `Could not find cell below item ${item.str} with definition ${JSON.stringify(labelDefinition)}`,
         );

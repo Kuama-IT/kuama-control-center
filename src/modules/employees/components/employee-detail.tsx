@@ -1,14 +1,14 @@
-import { employeesServer } from "@/modules/employees/employees.server";
-import { BackButton } from "@/modules/ui/components/back-button";
 import Image from "next/image";
-import { projectsServer } from "@/modules/projects/projects.server";
-import { ProjectCard } from "@/modules/projects/components/project-card";
-import { isFailure } from "@/utils/server-action-utils";
-import { ErrorMessage } from "@/modules/ui/components/error-message";
 import { EmployeeDangerZone } from "@/modules/employees/components/employee-danger-zone";
-import { EmployeeQuotas } from "@/modules/employees/components/employee-quotas";
-import { BrutalCard } from "@/modules/ui";
 import { EmployeeDetailPayslips } from "@/modules/employees/components/employee-detail-payslips";
+import { EmployeeQuotas } from "@/modules/employees/components/employee-quotas";
+import { employeesServer } from "@/modules/employees/employees.server";
+import { ProjectCard } from "@/modules/projects/components/project-card";
+import { projectsServer } from "@/modules/projects/projects.server";
+import { BrutalCard } from "@/modules/ui";
+import { BackButton } from "@/modules/ui/components/back-button";
+import { ErrorMessage } from "@/modules/ui/components/error-message";
+import { isFailure } from "@/utils/server-action-utils";
 
 export default async function EmployeeDetail({ id }: { id: number }) {
     const employee = await employeesServer.getExtended(id);
@@ -18,7 +18,7 @@ export default async function EmployeeDetail({ id }: { id: number }) {
     const employeeProjects = await projectsServer.getByEmployeeId(id);
     return (
         <div className="flex flex-col">
-            <div className="flex gap-4 items-center p-8 top-0 relative z-10">
+            <div className="relative top-0 z-10 flex items-center gap-4 p-8">
                 <BackButton />
                 {employee.avatarUrl && employee.fullName && (
                     <Image
@@ -26,10 +26,10 @@ export default async function EmployeeDetail({ id }: { id: number }) {
                         alt={employee.fullName}
                         width={100}
                         height={100}
-                        className="rounded-full animate-fade-in-from-left"
+                        className="animate-fade-in-from-left rounded-full"
                     />
                 )}
-                <h2 className="text-2xl animate-fade-in-from-left stagger-animation-700">
+                <h2 className="stagger-animation-700 animate-fade-in-from-left text-2xl">
                     {employee.fullName}
                 </h2>
             </div>

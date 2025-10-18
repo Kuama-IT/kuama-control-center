@@ -1,6 +1,6 @@
+import { eq, inArray } from "drizzle-orm";
 import { db } from "@/drizzle/drizzle-db";
 import { projectMedias, projects } from "@/drizzle/schema";
-import { eq, inArray } from "drizzle-orm";
 
 export const projectsDb = {
     async findById(projectId: number) {

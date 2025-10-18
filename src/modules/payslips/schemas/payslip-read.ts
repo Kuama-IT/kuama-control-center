@@ -1,3 +1,3 @@
-import { payslips } from "@/drizzle/schema";
+import { type payslips } from "@/drizzle/schema";
 
 export type PayslipRead = typeof payslips.$inferSelect;

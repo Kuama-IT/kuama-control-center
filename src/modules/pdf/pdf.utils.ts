@@ -1,5 +1,5 @@
-import PDFParser, { type Output } from "pdf2json";
 import { PDFDocument } from "pdf-lib";
+import PDFParser, { type Output } from "pdf2json";
 
 const loadPdfStructure = (pdfBuffer: ArrayBufferLike): Promise<Output> =>
     new Promise((resolve, reject) => {

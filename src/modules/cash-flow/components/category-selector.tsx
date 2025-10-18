@@ -1,22 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
 import { Check, ChevronsUpDown, Plus } from "lucide-react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover";
 import {
     Command,
     CommandEmpty,
@@ -34,10 +20,24 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-import { CashFlowCategoryRead } from "../schemas/cash-flow-category-read";
+import { type CashFlowCategoryRead } from "../schemas/cash-flow-category-read";
 
-interface CategorySelectorProps {
+type CategorySelectorProps = {
     categories: CashFlowCategoryRead[];
     selectedCategoryId?: number | null;
     transactionType: "income" | "expense";
@@ -48,7 +48,7 @@ interface CategorySelectorProps {
     }) => Promise<CashFlowCategoryRead>;
     placeholder?: string;
     className?: string;
-}
+};
 
 export function CategorySelector({
     categories,
@@ -76,7 +76,7 @@ export function CategorySelector({
     );
 
     const handleCreateCategory = async () => {
-        if (!newCategoryName.trim() || !onCategoryCreate) return;
+        if (!(newCategoryName.trim() && onCategoryCreate)) return;
 
         setIsCreating(true);
         try {

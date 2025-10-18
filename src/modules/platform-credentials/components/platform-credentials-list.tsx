@@ -12,7 +12,7 @@ export default async function PlatformCredentialsList() {
 
     const session = await auth();
 
-    if (!session?.user || !session.user.isAdmin) {
+    if (!(session?.user && session.user.isAdmin)) {
         return null;
     }
 

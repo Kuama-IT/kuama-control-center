@@ -1,12 +1,11 @@
-import {
-    WorkTimeListResponse,
-    YouTrackIssue,
-} from "@/modules/you-track/schemas/youtrack-schemas";
+import { format } from "date-fns";
 import { db } from "@/drizzle/drizzle-db";
 import { tasks, teams } from "@/drizzle/schema";
-
-import { format } from "date-fns";
-import { ProjectRead } from "@/modules/projects/schemas/projects.read.schema";
+import { type ProjectRead } from "@/modules/projects/schemas/projects.read.schema";
+import {
+    type WorkTimeListResponse,
+    type YouTrackIssue,
+} from "@/modules/you-track/schemas/youtrack-schemas";
 
 export type SyncYouTrackIssuesFromWorkItemsResult = {
     id: number;
@@ -18,7 +17,6 @@ export const syncYouTrackIssuesFromWorkItems = async (
     projects: ProjectRead[],
     employeeId: number,
 ) => {
-    console.log(`syncYouTrackIssuesFromWorkItems -> ${workItems.length}`);
     const workItemsIssues = workItems.map((workItem) => workItem.issue);
     // ensure we do not have dup issues
     const workItemsIssuesMap = new Map<string, YouTrackIssue>();
@@ -47,12 +45,10 @@ export const syncYouTrackIssuesFromWorkItems = async (
     const issues = Array.from(workItemsIssuesMap.values());
     const tasksData: SyncYouTrackIssuesFromWorkItemsResult = [];
 
-    console.log(`syncing teams`);
-
     // if a user logged time for a task of this project, it should be inside the project's team
     // get all projects unique
     await db.transaction(async (tx) => {
-        for (const [projectRingId, projectId] of teamProjectsMap) {
+        for (const [_projectRingId, projectId] of teamProjectsMap) {
             const payload: typeof teams.$inferInsert = {
                 employeeId: employeeId,
                 projectId: projectId,
@@ -61,8 +57,6 @@ export const syncYouTrackIssuesFromWorkItems = async (
             await tx.insert(teams).values(payload).onConflictDoNothing();
         }
     });
-
-    console.log(`prepping transaction on ${issues.length} issues`);
 
     await db.transaction(async (tx) => {
         for (const issue of issues) {
@@ -93,7 +87,7 @@ export const syncYouTrackIssuesFromWorkItems = async (
                 })
                 .returning({ taskId: tasks.id });
 
-            if (res.length != 1) {
+            if (res.length !== 1) {
                 throw new Error(`Could not upsert task ${issue.id}`);
             }
             tasksData.push({ id: res[0].taskId, youTrackId: issue.id });

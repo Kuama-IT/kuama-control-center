@@ -1,5 +1,5 @@
-import { type PayslipRead } from "@/modules/payslips/schemas/payslip-read";
 import { type EmployeeRead } from "@/modules/employees/schemas/employee-read";
+import { type PayslipRead } from "@/modules/payslips/schemas/payslip-read";
 
 export type EmployeeReadExtended = Omit<
     EmployeeRead,

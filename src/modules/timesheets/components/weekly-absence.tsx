@@ -5,11 +5,11 @@ import {
     isToday,
     startOfWeek,
 } from "date-fns";
-import { EmployeeAvatar } from "@/modules/employees/components/employee-avatar";
 import parsePostgresInterval from "postgres-interval";
-import { Title } from "@/modules/ui/components/title";
-import type { AbsenceDaysList } from "@/modules/timesheets/schemas";
+import { EmployeeAvatar } from "@/modules/employees/components/employee-avatar";
+import { type AbsenceDaysList } from "@/modules/timesheets/schemas";
 import { timesheetsServer } from "@/modules/timesheets/timesheets.server";
+import { Title } from "@/modules/ui/components/title";
 
 const getCurrentWeekDays = () => {
     const start = startOfWeek(new Date());
@@ -48,12 +48,12 @@ export default async function WeeklyAbsence() {
                         className={`flex flex-col gap-4 rounded-lg`}
                         key={index}
                     >
-                        <div className="flex flex-col px-4 py-2 min-w-52 bg-accent rounded-lg items-center">
-                            <span className="uppercase text-sm">
+                        <div className="flex min-w-52 flex-col items-center rounded-lg bg-accent px-4 py-2">
+                            <span className="text-sm uppercase">
                                 {format(date, "iii")}
                             </span>
                             <span
-                                className={`text-lg font-bold w-fit aspect-square rounded-full flex items-center justify-center ${isToday(date) ? "bg-foreground text-background text-sm p-1" : ""}`}
+                                className={`flex aspect-square w-fit items-center justify-center rounded-full font-bold text-lg ${isToday(date) ? "bg-foreground p-1 text-background text-sm" : ""}`}
                             >
                                 {format(date, "dd")}
                             </span>
@@ -86,11 +86,11 @@ export default async function WeeklyAbsence() {
                                     return (
                                         <div
                                             key={index}
-                                            className="flex gap-4 p-4 border rounded-lg"
+                                            className="flex gap-4 rounded-lg border p-4"
                                         >
                                             <EmployeeAvatar
-                                                avatarUrl={employee!.avatarUrl}
-                                                fullName={employee!.fullName}
+                                                avatarUrl={employee?.avatarUrl}
+                                                fullName={employee?.fullName}
                                             />
                                             <div className="flex flex-col gap-2">
                                                 {absence?.duration && (

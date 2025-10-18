@@ -7,8 +7,8 @@ import {
     BrutalSelect,
     BrutalSelectItem,
 } from "@/modules/ui";
+import { type OrganizationRead } from "@/modules/you-track/schemas/organization-read";
 import { useLinkOrganizationToClientMutation } from "../mutations/clients-mappings.mutations";
-import { OrganizationRead } from "@/modules/you-track/schemas/organization-read";
 
 export function ManualLinkOrganizationToClient({
     clientId,
@@ -23,7 +23,7 @@ export function ManualLinkOrganizationToClient({
     const selectedOrganizationId = value ? parseInt(value, 10) : undefined;
 
     return (
-        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-end">
+        <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-end">
             <BrutalFormField label="Manual match">
                 <BrutalSelect
                     value={value}

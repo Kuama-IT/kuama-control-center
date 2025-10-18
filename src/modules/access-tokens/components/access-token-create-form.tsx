@@ -42,9 +42,11 @@ const formSchema = z
         // - have a max usage count
         // - have an expiration date
         if (
-            !values.canBeUsedForInfinity &&
-            !values.expires &&
-            !values.allowedUsages
+            !(
+                values.canBeUsedForInfinity ||
+                values.expires ||
+                values.allowedUsages
+            )
         ) {
             ctx.addIssue({
                 code: z.ZodIssueCode.custom,
@@ -87,7 +89,7 @@ export const AccessTokenCreateForm = () => {
             form.setValue("allowedUsages", -1);
             form.setValue("canBeUsedForInfinity", false);
         }
-    }, [watchInfinity, watchExpires]);
+    }, [form]);
 
     const onSubmit = async (values: FormData) => {
         try {
@@ -150,7 +152,7 @@ export const AccessTokenCreateForm = () => {
                     )}
                 />
 
-                {!watchInfinity && !watchExpires && (
+                {!(watchInfinity || watchExpires) && (
                     <FormField
                         control={form.control}
                         name="allowedUsages"

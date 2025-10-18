@@ -62,7 +62,7 @@ export default function PlatformCredentialsForm({
     projectId,
     clients,
 }: Props) {
-    if (!clients && !clientId) {
+    if (!(clients || clientId)) {
         throw new Error("[DEV] Missing clients or clientId prop");
     }
 
@@ -94,7 +94,7 @@ export default function PlatformCredentialsForm({
             notifySuccess("Credentials created");
             router.refresh();
             form.reset();
-        } catch (e) {
+        } catch (_e) {
             notifyError("Error during credentials creation, check server logs");
         }
     };

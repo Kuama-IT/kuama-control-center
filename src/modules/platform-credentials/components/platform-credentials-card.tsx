@@ -1,9 +1,11 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
-import { SiJirasoftware, SiRedmine } from "react-icons/si";
-import { Button } from "@/components/ui/button";
+import { endOfMonth, format, startOfMonth } from "date-fns";
 import { Trash } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useRef, useState, useTransition } from "react";
+import { type DateRange } from "react-day-picker";
 import {
     FaArrowRight,
     FaDownload,
@@ -11,6 +13,11 @@ import {
     FaLink,
     FaSync,
 } from "react-icons/fa";
+import { MdOutlineToken } from "react-icons/md";
+import { SiJirasoftware, SiRedmine } from "react-icons/si";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
 import {
     Dialog,
     DialogClose,
@@ -26,22 +33,14 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover";
-
-import { useRef, useState, useTransition } from "react";
-import { deleteAction } from "../platform-credentials.actions";
-import { useRouter } from "next/navigation";
-import syncTimeSpentForClient from "@/modules/sync-data/actions/sync-time-spent-by-credentials-for-client";
-import Link from "next/link";
-import { isFailure } from "@/utils/server-action-utils";
-import { Calendar } from "@/components/ui/calendar";
-import { endOfMonth, format, startOfMonth } from "date-fns";
-import { DateRange } from "react-day-picker";
 import { Separator } from "@/components/ui/separator";
-import { notifyError, notifySuccess } from "@/modules/ui/components/notify";
+import syncTimeSpentForClient from "@/modules/sync-data/actions/sync-time-spent-by-credentials-for-client";
 import { CopyButton } from "@/modules/ui/components/copy-button";
-import { MdOutlineToken } from "react-icons/md";
-import type { PlatformCredentialsFullRead } from "../schemas/platform-credentials.schemas";
+import { notifyError, notifySuccess } from "@/modules/ui/components/notify";
 import { useDateRange } from "@/modules/ui/hooks/useDateRange";
+import { isFailure } from "@/utils/server-action-utils";
+import { deleteAction } from "../platform-credentials.actions";
+import { type PlatformCredentialsFullRead } from "../schemas/platform-credentials.schemas";
 
 export default function PlatformCredentialsCard({
     credentials,
@@ -51,11 +50,11 @@ export default function PlatformCredentialsCard({
     const canGenerateReport = credentials.platform === "easyredmine";
 
     return (
-        <div className="rounded-lg shadow-sm p-8 flex flex-col items-start gap-4 bg-background overflow-hidden group">
+        <div className="group flex flex-col items-start gap-4 overflow-hidden rounded-lg bg-background p-8 shadow-sm">
             <div className="flex items-center gap-4">
                 <Badge
                     variant="secondary"
-                    className="py-2 px-4 rounded-full min-w-14 uppercase flex gap-2 items-center"
+                    className="flex min-w-14 items-center gap-2 rounded-full px-4 py-2 uppercase"
                 >
                     {credentials.platform === "jira" && (
                         <SiJirasoftware className="h-6 w-6" />
@@ -65,7 +64,7 @@ export default function PlatformCredentialsCard({
                     )}
                     <span className="text-xs"> {credentials.platform}</span>
                 </Badge>
-                <h3 className="font-bold uppercase text-sm">
+                <h3 className="font-bold text-sm uppercase">
                     {credentials.name}
                 </h3>
 
@@ -73,10 +72,10 @@ export default function PlatformCredentialsCard({
                 {credentials.employee && <p>{credentials.employee.fullName}</p>}
             </div>
 
-            <div className="flex items-center justify-between w-full">
+            <div className="flex w-full items-center justify-between">
                 <div className="flex items-center gap-2">
                     <FaLink className="text-foreground/80" />
-                    <p className="mono text-lg text-foreground/80 tracking-wide text-ellipsis overflow-hidden w-4/5">
+                    <p className="mono w-4/5 overflow-hidden text-ellipsis text-foreground/80 text-lg tracking-wide">
                         {credentials.endpoint}
                     </p>
                     <CopyButton
@@ -86,7 +85,7 @@ export default function PlatformCredentialsCard({
                 </div>
                 <div className="flex items-center gap-2">
                     <MdOutlineToken className="text-foreground/80" />
-                    <p className="mono text-lg text-foreground/80 tracking-wide">
+                    <p className="mono text-foreground/80 text-lg tracking-wide">
                         ****************
                     </p>
 
@@ -97,7 +96,7 @@ export default function PlatformCredentialsCard({
                 </div>
             </div>
 
-            <div className="flex gap-2 items-center">
+            <div className="flex items-center gap-2">
                 {canGenerateReport && (
                     <SyncTimesheetButton credentialsId={credentials.id} />
                 )}
@@ -132,7 +131,7 @@ function DownloadTimesheetButton({
                 </Button>
             </PopoverTrigger>
             <PopoverContent
-                className="w-auto p-0 flex flex-col gap-4"
+                className="flex w-auto flex-col gap-4 p-0"
                 align="start"
             >
                 <Calendar
@@ -150,7 +149,7 @@ function DownloadTimesheetButton({
                 />
 
                 <Separator />
-                <div className="flex items-center pb-4 justify-center gap-2">
+                <div className="flex items-center justify-center gap-2 pb-4">
                     {range?.from && range?.to && (
                         <>
                             <Link
@@ -216,7 +215,7 @@ function DeleteButton({ credentialsId }: { credentialsId: number }) {
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <Button className="bg-destructive text-destructive-foreground uppercase flex">
+                <Button className="flex bg-destructive text-destructive-foreground uppercase">
                     <Trash />
                     Delete
                 </Button>
@@ -255,7 +254,7 @@ function SyncTimesheetButton({ credentialsId }: { credentialsId: number }) {
 
     const syncData = () => {
         const { from, to } = range ?? {};
-        if (!from || !to) {
+        if (!(from && to)) {
             return;
         }
         notifySuccess("Data sync will continue in background");
@@ -279,7 +278,7 @@ function SyncTimesheetButton({ credentialsId }: { credentialsId: number }) {
                 </Button>
             </PopoverTrigger>
             <PopoverContent
-                className="w-auto p-0 flex flex-col gap-4"
+                className="flex w-auto flex-col gap-4 p-0"
                 align="start"
             >
                 <Calendar
@@ -293,7 +292,7 @@ function SyncTimesheetButton({ credentialsId }: { credentialsId: number }) {
                 />
 
                 <Separator />
-                <div className="flex items-center pb-4 justify-center">
+                <div className="flex items-center justify-center pb-4">
                     <Button disabled={isPending} onClick={syncData}>
                         Sync {format(range?.from ?? today, "dd-MM-yyyy")}
                         <FaArrowRight />

@@ -2,7 +2,7 @@
 
 import { handleServerErrors } from "@/utils/server-action-utils";
 import { cashFlowService } from "./cash-flow.service";
-import { Transaction } from "./schemas/bank-statement-read";
+import { type Transaction } from "./schemas/bank-statement-read";
 
 export const handledDeleteCashFlowImport = handleServerErrors(
     async (id: number) => {

@@ -1,9 +1,8 @@
 "use client";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useGetLatestPayslipByEmployeeQuery } from "@/modules/payslips/queries/payslips.queries";
 import { cn } from "@/lib/utils";
+import { useGetLatestPayslipByEmployeeQuery } from "@/modules/payslips/queries/payslips.queries";
 import { brutalTheme } from "@/modules/ui/brutal-theme";
-import React from "react";
 
 export const EmployeeQuotas = ({ employee }: { employee: { id: number } }) => {
     const query = useGetLatestPayslipByEmployeeQuery(employee.id);
@@ -25,7 +24,7 @@ export const EmployeeQuotas = ({ employee }: { employee: { id: number } }) => {
         return (
             <div
                 className={cn(
-                    "font-mono text-center text-sm",
+                    "text-center font-mono text-sm",
                     brutalTheme.borders.thin,
                     brutalTheme.colors.primary.accent,
                     brutalTheme.shadows.sm,

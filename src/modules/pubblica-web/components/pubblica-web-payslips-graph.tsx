@@ -1,13 +1,13 @@
 "use client";
 import {
-    LineChart,
+    CartesianGrid,
+    Legend,
     Line,
+    LineChart,
+    ResponsiveContainer,
+    Tooltip,
     XAxis,
     YAxis,
-    CartesianGrid,
-    Tooltip,
-    Legend,
-    ResponsiveContainer,
 } from "recharts";
 
 export type PayslipsGraphData = {
@@ -17,9 +17,9 @@ export type PayslipsGraphData = {
     currentYearEstimate: number;
 };
 
-interface PubblicaWebPayslipsGraphProps {
+type PubblicaWebPayslipsGraphProps = {
     data: PayslipsGraphData[];
-}
+};
 
 export function PubblicaWebPayslipsGraph({
     data = [],

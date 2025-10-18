@@ -1,17 +1,16 @@
-import { serverEnv } from "@/env/server-env";
-import { PubblicaWebApi } from "./pubblica-web-api-client";
-import { pubblicaWebUtils } from "./pubblica-web.utils";
+import { createHash } from "crypto";
+import { desc, eq, isNull } from "drizzle-orm";
 import { db } from "@/drizzle/drizzle-db";
 import {
     documents,
     pubblicaWebMonthlyBalances,
-    pubblicaWebPayslips,
     pubblicaWebPayslipSourceFiles,
+    pubblicaWebPayslips,
 } from "@/drizzle/schema";
-import { CreatePubblicaWebMonthlyBalanceDto } from "./schemas/pubblica-web.create.schema";
-import { eq, desc, isNull } from "drizzle-orm";
-import { createHash } from "crypto";
-import fs from "node:fs";
+import { serverEnv } from "@/env/server-env";
+import { pubblicaWebUtils } from "./pubblica-web.utils";
+import { PubblicaWebApi } from "./pubblica-web-api-client";
+import { type CreatePubblicaWebMonthlyBalanceDto } from "./schemas/pubblica-web.create.schema";
 
 export const pubblicaWebServer = {
     async storeMonthlyBalanceByYearAndMonth(
@@ -50,7 +49,6 @@ export const pubblicaWebServer = {
 
                 const key = `${year}-${month}`;
                 if (!existingBalancesSet.has(key)) {
-                    console.log(`Storing missing monthly balance for ${key}`);
                     try {
                         await _storeMonthlyBalanceByYearAndMonth({
                             year,
@@ -148,10 +146,6 @@ export const pubblicaWebServer = {
 
                 const key = `${year}-${month}`;
                 if (!existingFilesSet.has(key)) {
-                    console.log(
-                        `Storing missing payslip source file for ${key}`,
-                    );
-
                     try {
                         await _storePayslipsSourceFileByYearAndMonth({
                             year,
@@ -187,9 +181,6 @@ export const pubblicaWebServer = {
             );
 
         for (const file of unimportedFiles) {
-            console.log(
-                `Parsing and storing payslips from source file ID ${file.id}`,
-            );
             await _parseAndStorePayslipsSourceFile(file.id);
         }
     },
@@ -211,9 +202,6 @@ export const pubblicaWebServer = {
             );
 
         for (const balance of unparsedBalances) {
-            console.log(
-                `Parsing and updating monthly balance for ${balance.year}-${balance.month}`,
-            );
             try {
                 const doc = await db
                     .select({ content: documents.content })
@@ -303,8 +291,6 @@ async function _storePayslipsSourceFileByYearAndMonth({
     await client.authenticate();
 
     const payslips = await client.fetchPayslips(year, month);
-
-    console.log(`Fetched payslips for ${year}-${month}: ${payslips.name}`);
 
     const content = Buffer.from(payslips.bytes);
     const doc = await db

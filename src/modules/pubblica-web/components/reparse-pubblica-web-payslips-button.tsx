@@ -2,8 +2,8 @@
 
 import { useReparsePubblicaWebPayslipsMutation } from "@/modules/pubblica-web/mutations/pubblica-web.mutations";
 import { BrutalButton } from "@/modules/ui";
-import { isFailure } from "@/utils/failures.utils";
 import { notifyError, notifySuccess } from "@/modules/ui/components/notify";
+import { isFailure } from "@/utils/failures.utils";
 
 export function ReparsePubblicaWebPayslipsButton() {
     const mutation = useReparsePubblicaWebPayslipsMutation();

@@ -1,29 +1,51 @@
 "use client";
 
-import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
+    ArrowRight,
+    Bell,
+    Calendar as CalendarIcon,
+    Circle,
+    Database,
+    Download,
+    Edit,
+    Hash,
+    Minus,
+    MoreHorizontal,
+    Plus,
+    Search,
+    Settings,
+    Square,
+    Trash,
+    Triangle,
+    User,
+} from "lucide-react";
+import React, { useState } from "react";
+import { toast } from "sonner";
 import {
     AlertDialog,
-    AlertDialogTrigger,
+    AlertDialogAction,
+    AlertDialogCancel,
     AlertDialogContent,
-    AlertDialogHeader,
-    AlertDialogTitle,
     AlertDialogDescription,
     AlertDialogFooter,
-    AlertDialogCancel,
-    AlertDialogAction,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+    Command,
+    CommandEmpty,
+    CommandGroup,
+    CommandInput,
+    CommandItem,
+    CommandList,
+} from "@/components/ui/command";
+import { DateRangePicker } from "@/components/ui/date-range-picker";
 import {
     Dialog,
     DialogContent,
@@ -33,36 +55,13 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog";
 import {
-    HoverCard,
-    HoverCardContent,
-    HoverCardTrigger,
-} from "@/components/ui/hover-card";
-import {
-    Command,
-    CommandEmpty,
-    CommandGroup,
-    CommandInput,
-    CommandItem,
-    CommandList,
-} from "@/components/ui/command";
-import {
-    Table,
-    TableBody,
-    TableCaption,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table";
-import { Calendar } from "@/components/ui/calendar";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover";
-import { Skeleton } from "@/components/ui/skeleton";
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
     Form,
     FormControl,
@@ -73,34 +72,35 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { DateRangePicker } from "@/components/ui/date-range-picker";
-import { toast } from "sonner";
+    HoverCard,
+    HoverCardContent,
+    HoverCardTrigger,
+} from "@/components/ui/hover-card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
-    Square,
-    Circle,
-    Triangle,
-    ArrowRight,
-    Hash,
-    Minus,
-    Calendar as CalendarIcon,
-    Search,
-    User,
-    Settings,
-    Database,
-    MoreHorizontal,
-    Plus,
-    Download,
-    Edit,
-    Trash,
-    Bell,
-} from "lucide-react";
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+    Table,
+    TableBody,
+    TableCaption,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table";
 
 export default function BrutalUIShowcase() {
     const [selectedTab, setSelectedTab] = useState("FORMS");
@@ -248,13 +248,13 @@ export default function BrutalUIShowcase() {
             <div className="relative overflow-hidden">
                 {/* Background geometric shapes */}
                 <div
-                    className={`${brutalClasses.brutalistShape} w-32 h-32 top-10 right-20`}
+                    className={`${brutalClasses.brutalistShape} top-10 right-20 h-32 w-32`}
                 ></div>
                 <div
-                    className={`${brutalClasses.brutalistShape} w-20 h-20 top-32 left-10 rotate-45`}
+                    className={`${brutalClasses.brutalistShape} top-32 left-10 h-20 w-20 rotate-45`}
                 ></div>
 
-                <div className="relative z-10 container mx-auto px-6 py-16">
+                <div className="container relative z-10 mx-auto px-6 py-16">
                     <div className="max-w-4xl">
                         <h1
                             className={`${brutalClasses.header} ${brutalClasses.text.primary} mb-4`}
@@ -265,39 +265,39 @@ export default function BrutalUIShowcase() {
                             <br />
                             SYSTEM
                         </h1>
-                        <div className="flex items-center space-x-4 mb-8">
-                            <div className="w-16 h-2 bg-black"></div>
+                        <div className="mb-8 flex items-center space-x-4">
+                            <div className="h-2 w-16 bg-black"></div>
                             <p
-                                className={`${brutalClasses.text.secondary} text-xl font-mono uppercase tracking-wider`}
+                                className={`${brutalClasses.text.secondary} font-mono text-xl uppercase tracking-wider`}
                             >
                                 RAW // FUNCTIONAL // UNCOMPROMISING
                             </p>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-12">
+                        <div className="mt-12 grid grid-cols-1 gap-4 md:grid-cols-3">
                             <div className={brutalClasses.cardSecondary}>
-                                <Hash className="w-8 h-8 mb-2" />
-                                <div className="font-black uppercase text-sm">
+                                <Hash className="mb-2 h-8 w-8" />
+                                <div className="font-black text-sm uppercase">
                                     STRUCTURE
                                 </div>
-                                <div className="text-xs font-mono">
+                                <div className="font-mono text-xs">
                                     GEOMETRIC PRECISION
                                 </div>
                             </div>
                             <div className={brutalClasses.cardSecondary}>
-                                <Square className="w-8 h-8 mb-2" />
-                                <div className="font-black uppercase text-sm">
+                                <Square className="mb-2 h-8 w-8" />
+                                <div className="font-black text-sm uppercase">
                                     FUNCTION
                                 </div>
-                                <div className="text-xs font-mono">
+                                <div className="font-mono text-xs">
                                     FORM FOLLOWS PURPOSE
                                 </div>
                             </div>
                             <div className={brutalClasses.cardSecondary}>
-                                <Triangle className="w-8 h-8 mb-2" />
-                                <div className="font-black uppercase text-sm">
+                                <Triangle className="mb-2 h-8 w-8" />
+                                <div className="font-black text-sm uppercase">
                                     IMPACT
                                 </div>
-                                <div className="text-xs font-mono">
+                                <div className="font-mono text-xs">
                                     BOLD STATEMENTS
                                 </div>
                             </div>
@@ -307,17 +307,17 @@ export default function BrutalUIShowcase() {
             </div>
 
             {/* Navigation Tabs */}
-            <div className="bg-gray-50 border-t-4 border-b-4 border-black">
+            <div className="border-black border-t-4 border-b-4 bg-gray-50">
                 <div className="container mx-auto px-6 py-8">
                     <div className="flex flex-wrap gap-4">
                         {tabs.map((tab) => (
                             <button
                                 key={tab}
                                 onClick={() => setSelectedTab(tab)}
-                                className={`px-6 py-3 font-black uppercase tracking-wider border-4 border-black transition-all duration-150 ${
+                                className={`border-4 border-black px-6 py-3 font-black uppercase tracking-wider transition-all duration-150 ${
                                     selectedTab === tab
-                                        ? "bg-black text-white shadow-none translate-x-[4px] translate-y-[4px]"
-                                        : "bg-white text-black shadow-[4px_4px_0px_0px_#000000] hover:shadow-[2px_2px_0px_0px_#000000] hover:translate-x-[2px] hover:translate-y-[2px]"
+                                        ? "translate-x-[4px] translate-y-[4px] bg-black text-white shadow-none"
+                                        : "bg-white text-black shadow-[4px_4px_0px_0px_#000000] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_#000000]"
                                 }`}
                             >
                                 {tab}
@@ -327,7 +327,7 @@ export default function BrutalUIShowcase() {
                 </div>
             </div>
 
-            <div className="container mx-auto px-6 py-16 space-y-16">
+            <div className="container mx-auto space-y-16 px-6 py-16">
                 {/* Forms Section */}
                 {selectedTab === "FORMS" && (
                     <div className="space-y-8">
@@ -337,11 +337,11 @@ export default function BrutalUIShowcase() {
                             INPUT CONTROLS
                         </h2>
                         <div className={brutalClasses.card}>
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
                                 <div className="space-y-6">
                                     <div>
                                         <Label
-                                            className={`${brutalClasses.text.primary} font-bold uppercase tracking-wider mb-2 block`}
+                                            className={`${brutalClasses.text.primary} mb-2 block font-bold uppercase tracking-wider`}
                                         >
                                             FULL NAME
                                         </Label>
@@ -352,7 +352,7 @@ export default function BrutalUIShowcase() {
                                     </div>
                                     <div>
                                         <Label
-                                            className={`${brutalClasses.text.primary} font-bold uppercase tracking-wider mb-2 block`}
+                                            className={`${brutalClasses.text.primary} mb-2 block font-bold uppercase tracking-wider`}
                                         >
                                             EMAIL ADDRESS
                                         </Label>
@@ -364,7 +364,7 @@ export default function BrutalUIShowcase() {
                                     </div>
                                     <div>
                                         <Label
-                                            className={`${brutalClasses.text.primary} font-bold uppercase tracking-wider mb-2 block`}
+                                            className={`${brutalClasses.text.primary} mb-2 block font-bold uppercase tracking-wider`}
                                         >
                                             DEPARTMENT
                                         </Label>
@@ -374,7 +374,7 @@ export default function BrutalUIShowcase() {
                                             >
                                                 <SelectValue placeholder="CHOOSE DEPARTMENT" />
                                             </SelectTrigger>
-                                            <SelectContent className="bg-white border-4 border-black shadow-[8px_8px_0px_0px_#000000]">
+                                            <SelectContent className="border-4 border-black bg-white shadow-[8px_8px_0px_0px_#000000]">
                                                 <SelectItem
                                                     value="dev"
                                                     className="font-mono uppercase hover:bg-gray-100"
@@ -404,8 +404,8 @@ export default function BrutalUIShowcase() {
                                     </div>
                                 </div>
                                 <div className="space-y-6">
-                                    <div className="bg-gray-50 border-4 border-black p-6">
-                                        <h3 className="font-black uppercase mb-4">
+                                    <div className="border-4 border-black bg-gray-50 p-6">
+                                        <h3 className="mb-4 font-black uppercase">
                                             FORM PREVIEW
                                         </h3>
                                         <div className="space-y-2 font-mono text-sm">
@@ -445,9 +445,9 @@ export default function BrutalUIShowcase() {
                             ACTION TRIGGERS
                         </h2>
                         <div className={brutalClasses.card}>
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
                                 <div>
-                                    <h3 className="font-black uppercase mb-4 text-lg">
+                                    <h3 className="mb-4 font-black text-lg uppercase">
                                         PRIMARY ACTIONS
                                     </h3>
                                     <div className="space-y-4">
@@ -459,7 +459,7 @@ export default function BrutalUIShowcase() {
                                         <Button
                                             className={`${brutalClasses.button.primary} w-full`}
                                         >
-                                            <ArrowRight className="w-4 h-4 mr-2" />
+                                            <ArrowRight className="mr-2 h-4 w-4" />
                                             CONTINUE
                                         </Button>
                                         <Button
@@ -470,7 +470,7 @@ export default function BrutalUIShowcase() {
                                     </div>
                                 </div>
                                 <div>
-                                    <h3 className="font-black uppercase mb-4 text-lg">
+                                    <h3 className="mb-4 font-black text-lg uppercase">
                                         SECONDARY ACTIONS
                                     </h3>
                                     <div className="space-y-4">
@@ -492,7 +492,7 @@ export default function BrutalUIShowcase() {
                                     </div>
                                 </div>
                                 <div>
-                                    <h3 className="font-black uppercase mb-4 text-lg">
+                                    <h3 className="mb-4 font-black text-lg uppercase">
                                         DESTRUCTIVE
                                     </h3>
                                     <div className="space-y-4">
@@ -514,9 +514,9 @@ export default function BrutalUIShowcase() {
                                                     TERMINATE
                                                 </Button>
                                             </AlertDialogTrigger>
-                                            <AlertDialogContent className="bg-white border-4 border-black shadow-[12px_12px_0px_0px_#000000]">
+                                            <AlertDialogContent className="border-4 border-black bg-white shadow-[12px_12px_0px_0px_#000000]">
                                                 <AlertDialogHeader>
-                                                    <AlertDialogTitle className="font-black uppercase text-2xl">
+                                                    <AlertDialogTitle className="font-black text-2xl uppercase">
                                                         CONFIRM DESTRUCTION
                                                     </AlertDialogTitle>
                                                     <AlertDialogDescription className="font-mono text-gray-600">
@@ -565,20 +565,20 @@ export default function BrutalUIShowcase() {
                             <div className="space-y-8">
                                 {/* Progress Indicators */}
                                 <div>
-                                    <h3 className="font-black uppercase mb-6 text-lg">
+                                    <h3 className="mb-6 font-black text-lg uppercase">
                                         PROGRESS TRACKING
                                     </h3>
                                     <div className="space-y-6">
                                         <div>
-                                            <div className="flex justify-between items-center mb-2">
+                                            <div className="mb-2 flex items-center justify-between">
                                                 <span className="font-bold uppercase">
                                                     COMPLETION
                                                 </span>
-                                                <span className="font-mono font-black">
+                                                <span className="font-black font-mono">
                                                     {progress}%
                                                 </span>
                                             </div>
-                                            <div className="w-full h-8 bg-gray-200 border-4 border-black">
+                                            <div className="h-8 w-full border-4 border-black bg-gray-200">
                                                 <div
                                                     className="h-full bg-black transition-all duration-500"
                                                     style={{
@@ -588,16 +588,16 @@ export default function BrutalUIShowcase() {
                                             </div>
                                         </div>
                                         <div>
-                                            <div className="flex justify-between items-center mb-2">
+                                            <div className="mb-2 flex items-center justify-between">
                                                 <span className="font-bold uppercase">
                                                     MEMORY USAGE
                                                 </span>
-                                                <span className="font-mono font-black">
+                                                <span className="font-black font-mono">
                                                     84%
                                                 </span>
                                             </div>
-                                            <div className="w-full h-8 bg-gray-200 border-4 border-black">
-                                                <div className="h-full bg-red-500 w-[84%]"></div>
+                                            <div className="h-8 w-full border-4 border-black bg-gray-200">
+                                                <div className="h-full w-[84%] bg-red-500"></div>
                                             </div>
                                         </div>
                                     </div>
@@ -605,23 +605,23 @@ export default function BrutalUIShowcase() {
 
                                 {/* Status Badges */}
                                 <div>
-                                    <h3 className="font-black uppercase mb-6 text-lg">
+                                    <h3 className="mb-6 font-black text-lg uppercase">
                                         STATUS INDICATORS
                                     </h3>
                                     <div className="flex flex-wrap gap-4">
-                                        <Badge className="bg-green-500 text-white border-4 border-black font-bold uppercase px-4 py-2 shadow-[4px_4px_0px_0px_#000000]">
+                                        <Badge className="border-4 border-black bg-green-500 px-4 py-2 font-bold text-white uppercase shadow-[4px_4px_0px_0px_#000000]">
                                             ACTIVE
                                         </Badge>
-                                        <Badge className="bg-yellow-500 text-black border-4 border-black font-bold uppercase px-4 py-2 shadow-[4px_4px_0px_0px_#000000]">
+                                        <Badge className="border-4 border-black bg-yellow-500 px-4 py-2 font-bold text-black uppercase shadow-[4px_4px_0px_0px_#000000]">
                                             PENDING
                                         </Badge>
-                                        <Badge className="bg-red-500 text-white border-4 border-black font-bold uppercase px-4 py-2 shadow-[4px_4px_0px_0px_#000000]">
+                                        <Badge className="border-4 border-black bg-red-500 px-4 py-2 font-bold text-white uppercase shadow-[4px_4px_0px_0px_#000000]">
                                             ERROR
                                         </Badge>
-                                        <Badge className="bg-gray-500 text-white border-4 border-black font-bold uppercase px-4 py-2 shadow-[4px_4px_0px_0px_#000000]">
+                                        <Badge className="border-4 border-black bg-gray-500 px-4 py-2 font-bold text-white uppercase shadow-[4px_4px_0px_0px_#000000]">
                                             DISABLED
                                         </Badge>
-                                        <Badge className="bg-blue-500 text-white border-4 border-black font-bold uppercase px-4 py-2 shadow-[4px_4px_0px_0px_#000000]">
+                                        <Badge className="border-4 border-black bg-blue-500 px-4 py-2 font-bold text-white uppercase shadow-[4px_4px_0px_0px_#000000]">
                                             PROCESSING
                                         </Badge>
                                     </div>
@@ -629,7 +629,7 @@ export default function BrutalUIShowcase() {
 
                                 {/* Data Table */}
                                 <div>
-                                    <h3 className="font-black uppercase mb-6 text-lg">
+                                    <h3 className="mb-6 font-black text-lg uppercase">
                                         DATA TABLE
                                     </h3>
                                     <Table
@@ -637,7 +637,7 @@ export default function BrutalUIShowcase() {
                                             brutalClasses.table.container
                                         }
                                     >
-                                        <TableCaption className="font-bold text-lg uppercase mt-6 text-black">
+                                        <TableCaption className="mt-6 font-bold text-black text-lg uppercase">
                                             SYSTEM COMPONENTS STATUS
                                         </TableCaption>
                                         <TableHeader
@@ -713,7 +713,7 @@ export default function BrutalUIShowcase() {
                                                         brutalClasses.table.cell
                                                     }
                                                 >
-                                                    <Badge className="bg-green-500 text-white border-2 border-black font-bold uppercase">
+                                                    <Badge className="border-2 border-black bg-green-500 font-bold text-white uppercase">
                                                         ONLINE
                                                     </Badge>
                                                 </TableCell>
@@ -731,7 +731,7 @@ export default function BrutalUIShowcase() {
                                                 >
                                                     <Button
                                                         size="sm"
-                                                        className="bg-black text-white border-2 border-black hover:bg-white hover:text-black font-bold uppercase px-3 py-1 rounded-none"
+                                                        className="rounded-none border-2 border-black bg-black px-3 py-1 font-bold text-white uppercase hover:bg-white hover:text-black"
                                                     >
                                                         VIEW
                                                     </Button>
@@ -761,7 +761,7 @@ export default function BrutalUIShowcase() {
                                                         brutalClasses.table.cell
                                                     }
                                                 >
-                                                    <Badge className="bg-yellow-500 text-black border-2 border-black font-bold uppercase">
+                                                    <Badge className="border-2 border-black bg-yellow-500 font-bold text-black uppercase">
                                                         MAINT
                                                     </Badge>
                                                 </TableCell>
@@ -779,7 +779,7 @@ export default function BrutalUIShowcase() {
                                                 >
                                                     <Button
                                                         size="sm"
-                                                        className="bg-black text-white border-2 border-black hover:bg-white hover:text-black font-bold uppercase px-3 py-1 rounded-none"
+                                                        className="rounded-none border-2 border-black bg-black px-3 py-1 font-bold text-white uppercase hover:bg-white hover:text-black"
                                                     >
                                                         VIEW
                                                     </Button>
@@ -809,7 +809,7 @@ export default function BrutalUIShowcase() {
                                                         brutalClasses.table.cell
                                                     }
                                                 >
-                                                    <Badge className="bg-red-500 text-white border-2 border-black font-bold uppercase">
+                                                    <Badge className="border-2 border-black bg-red-500 font-bold text-white uppercase">
                                                         ERROR
                                                     </Badge>
                                                 </TableCell>
@@ -827,7 +827,7 @@ export default function BrutalUIShowcase() {
                                                 >
                                                     <Button
                                                         size="sm"
-                                                        className="bg-red-500 text-white border-2 border-black hover:bg-red-700 hover:text-white font-bold uppercase px-3 py-1 rounded-none"
+                                                        className="rounded-none border-2 border-black bg-red-500 px-3 py-1 font-bold text-white uppercase hover:bg-red-700 hover:text-white"
                                                     >
                                                         FIX
                                                     </Button>
@@ -857,7 +857,7 @@ export default function BrutalUIShowcase() {
                                                         brutalClasses.table.cell
                                                     }
                                                 >
-                                                    <Badge className="bg-green-500 text-white border-2 border-black font-bold uppercase">
+                                                    <Badge className="border-2 border-black bg-green-500 font-bold text-white uppercase">
                                                         ONLINE
                                                     </Badge>
                                                 </TableCell>
@@ -875,7 +875,7 @@ export default function BrutalUIShowcase() {
                                                 >
                                                     <Button
                                                         size="sm"
-                                                        className="bg-black text-white border-2 border-black hover:bg-white hover:text-black font-bold uppercase px-3 py-1 rounded-none"
+                                                        className="rounded-none border-2 border-black bg-black px-3 py-1 font-bold text-white uppercase hover:bg-white hover:text-black"
                                                     >
                                                         VIEW
                                                     </Button>
@@ -900,7 +900,7 @@ export default function BrutalUIShowcase() {
 
                         {/* Checkboxes */}
                         <div className={brutalClasses.card}>
-                            <h3 className="font-black text-xl uppercase mb-6">
+                            <h3 className="mb-6 font-black text-xl uppercase">
                                 CHECKBOXES
                             </h3>
                             <div className="space-y-4">
@@ -911,7 +911,7 @@ export default function BrutalUIShowcase() {
                                     />
                                     <Label
                                         htmlFor="check1"
-                                        className="font-bold text-lg cursor-pointer"
+                                        className="cursor-pointer font-bold text-lg"
                                     >
                                         ENABLE BRUTAL MODE
                                     </Label>
@@ -924,7 +924,7 @@ export default function BrutalUIShowcase() {
                                     />
                                     <Label
                                         htmlFor="check2"
-                                        className="font-bold text-lg cursor-pointer"
+                                        className="cursor-pointer font-bold text-lg"
                                     >
                                         HIGH CONTRAST ACTIVE
                                     </Label>
@@ -936,7 +936,7 @@ export default function BrutalUIShowcase() {
                                     />
                                     <Label
                                         htmlFor="check3"
-                                        className="font-bold text-lg cursor-pointer"
+                                        className="cursor-pointer font-bold text-lg"
                                     >
                                         SHADOW EFFECTS
                                     </Label>
@@ -946,7 +946,7 @@ export default function BrutalUIShowcase() {
 
                         {/* Calendar */}
                         <div className={brutalClasses.card}>
-                            <h3 className="font-black text-xl uppercase mb-6">
+                            <h3 className="mb-6 font-black text-xl uppercase">
                                 CALENDAR PICKER
                             </h3>
                             <div className="flex justify-center">
@@ -999,7 +999,7 @@ export default function BrutalUIShowcase() {
 
                         {/* Command Palette */}
                         <div className={brutalClasses.card}>
-                            <h3 className="font-black text-xl uppercase mb-6">
+                            <h3 className="mb-6 font-black text-xl uppercase">
                                 COMMAND PALETTE
                             </h3>
                             <Command
@@ -1082,7 +1082,7 @@ export default function BrutalUIShowcase() {
 
                         {/* Dialogs */}
                         <div className={brutalClasses.card}>
-                            <h3 className="font-black text-xl uppercase mb-6">
+                            <h3 className="mb-6 font-black text-xl uppercase">
                                 DIALOGS
                             </h3>
                             <div className="flex flex-wrap gap-4">
@@ -1121,7 +1121,7 @@ export default function BrutalUIShowcase() {
                                                 design.
                                             </DialogDescription>
                                         </DialogHeader>
-                                        <div className="flex justify-end space-x-4 mt-6">
+                                        <div className="mt-6 flex justify-end space-x-4">
                                             <Button
                                                 className={
                                                     brutalClasses.button
@@ -1145,7 +1145,7 @@ export default function BrutalUIShowcase() {
 
                         {/* Hover Cards */}
                         <div className={brutalClasses.card}>
-                            <h3 className="font-black text-xl uppercase mb-6">
+                            <h3 className="mb-6 font-black text-xl uppercase">
                                 HOVER CARDS
                             </h3>
                             <div className="space-y-4">
@@ -1174,8 +1174,8 @@ export default function BrutalUIShowcase() {
                                                     materials, geometric forms,
                                                     and functional expression.
                                                 </p>
-                                                <div className="flex items-center space-x-2 mt-4">
-                                                    <Square className="w-4 h-4" />
+                                                <div className="mt-4 flex items-center space-x-2">
+                                                    <Square className="h-4 w-4" />
                                                     <span className="font-mono text-xs">
                                                         EST. 1950s
                                                     </span>
@@ -1190,7 +1190,7 @@ export default function BrutalUIShowcase() {
 
                         {/* Avatars */}
                         <div className={brutalClasses.card}>
-                            <h3 className="font-black text-xl uppercase mb-6">
+                            <h3 className="mb-6 font-black text-xl uppercase">
                                 USER AVATARS
                             </h3>
                             <div className="flex flex-wrap gap-6">
@@ -1209,7 +1209,7 @@ export default function BrutalUIShowcase() {
                                             CN
                                         </AvatarFallback>
                                     </Avatar>
-                                    <p className="font-bold text-sm mt-2">
+                                    <p className="mt-2 font-bold text-sm">
                                         WITH IMAGE
                                     </p>
                                 </div>
@@ -1227,7 +1227,7 @@ export default function BrutalUIShowcase() {
                                             JD
                                         </AvatarFallback>
                                     </Avatar>
-                                    <p className="font-bold text-sm mt-2">
+                                    <p className="mt-2 font-bold text-sm">
                                         INITIALS ONLY
                                     </p>
                                 </div>
@@ -1242,10 +1242,10 @@ export default function BrutalUIShowcase() {
                                                 brutalClasses.avatar.fallback
                                             }
                                         >
-                                            <User className="w-8 h-8" />
+                                            <User className="h-8 w-8" />
                                         </AvatarFallback>
                                     </Avatar>
-                                    <p className="font-bold text-sm mt-2">
+                                    <p className="mt-2 font-bold text-sm">
                                         ICON AVATAR
                                     </p>
                                 </div>
@@ -1265,7 +1265,7 @@ export default function BrutalUIShowcase() {
 
                         {/* Popover */}
                         <div className={brutalClasses.card}>
-                            <h3 className="font-black text-xl uppercase mb-6">
+                            <h3 className="mb-6 font-black text-xl uppercase">
                                 POPOVERS
                             </h3>
                             <div className="flex flex-wrap gap-4">
@@ -1378,12 +1378,12 @@ export default function BrutalUIShowcase() {
 
                         {/* Skeleton Loading States */}
                         <div className={brutalClasses.card}>
-                            <h3 className="font-black text-xl uppercase mb-6">
+                            <h3 className="mb-6 font-black text-xl uppercase">
                                 LOADING STATES
                             </h3>
                             <div className="space-y-6">
                                 <div>
-                                    <h4 className="font-bold text-lg mb-4">
+                                    <h4 className="mb-4 font-bold text-lg">
                                         PROFILE LOADING
                                     </h4>
                                     <div className="flex items-center space-x-4">
@@ -1402,7 +1402,7 @@ export default function BrutalUIShowcase() {
                                 </div>
 
                                 <div>
-                                    <h4 className="font-bold text-lg mb-4">
+                                    <h4 className="mb-4 font-bold text-lg">
                                         CONTENT LOADING
                                     </h4>
                                     <div className="space-y-3">
@@ -1422,10 +1422,10 @@ export default function BrutalUIShowcase() {
                                 </div>
 
                                 <div>
-                                    <h4 className="font-bold text-lg mb-4">
+                                    <h4 className="mb-4 font-bold text-lg">
                                         CARD LOADING
                                     </h4>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                         {[1, 2].map((i) => (
                                             <div
                                                 key={i}
@@ -1434,10 +1434,10 @@ export default function BrutalUIShowcase() {
                                                 }
                                             >
                                                 <Skeleton
-                                                    className={`${brutalClasses.skeleton.text} h-6 w-3/4 mb-3`}
+                                                    className={`${brutalClasses.skeleton.text} mb-3 h-6 w-3/4`}
                                                 />
                                                 <Skeleton
-                                                    className={`${brutalClasses.skeleton.text} h-4 w-full mb-2`}
+                                                    className={`${brutalClasses.skeleton.text} mb-2 h-4 w-full`}
                                                 />
                                                 <Skeleton
                                                     className={`${brutalClasses.skeleton.text} h-4 w-2/3`}
@@ -1451,7 +1451,7 @@ export default function BrutalUIShowcase() {
 
                         {/* Dropdown Menu */}
                         <div className={brutalClasses.card}>
-                            <h3 className="font-black text-xl uppercase mb-6">
+                            <h3 className="mb-6 font-black text-xl uppercase">
                                 DROPDOWN MENUS
                             </h3>
                             <div className="flex flex-wrap gap-4">
@@ -1461,7 +1461,7 @@ export default function BrutalUIShowcase() {
                                             brutalClasses.dropdown.trigger
                                         }
                                     >
-                                        <MoreHorizontal className="w-5 h-5 mr-2" />
+                                        <MoreHorizontal className="mr-2 h-5 w-5" />
                                         ACTIONS
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent
@@ -1486,7 +1486,7 @@ export default function BrutalUIShowcase() {
                                                 brutalClasses.dropdown.item
                                             }
                                         >
-                                            <Edit className="w-4 h-4 mr-2" />
+                                            <Edit className="mr-2 h-4 w-4" />
                                             EDIT
                                         </DropdownMenuItem>
                                         <DropdownMenuItem
@@ -1494,7 +1494,7 @@ export default function BrutalUIShowcase() {
                                                 brutalClasses.dropdown.item
                                             }
                                         >
-                                            <Download className="w-4 h-4 mr-2" />
+                                            <Download className="mr-2 h-4 w-4" />
                                             DOWNLOAD
                                         </DropdownMenuItem>
                                         <DropdownMenuSeparator
@@ -1505,7 +1505,7 @@ export default function BrutalUIShowcase() {
                                         <DropdownMenuItem
                                             className={`${brutalClasses.dropdown.item} text-red-500`}
                                         >
-                                            <Trash className="w-4 h-4 mr-2" />
+                                            <Trash className="mr-2 h-4 w-4" />
                                             DELETE
                                         </DropdownMenuItem>
                                     </DropdownMenuContent>
@@ -1517,7 +1517,7 @@ export default function BrutalUIShowcase() {
                                             brutalClasses.dropdown.trigger
                                         }
                                     >
-                                        <Plus className="w-5 h-5 mr-2" />
+                                        <Plus className="mr-2 h-5 w-5" />
                                         CREATE
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent
@@ -1542,7 +1542,7 @@ export default function BrutalUIShowcase() {
                                                 brutalClasses.dropdown.item
                                             }
                                         >
-                                            <User className="w-4 h-4 mr-2" />
+                                            <User className="mr-2 h-4 w-4" />
                                             USER
                                         </DropdownMenuItem>
                                         <DropdownMenuItem
@@ -1550,7 +1550,7 @@ export default function BrutalUIShowcase() {
                                                 brutalClasses.dropdown.item
                                             }
                                         >
-                                            <Database className="w-4 h-4 mr-2" />
+                                            <Database className="mr-2 h-4 w-4" />
                                             PROJECT
                                         </DropdownMenuItem>
                                         <DropdownMenuItem
@@ -1558,7 +1558,7 @@ export default function BrutalUIShowcase() {
                                                 brutalClasses.dropdown.item
                                             }
                                         >
-                                            <Settings className="w-4 h-4 mr-2" />
+                                            <Settings className="mr-2 h-4 w-4" />
                                             WORKSPACE
                                         </DropdownMenuItem>
                                     </DropdownMenuContent>
@@ -1568,7 +1568,7 @@ export default function BrutalUIShowcase() {
 
                         {/* Notifications */}
                         <div className={brutalClasses.card}>
-                            <h3 className="font-black text-xl uppercase mb-6">
+                            <h3 className="mb-6 font-black text-xl uppercase">
                                 NOTIFICATIONS
                             </h3>
                             <div className="space-y-4">
@@ -1595,7 +1595,7 @@ export default function BrutalUIShowcase() {
                                             })
                                         }
                                     >
-                                        <Bell className="w-5 h-5 mr-2" />
+                                        <Bell className="mr-2 h-5 w-5" />
                                         SUCCESS
                                     </Button>
 
@@ -1618,7 +1618,7 @@ export default function BrutalUIShowcase() {
                                             })
                                         }
                                     >
-                                        <Trash className="w-5 h-5 mr-2" />
+                                        <Trash className="mr-2 h-5 w-5" />
                                         ERROR
                                     </Button>
 
@@ -1643,7 +1643,7 @@ export default function BrutalUIShowcase() {
                                             })
                                         }
                                     >
-                                        <Settings className="w-5 h-5 mr-2" />
+                                        <Settings className="mr-2 h-5 w-5" />
                                         INFO
                                     </Button>
                                 </div>
@@ -1662,9 +1662,9 @@ export default function BrutalUIShowcase() {
                         </h2>
                         <div className={brutalClasses.card}>
                             <div className="space-y-6">
-                                <div className="bg-black text-green-400 p-6 font-mono text-sm border-4 border-gray-600">
+                                <div className="border-4 border-gray-600 bg-black p-6 font-mono text-green-400 text-sm">
                                     <div className="mb-4">
-                                        <span className="text-white font-bold">
+                                        <span className="font-bold text-white">
                                             [SYSTEM]
                                         </span>{" "}
                                         BRUTAL DESIGN TERMINAL v2.1.0
@@ -1702,24 +1702,24 @@ export default function BrutalUIShowcase() {
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                                     <div
                                         className={brutalClasses.cardSecondary}
                                     >
-                                        <h4 className="font-black uppercase mb-4">
+                                        <h4 className="mb-4 font-black uppercase">
                                             TYPOGRAPHY SCALE
                                         </h4>
                                         <div className="space-y-2">
-                                            <div className="text-4xl font-black">
+                                            <div className="font-black text-4xl">
                                                 HEADLINE
                                             </div>
-                                            <div className="text-2xl font-bold">
+                                            <div className="font-bold text-2xl">
                                                 SUBHEADING
                                             </div>
-                                            <div className="text-lg font-medium">
+                                            <div className="font-medium text-lg">
                                                 Body Text
                                             </div>
-                                            <div className="text-sm font-mono">
+                                            <div className="font-mono text-sm">
                                                 SYSTEM.MONO
                                             </div>
                                         </div>
@@ -1728,14 +1728,14 @@ export default function BrutalUIShowcase() {
                                     <div
                                         className={brutalClasses.cardSecondary}
                                     >
-                                        <h4 className="font-black uppercase mb-4">
+                                        <h4 className="mb-4 font-black uppercase">
                                             COLOR SYSTEM
                                         </h4>
                                         <div className="grid grid-cols-4 gap-2">
-                                            <div className="w-full h-12 bg-black border-2 border-gray-400"></div>
-                                            <div className="w-full h-12 bg-white border-2 border-black"></div>
-                                            <div className="w-full h-12 bg-red-500 border-2 border-black"></div>
-                                            <div className="w-full h-12 bg-gray-500 border-2 border-black"></div>
+                                            <div className="h-12 w-full border-2 border-gray-400 bg-black"></div>
+                                            <div className="h-12 w-full border-2 border-black bg-white"></div>
+                                            <div className="h-12 w-full border-2 border-black bg-red-500"></div>
+                                            <div className="h-12 w-full border-2 border-black bg-gray-500"></div>
                                         </div>
                                         <div className="mt-2 font-mono text-xs">
                                             BLACK / WHITE / ACCENT / NEUTRAL
@@ -1747,11 +1747,11 @@ export default function BrutalUIShowcase() {
                     </div>
                 )}
 
-                <Separator className="border-t-4 border-black my-16" />
+                <Separator className="my-16 border-black border-t-4" />
 
                 {/* Footer */}
-                <div className="text-center py-16">
-                    <div className="max-w-2xl mx-auto">
+                <div className="py-16 text-center">
+                    <div className="mx-auto max-w-2xl">
                         <h3
                             className={`${brutalClasses.subheader} ${brutalClasses.text.primary} mb-6`}
                         >
@@ -1763,11 +1763,11 @@ export default function BrutalUIShowcase() {
                                 NON-ESSENTIAL DECORATION"
                             </p>
                             <div className="flex items-center justify-center space-x-4">
-                                <Minus className="w-8 h-8" />
+                                <Minus className="h-8 w-8" />
                                 <span className="font-black text-black">
                                     BRUTAL DESIGN SYSTEM
                                 </span>
-                                <Minus className="w-8 h-8" />
+                                <Minus className="h-8 w-8" />
                             </div>
                             <p className="text-sm">
                                 INSPIRED BY BRUTALIST ARCHITECTURE // KUAMA

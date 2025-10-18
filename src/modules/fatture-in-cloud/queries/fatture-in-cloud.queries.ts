@@ -1,4 +1,4 @@
-import { IssuedDocument } from "@fattureincloud/fattureincloud-ts-sdk";
+import { type IssuedDocument } from "@fattureincloud/fattureincloud-ts-sdk";
 import { useQuery } from "@tanstack/react-query";
 
 export const useEmittedInvoicesQuery = ({

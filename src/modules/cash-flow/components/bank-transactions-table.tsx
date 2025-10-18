@@ -80,12 +80,7 @@ export default function BankTransactionsTable({
 
             return existingCashFlowEntries.some((entry) => {
                 // Ensure entry and transaction have valid date properties
-                if (
-                    !entry ||
-                    !entry.date ||
-                    !transaction ||
-                    !transaction.date
-                ) {
+                if (!(entry && entry.date && transaction && transaction.date)) {
                     return false;
                 }
 

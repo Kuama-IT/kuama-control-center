@@ -1,6 +1,6 @@
-import { db, Transaction } from "@/drizzle/drizzle-db";
-import { payslips } from "@/drizzle/schema";
 import { desc, eq } from "drizzle-orm";
+import { db, type Transaction } from "@/drizzle/drizzle-db";
+import { payslips } from "@/drizzle/schema";
 
 export const payslipsDb = {
     create(payslip: CreatePayslip, tx?: Transaction) {

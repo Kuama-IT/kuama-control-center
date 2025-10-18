@@ -1,6 +1,6 @@
 import { endOfMonth, format, startOfMonth } from "date-fns";
 import { useState } from "react";
-import { DateRange } from "react-day-picker";
+import { type DateRange } from "react-day-picker";
 
 export const useDateRange = () => {
     const today = new Date();

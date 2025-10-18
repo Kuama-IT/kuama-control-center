@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { EmployeeRead } from "@/modules/employees/schemas/employee-read";
-import { ProjectRead } from "@/modules/projects/schemas/projects.read.schema";
+import { type EmployeeRead } from "@/modules/employees/schemas/employee-read";
+import { type ProjectRead } from "@/modules/projects/schemas/projects.read.schema";
 
 export const SupportedPlatforms = z.enum([
     "github",

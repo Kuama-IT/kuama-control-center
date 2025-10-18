@@ -3,8 +3,8 @@
 import { handleServerErrors } from "@/utils/server-action-utils";
 import { cashFlowCategoryServer } from "./cash-flow-category.server";
 import {
+    type CashFlowCategoryForm,
     cashFlowCategoryFormSchema,
-    CashFlowCategoryForm,
 } from "./schemas/cash-flow-catefory-form.schema";
 import { cashFlowCategoryUpdateSchema } from "./schemas/cash-flow-category.update.schema";
 

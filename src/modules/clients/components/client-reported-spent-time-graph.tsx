@@ -1,7 +1,7 @@
 import { clientsServer } from "@/modules/clients/clients.server";
 import { FillParentAreaChart } from "@/modules/graphs/components/fill-parent-area-chart";
-import { isFailure } from "@/utils/server-action-utils";
 import { ErrorMessage } from "@/modules/ui/components/error-message";
+import { isFailure } from "@/utils/server-action-utils";
 
 export default async function ClientReportedSpentTimeGraph({
     clientId,

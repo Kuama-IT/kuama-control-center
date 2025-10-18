@@ -1,6 +1,7 @@
 "use server";
-import { employeesServer } from "./employees.server";
 import { serverActionUtils } from "@/utils/server-actions.utils";
+
+import { employeesServer } from "./employees.server";
 
 export const deleteAction = serverActionUtils.createSafeAction(
     employeesServer.deleteEmployee,

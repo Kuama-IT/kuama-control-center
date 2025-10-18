@@ -1,15 +1,15 @@
-import {
-    BalanceRead,
-    CellValue,
-    Transaction,
-} from "./schemas/bank-statement-read";
 import * as XLSX from "xlsx";
+import {
+    type BalanceRead,
+    type CellValue,
+    type Transaction,
+} from "./schemas/bank-statement-read";
 
 export const bankStatementUtils = {
     parseBancaIntesaXslx(bytes: Buffer): CellValue[][] {
         const workbook = XLSX.read(bytes, { type: "buffer" });
         const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-        const [firstCell, lastCell] = worksheet["!ref"]!.split(":");
+        const [firstCell, lastCell] = worksheet["!ref"]?.split(":");
         const firstCellLetter = firstCell.replace(/[0-9]/g, "");
         const firstCellNumber = parseInt(firstCell.replace(/[A-Z]/g, ""));
         const lastCellLetter = lastCell.replace(/[0-9]/g, "");

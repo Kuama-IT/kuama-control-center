@@ -1,11 +1,11 @@
-import { Failure } from "@/utils/server-action-utils";
 import { cn } from "@/lib/utils";
 import { brutalTheme } from "@/modules/ui";
+import { type Failure } from "@/utils/server-action-utils";
 
 export const ErrorMessage = ({ failure }: { failure: Failure }) => (
     <div
         className={cn(
-            "font-mono text-center text-sm",
+            "text-center font-mono text-sm",
             brutalTheme.text.primary,
         )}
     >

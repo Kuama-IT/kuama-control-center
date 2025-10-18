@@ -4,7 +4,7 @@ export const similarityUtils = {
     similarity(a: string, b: string) {
         const na = normalize(a);
         const nb = normalize(b);
-        if (!na || !nb) return 0;
+        if (!(na && nb)) return 0;
         const maxLen = Math.max(na.length, nb.length);
         if (maxLen === 0) return 1;
         const dist = levenshteinDistance(na, nb);

@@ -1,13 +1,13 @@
+import { format } from "date-fns";
 import { serverEnv } from "@/env/server-env";
 import {
     absenceReasonsResponseSchema,
     closuresResponseSchema,
-    DipendentiInCloudEmployeeDetail,
+    type DipendentiInCloudEmployeeDetail,
     dipendentiInCloudEmployeeDetailResponseSchema,
     dipendentiInCloudEmployeesSchema,
     dipendentiInCloudTimesheetResponseSchema,
 } from "@/modules/dipendenti-in-cloud/schemas/dipendenti-in-cloud-schemas";
-import { format } from "date-fns";
 
 export class DipendentiInCloudApi {
     constructor(
@@ -63,7 +63,6 @@ export class DipendentiInCloudApi {
         const formattedStartOfMonth = format(from, "yyyy-MM-dd");
         const formattedEndOfMonth = format(to, "yyyy-MM-dd");
         const employeesIds = employees.map((employee) => employee.id);
-        console.log(employeesIds);
         const endpoint = `${this.endpoint}timesheet?`;
         const params = new URLSearchParams({
             employees: employeesIds.join(","),
@@ -78,8 +77,6 @@ export class DipendentiInCloudApi {
         );
 
         const jsonResponse = await rawResponse.json();
-
-        console.log(jsonResponse);
 
         const parsed =
             dipendentiInCloudTimesheetResponseSchema.parse(jsonResponse);

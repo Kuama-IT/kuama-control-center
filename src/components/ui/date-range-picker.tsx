@@ -1,5 +1,7 @@
 "use client";
 
+import { format } from "date-fns";
+import { Calendar as CalendarIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -7,11 +9,9 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover";
-import { format } from "date-fns";
-import { Calendar as CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-interface DateRangePickerProps {
+type DateRangePickerProps = {
     from: Date;
     to: Date;
     onFromChange: (date: Date) => void;
@@ -19,7 +19,7 @@ interface DateRangePickerProps {
     title?: string;
     statusText?: string;
     className?: string;
-}
+};
 
 export function DateRangePicker({
     from,
@@ -33,17 +33,17 @@ export function DateRangePicker({
     return (
         <div
             className={cn(
-                "flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between p-4 rounded-lg border bg-card",
+                "flex flex-col items-start justify-between gap-4 rounded-lg border bg-card p-4 sm:flex-row sm:items-center",
                 className,
             )}
         >
-            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-                <h2 className="text-lg font-semibold">{title}</h2>
-                <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
-                    <span className="text-sm text-muted-foreground">
+            <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
+                <h2 className="font-semibold text-lg">{title}</h2>
+                <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center">
+                    <span className="text-muted-foreground text-sm">
                         Date range:
                     </span>
-                    <div className="flex gap-2 items-center">
+                    <div className="flex items-center gap-2">
                         <Popover>
                             <PopoverTrigger asChild>
                                 <Button
@@ -104,7 +104,7 @@ export function DateRangePicker({
             </div>
 
             {statusText && (
-                <div className="text-sm text-muted-foreground">
+                <div className="text-muted-foreground text-sm">
                     {statusText}
                 </div>
             )}

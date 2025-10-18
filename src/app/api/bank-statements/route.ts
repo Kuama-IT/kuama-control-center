@@ -5,7 +5,7 @@ export async function POST(request: NextRequest) {
     const formData = await request.formData();
     const file = formData.get("file");
     const fileName = formData.get("fileName");
-    if (!file || !(file instanceof Blob)) {
+    if (!(file && file instanceof Blob)) {
         return Response.json({ message: "File is required" }, { status: 400 });
     }
     if (!fileName || typeof fileName !== "string") {

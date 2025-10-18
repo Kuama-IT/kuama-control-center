@@ -1,7 +1,7 @@
 "use client";
 
-import { UploadButton } from "@/modules/uploadthing/utils";
 import { useRouter } from "next/navigation";
+import { UploadButton } from "@/modules/uploadthing/utils";
 
 export const AddImageToProject = ({ projectId }: { projectId: number }) => {
     const router = useRouter();

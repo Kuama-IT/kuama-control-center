@@ -1,15 +1,15 @@
-import { firstOrThrow } from "@/utils/array-utils";
+import { differenceInYears, isValid, parse } from "date-fns";
 import { db } from "@/drizzle/drizzle-db";
-import { employeesDb } from "./employees.db";
 import { employees } from "@/drizzle/schema";
-import { dipendentiInCloudApiClient } from "../dipendenti-in-cloud/dipendenti-in-cloud-api-client";
-import { youtrackApiClient } from "../you-track/youtrack-api-client";
-import { type EmployeeRead } from "./schemas/employee-read";
-import { youTrackUtils } from "@/modules/you-track/youtrack-utils";
 import { type EmployeeReadExtended } from "@/modules/employees/schemas/employee-read-extended";
 import { payslipsDb } from "@/modules/payslips/payslips.db";
-import { differenceInYears, isValid, parse } from "date-fns";
 import { payslipsUtils } from "@/modules/payslips/payslips.utils";
+import { youTrackUtils } from "@/modules/you-track/youtrack-utils";
+import { firstOrThrow } from "@/utils/array-utils";
+import { dipendentiInCloudApiClient } from "../dipendenti-in-cloud/dipendenti-in-cloud-api-client";
+import { youtrackApiClient } from "../you-track/youtrack-api-client";
+import { employeesDb } from "./employees.db";
+import { type EmployeeRead } from "./schemas/employee-read";
 
 export const employeesServer = {
     async all(): Promise<EmployeeRead[]> {
@@ -91,7 +91,7 @@ const calculateAge = (
     birthdate: Date | null,
     referenceDate: Date,
 ): number | null => {
-    if (!birthdate || !isValid(birthdate)) return null;
+    if (!(birthdate && isValid(birthdate))) return null;
     try {
         return differenceInYears(referenceDate, birthdate);
     } catch (error) {

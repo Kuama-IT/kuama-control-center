@@ -1,4 +1,7 @@
-import React, { CSSProperties } from "react";
+import type React from "react";
+import { type CSSProperties } from "react";
+import { Separator as ShadcnSeparator } from "@/components/ui/separator";
+import { Skeleton as ShadcnSkeleton } from "@/components/ui/skeleton";
 import {
     Table,
     TableCaption,
@@ -7,17 +10,15 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import { Separator as ShadcnSeparator } from "@/components/ui/separator";
-import { Skeleton as ShadcnSkeleton } from "@/components/ui/skeleton";
 import { brutalTheme, brutalUtils, cn } from "@/modules/ui";
 
 // Brutal Card Component
-export interface BrutalCardProps {
+export type BrutalCardProps = {
     children: React.ReactNode;
     variant?: "primary" | "secondary" | "danger";
     className?: string;
     style?: CSSProperties;
-}
+};
 
 export const BrutalCard: React.FC<BrutalCardProps> = ({
     children,
@@ -45,11 +46,11 @@ export const BrutalCard: React.FC<BrutalCardProps> = ({
 };
 
 // Brutal Table Components
-export interface BrutalTableProps {
+export type BrutalTableProps = {
     children: React.ReactNode;
     caption?: string;
     className?: string;
-}
+};
 
 export const BrutalTable: React.FC<BrutalTableProps> = ({
     children,
@@ -67,7 +68,7 @@ export const BrutalTable: React.FC<BrutalTableProps> = ({
             )}
         >
             {caption && (
-                <TableCaption className="font-bold text-lg uppercase mt-6 text-black">
+                <TableCaption className="mt-6 font-bold text-black text-lg uppercase">
                     {caption}
                 </TableCaption>
             )}
@@ -80,7 +81,7 @@ export const BrutalTableHeader: React.FC<{ children: React.ReactNode }> = ({
     children,
 }) => {
     return (
-        <TableHeader className="border-b-4 border-black bg-gray-100">
+        <TableHeader className="border-black border-b-4 bg-gray-100">
             {children}
         </TableHeader>
     );
@@ -93,7 +94,7 @@ export const BrutalTableRow: React.FC<{
     return (
         <TableRow
             className={cn(
-                "border-b-2 border-black hover:bg-gray-50",
+                "border-black border-b-2 hover:bg-gray-50",
                 brutalTheme.transitions.fast,
                 className,
             )}
@@ -110,7 +111,7 @@ export const BrutalTableHead: React.FC<{
     return (
         <TableHead
             className={cn(
-                "border-r-2 border-black p-6 font-black uppercase text-lg last:border-r-0",
+                "border-black border-r-2 p-6 font-black text-lg uppercase last:border-r-0",
                 className,
             )}
         >
@@ -126,7 +127,7 @@ export const BrutalTableCell: React.FC<{
     return (
         <TableCell
             className={cn(
-                "border-r-2 border-black p-6 font-bold last:border-r-0",
+                "border-black border-r-2 p-6 font-bold last:border-r-0",
                 className,
             )}
         >
@@ -136,10 +137,10 @@ export const BrutalTableCell: React.FC<{
 };
 
 // Brutal Separator
-export interface BrutalSeparatorProps {
+export type BrutalSeparatorProps = {
     orientation?: "horizontal" | "vertical";
     className?: string;
-}
+};
 
 export const BrutalSeparator: React.FC<BrutalSeparatorProps> = ({
     orientation = "horizontal",
@@ -158,10 +159,10 @@ export const BrutalSeparator: React.FC<BrutalSeparatorProps> = ({
 };
 
 // Brutal Skeleton Components
-export interface BrutalSkeletonProps {
+export type BrutalSkeletonProps = {
     variant?: "default" | "avatar" | "text";
     className?: string;
-}
+};
 
 export const BrutalSkeleton: React.FC<BrutalSkeletonProps> = ({
     variant = "default",
@@ -181,11 +182,11 @@ export const BrutalSkeleton: React.FC<BrutalSkeletonProps> = ({
 };
 
 // Layout Components
-export interface BrutalContainerProps {
+export type BrutalContainerProps = {
     children: React.ReactNode;
     size?: "sm" | "md" | "lg" | "xl" | "full";
     className?: string;
-}
+};
 
 export const BrutalContainer: React.FC<BrutalContainerProps> = ({
     children,
@@ -207,12 +208,12 @@ export const BrutalContainer: React.FC<BrutalContainerProps> = ({
     );
 };
 
-export interface BrutalSectionProps {
+export type BrutalSectionProps = {
     children: React.ReactNode;
     title?: string;
     subtitle?: string;
     className?: string;
-}
+};
 
 export const BrutalSection: React.FC<BrutalSectionProps> = ({
     children,

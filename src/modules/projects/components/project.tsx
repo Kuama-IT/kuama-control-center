@@ -1,22 +1,22 @@
 import { Suspense } from "react";
 import ClientSpentTime from "@/modules/clients/components/client-spent-time";
-import { AddImageToProject } from "@/modules/projects/components/project-upload-images-button";
-import { ProjectSlider } from "@/modules/projects/components/project-slider";
 import { EmployeeAvatar } from "@/modules/employees/components/employee-avatar";
-import { ProjectReadExtended } from "@/modules/projects/schemas/projects.read.schema";
+import { ProjectSlider } from "@/modules/projects/components/project-slider";
+import { AddImageToProject } from "@/modules/projects/components/project-upload-images-button";
+import { type ProjectReadExtended } from "@/modules/projects/schemas/projects.read.schema";
 
 export const Project = ({ project }: { project: ProjectReadExtended }) => {
     return (
         <div>
-            <div className="flex justify-between items-center px-8">
-                <div className="flex gap-4 items-center">
-                    <span className="flex items-center justify-center h-10 w-10 rounded bg-black text-white uppercase">
+            <div className="flex items-center justify-between px-8">
+                <div className="flex items-center gap-4">
+                    <span className="flex h-10 w-10 items-center justify-center rounded bg-black text-white uppercase">
                         {project.name?.at(0)}
                     </span>
                     <h3 className="text-2xl">{project.name}</h3>
                 </div>
 
-                <div className="flex divide-x items-center">
+                <div className="flex items-center divide-x">
                     <div className="px-4">
                         <Suspense
                             fallback={"loading project month spent time total"}
@@ -34,7 +34,7 @@ export const Project = ({ project }: { project: ProjectReadExtended }) => {
                 </div>
             </div>
 
-            <div className="flex gap-2 py-4 px-8">
+            <div className="flex gap-2 px-8 py-4">
                 {project.teams.map((member) => (
                     <EmployeeAvatar
                         key={member.id}

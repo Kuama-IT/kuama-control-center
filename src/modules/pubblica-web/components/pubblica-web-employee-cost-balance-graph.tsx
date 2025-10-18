@@ -1,11 +1,11 @@
 "use client";
 // Custom tooltip to show only the four plotted values (including 0)
-import type {
-    ValueType,
-    NameType,
-    Payload,
+import {
+    type NameType,
+    type Payload,
+    type ValueType,
 } from "recharts/types/component/DefaultTooltipContent";
-import type { TooltipContentProps } from "recharts/types/component/Tooltip";
+import { type TooltipContentProps } from "recharts/types/component/Tooltip";
 
 const plottedKeys = [
     "currentYearBusinessCost",
@@ -31,7 +31,7 @@ function CustomTooltip({
     payload,
     label,
 }: TooltipContentProps<ValueType, NameType>) {
-    if (!active || !payload || payload.length === 0) return null;
+    if (!(active && payload) || payload.length === 0) return null;
 
     const filteredPayload = payload.filter(isPlottableEntry);
 
@@ -59,16 +59,16 @@ function CustomTooltip({
 }
 
 import {
-    ResponsiveContainer,
+    Area,
     AreaChart,
+    Legend,
+    ResponsiveContainer,
+    Tooltip,
     XAxis,
     YAxis,
-    Tooltip,
-    Legend,
-    Area,
 } from "recharts";
-import type { EmployeeCostBalanceGraphData } from "../actions/payrolls.actions";
-import { InvoicesGraphData } from "@/modules/fatture-in-cloud/fatture-in-cloud.actions";
+import { type InvoicesGraphData } from "@/modules/fatture-in-cloud/fatture-in-cloud.actions";
+import { type EmployeeCostBalanceGraphData } from "../actions/payrolls.actions";
 
 export function PubblicaWebEmployeeCostBalanceGraph({
     data,

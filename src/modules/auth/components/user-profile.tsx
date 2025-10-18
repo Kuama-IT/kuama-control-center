@@ -1,10 +1,10 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { auth } from "@/modules/auth/auth";
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover";
+import { auth } from "@/modules/auth/auth";
 
 import { SignOutButton } from "@/modules/auth/components/sign-out-button";
 
@@ -16,7 +16,7 @@ export const UserProfile = async () => {
 
     const user = session.user;
     return (
-        <div className="hidden-print fixed top-0 m-4 right-0 z-10">
+        <div className="hidden-print fixed top-0 right-0 z-10 m-4">
             <Popover>
                 <PopoverTrigger className="cursor-pointer" asChild>
                     <Avatar className="h-12 w-12">

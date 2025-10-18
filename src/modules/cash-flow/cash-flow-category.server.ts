@@ -1,13 +1,13 @@
+import { cashFlowCategoryDb } from "./cash-flow-category.db";
 import {
+    type CashFlowCategoryForm,
     cashFlowCategoryFormSchema,
-    CashFlowCategoryForm,
 } from "./schemas/cash-flow-catefory-form.schema";
 import {
+    type CashFlowCategoryUpdate,
     cashFlowCategoryUpdateSchema,
-    CashFlowCategoryUpdate,
 } from "./schemas/cash-flow-category.update.schema";
-import { cashFlowCategoryDb } from "./cash-flow-category.db";
-import { CashFlowCategoryRead } from "./schemas/cash-flow-category-read";
+import { type CashFlowCategoryRead } from "./schemas/cash-flow-category-read";
 
 export const cashFlowCategoryServer = {
     async list(): Promise<CashFlowCategoryRead[]> {

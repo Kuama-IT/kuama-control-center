@@ -1,3 +1,4 @@
+import { asc, eq, inArray } from "drizzle-orm";
 import { db } from "@/drizzle/drizzle-db";
 import {
     clients,
@@ -6,7 +7,6 @@ import {
     platformCredentialsToEmployeesAndProjects,
     projects as projectsTable,
 } from "@/drizzle/schema";
-import { asc, eq, inArray } from "drizzle-orm";
 
 export const platformCredentialsDb = {
     listAll(client: any = db) {

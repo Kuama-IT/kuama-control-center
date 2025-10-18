@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { CashFlowEntryRead } from "../schemas/cash-flow-entry-read";
+import { type CashFlowEntryRead } from "../schemas/cash-flow-entry-read";
 
 export const useCashFlowsQuery = ({ from, to }: { from: Date; to: Date }) => {
     return useQuery({

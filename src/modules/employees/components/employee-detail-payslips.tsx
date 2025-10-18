@@ -1,7 +1,7 @@
 "use client";
 
-import { PayslipRead } from "@/modules/payslips/schemas/payslip-read";
 import { useState } from "react";
+import { type PayslipRead } from "@/modules/payslips/schemas/payslip-read";
 
 export function EmployeeDetailPayslips({
     payslips,
@@ -62,17 +62,17 @@ export function EmployeeDetailPayslips({
                     .map(([year, list]) => (
                         <div key={year}>
                             <button
-                                className="font-bold uppercase text-left w-full py-2 px-4 border-2 border-black bg-yellow-200 hover:bg-yellow-300 transition-colors"
+                                className="w-full border-2 border-black bg-yellow-200 px-4 py-2 text-left font-bold uppercase transition-colors hover:bg-yellow-300"
                                 onClick={() => toggleYear(Number(year))}
                             >
                                 {year} ({list.length} cedolini)
                             </button>
                             {openYears.includes(Number(year)) && (
-                                <div className="border-l-4 border-black pl-4 mt-2 space-y-2">
+                                <div className="mt-2 space-y-2 border-black border-l-4 pl-4">
                                     {list.map((p) => (
                                         <div
                                             key={p.id}
-                                            className="p-2 bg-white border-2 border-black shadow-sm font-mono text-xs"
+                                            className="border-2 border-black bg-white p-2 font-mono text-xs shadow-sm"
                                         >
                                             <div>
                                                 <strong>Mese:</strong> {p.month}

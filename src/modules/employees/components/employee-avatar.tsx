@@ -11,7 +11,7 @@ export const EmployeeAvatar = ({
 }) => {
     return (
         <div
-            className="rounded-full relative overflow-hidden bg-white flex items-center justify-center"
+            className="relative flex items-center justify-center overflow-hidden rounded-full bg-white"
             style={{ width: size, height: size }}
         >
             {avatarUrl ? (

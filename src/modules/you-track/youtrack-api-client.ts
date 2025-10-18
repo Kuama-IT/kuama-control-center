@@ -108,10 +108,12 @@ class YoutrackApiClient {
         ).flat();
         const activeUsers = allUsers.filter(
             ({ banned, login, email }) =>
-                !banned &&
-                !YoutrackApiClient.loginsToIgnore.includes(login) &&
-                !loginsToAssociate.includes(login) &&
-                !loginsToAssociate.includes(email ?? ""),
+                !(
+                    banned ||
+                    YoutrackApiClient.loginsToIgnore.includes(login) ||
+                    loginsToAssociate.includes(login) ||
+                    loginsToAssociate.includes(email ?? "")
+                ),
         );
         const inactiveUsers = allUsers.filter(
             ({ banned, login, email }) =>
@@ -198,7 +200,7 @@ class YoutrackApiClient {
         }
         const users = await this.getUsers();
         const user = users.find((u) => u.email === email);
-        if (!user || !user.ringId) {
+        if (!(user && user.ringId)) {
             return false;
         }
 

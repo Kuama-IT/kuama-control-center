@@ -1,16 +1,16 @@
+import { Octokit } from "@octokit/core";
 import {
-    GithubCommits,
+    type Api,
+    restEndpointMethods,
+} from "@octokit/plugin-rest-endpoint-methods";
+import { serverEnv } from "@/env/server-env";
+import {
+    type GithubCommits,
+    type GithubRepositories,
     githubCommitsResponseSchema,
-    GithubRepositories,
     githubRepositoriesResponseSchema,
     githubUsersResponseSchema,
 } from "@/modules/github/schemas/github-schemas";
-import { serverEnv } from "@/env/server-env";
-import { Octokit } from "@octokit/core";
-import {
-    Api,
-    restEndpointMethods,
-} from "@octokit/plugin-rest-endpoint-methods";
 
 // TODO does our token have access to PortIT repositories?
 class GithubApiClient {

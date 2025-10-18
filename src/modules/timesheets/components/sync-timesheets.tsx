@@ -1,34 +1,40 @@
 "use client";
-import { Title } from "@/modules/ui/components/title";
 import { endOfMonth, format, startOfMonth } from "date-fns";
-import { FormEvent, useEffect, useRef, useState, useTransition } from "react";
-import { DateRange } from "react-day-picker";
-import { getUnlimitedAccessToken } from "@/modules/access-tokens/access-tokens.actions";
-import { Calendar } from "@/components/ui/calendar";
-import { Button } from "@/components/ui/button";
-import { FaArrowRight, FaEye } from "react-icons/fa";
-import { Separator } from "@/components/ui/separator";
-import { isFailure } from "@/utils/server-action-utils";
-import { notifyError, notifySuccess } from "@/modules/ui/components/notify";
 import Link from "next/link";
+import {
+    type FormEvent,
+    useEffect,
+    useRef,
+    useState,
+    useTransition,
+} from "react";
+import { type DateRange } from "react-day-picker";
+import { FaArrowRight, FaEye } from "react-icons/fa";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover";
-import { useDateRange } from "@/modules/ui/hooks/useDateRange";
+import { Separator } from "@/components/ui/separator";
+import { getUnlimitedAccessToken } from "@/modules/access-tokens/access-tokens.actions";
 import {
     useSyncAbsenceReasonsAndClosuresFromDipendentiInCloudMutation,
     useSyncPresenceAndAbsenceFromDipendentiInCloudActionMutation,
 } from "@/modules/timesheets/mutations/timesheets.mutations";
-import { BrutalButton, BrutalCalendar, BrutalSeparator } from "@/modules/ui";
+import { BrutalButton, BrutalSeparator } from "@/modules/ui";
+import { notifyError, notifySuccess } from "@/modules/ui/components/notify";
+import { Title } from "@/modules/ui/components/title";
+import { useDateRange } from "@/modules/ui/hooks/useDateRange";
+import { isFailure } from "@/utils/server-action-utils";
 
 export default function SyncTimesheets() {
     return (
         <>
             <Title>Timesheets</Title>
 
-            <div className="flex flex-col gap-8 items-center">
+            <div className="flex flex-col items-center gap-8">
                 <SyncTimesheetForm />
                 <BrutalSeparator />
 
@@ -72,7 +78,7 @@ const PreviewEmployeePresenceReport = () => {
                 </BrutalButton>
             </PopoverTrigger>
             <PopoverContent
-                className="w-auto p-0 flex flex-col gap-4"
+                className="flex w-auto flex-col gap-4 p-0"
                 align="start"
             >
                 <Calendar
@@ -89,7 +95,7 @@ const PreviewEmployeePresenceReport = () => {
                 />
 
                 <Separator />
-                <div className="flex items-center p-4 justify-center">
+                <div className="flex items-center justify-center p-4">
                     {range?.from && range?.to && (
                         <Link
                             className="w-full"
@@ -159,7 +165,7 @@ const SyncTimesheetForm = () => {
 
     const onSubmit = (ev: FormEvent) => {
         ev.preventDefault();
-        if (!range || !range.from || !range.to) {
+        if (!(range && range.from && range.to)) {
             return;
         }
 
@@ -170,7 +176,6 @@ const SyncTimesheetForm = () => {
             },
             {
                 onSuccess: (res) => {
-                    console.log(res);
                     if (isFailure(res)) {
                         notifyError(
                             "Error while syncing dipendenti in cloud timesheet",
@@ -184,7 +189,7 @@ const SyncTimesheetForm = () => {
         );
     };
     return (
-        <form className="flex flex-col gap-2 items-center" onSubmit={onSubmit}>
+        <form className="flex flex-col items-center gap-2" onSubmit={onSubmit}>
             <Calendar
                 today={today}
                 mode="range"
@@ -208,7 +213,7 @@ const SyncTimesheetForm = () => {
                 </BrutalButton>
 
                 {range && range?.from && range?.to && (
-                    <p className="italic text-sm flex gap-2 items-center justify-center">
+                    <p className="flex items-center justify-center gap-2 text-sm italic">
                         {format(range.from, "dd-MM-yyyy")}
                         <FaArrowRight />
                         {format(range.to, "dd-MM-yyyy")}

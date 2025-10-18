@@ -1,10 +1,10 @@
-import type { Metadata } from "next";
+import { type Metadata } from "next";
 import { Roboto_Flex } from "next/font/google";
 import "./globals.css";
-import { UserProfile } from "@/modules/auth/components/user-profile";
-import type { ReactNode } from "react";
-import { NavBar } from "@/modules/ui/components/navbar";
+import { type ReactNode } from "react";
 import { Toaster } from "@/components/ui/sonner";
+import { UserProfile } from "@/modules/auth/components/user-profile";
+import { NavBar } from "@/modules/ui/components/navbar";
 import Providers from "@/modules/ui/components/providers";
 
 const appFont = Roboto_Flex({

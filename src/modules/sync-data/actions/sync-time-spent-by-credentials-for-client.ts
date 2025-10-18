@@ -21,7 +21,7 @@ const action = async (
     const projectId = credentials.project?.id;
     const employeeId = credentials.employee?.id;
 
-    if (!projectId || !employeeId) {
+    if (!(projectId && employeeId)) {
         throw new Error(
             `Project ID or Employee ID not found for credential ${credentialId}`,
         );
@@ -59,17 +59,13 @@ const action = async (
                     })
                     .returning({ taskId: tasks.id });
 
-                if (res.length != 1) {
+                if (res.length !== 1) {
                     throw new Error(
                         `Could not upsert task ${spentTime.task.id}`,
                     );
                 }
 
                 const { taskId } = firstOrThrow(res);
-
-                console.log(
-                    `spending time for task ${spentTime.task.subject}: ${spentTime.spentTime}`,
-                );
                 const spentTimePayload: typeof spentTimes.$inferInsert = {
                     duration: `${spentTime.spentTime} hour`,
                     date: format(new Date(spentTime.date), "yyyy-MM-dd"),
@@ -96,7 +92,6 @@ const handled = handleServerErrors(
     async (credentialId: number, range: { from: Date; to: Date }) => {
         // do not make user to wait until import is done
         void action(credentialId, range);
-        console.log("request completed");
     },
 );
 

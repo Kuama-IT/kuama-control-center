@@ -1,19 +1,19 @@
 import { drizzle } from "drizzle-orm/postgres-js";
-import { serverEnv } from "@/env/server-env";
 import postgres from "postgres";
+import { serverEnv } from "@/env/server-env";
 import * as schema from "./schema";
 
 // TODO switch over pools
 
 const client = postgres(serverEnv.databaseUrl, {
-  prepare: false, // Disable prefetch as it is not supported for "Transaction" pool mode
+    prepare: false, // Disable prefetch as it is not supported for "Transaction" pool mode
 });
 
 export const db = drizzle({
-  casing: "snake_case",
-  client,
-  logger: serverEnv.showDatabaseLogs,
-  schema
+    casing: "snake_case",
+    client,
+    logger: serverEnv.showDatabaseLogs,
+    schema,
 });
 
 // Transaction type inferred from db.transaction callback parameter

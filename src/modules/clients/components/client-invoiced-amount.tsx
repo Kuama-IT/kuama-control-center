@@ -1,6 +1,6 @@
 import { clientsServer } from "@/modules/clients/clients.server";
-import { isFailure } from "@/utils/server-action-utils";
 import { ErrorMessage } from "@/modules/ui/components/error-message";
+import { isFailure } from "@/utils/server-action-utils";
 
 export default async function ClientInvoicedAmount({
     clientId,

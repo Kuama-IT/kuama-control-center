@@ -1,7 +1,7 @@
-import { copyToClipboard } from "@/modules/ui/ui-utils";
-import { notifySuccess } from "@/modules/ui/components/notify";
 import { Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { notifySuccess } from "@/modules/ui/components/notify";
+import { copyToClipboard } from "@/modules/ui/ui-utils";
 
 export const CopyButton = ({
     className = "",

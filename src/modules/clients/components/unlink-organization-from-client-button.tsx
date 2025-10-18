@@ -1,8 +1,8 @@
 "use client";
 
 import { BrutalButton } from "@/modules/ui";
+import { type OrganizationRead } from "@/modules/you-track/schemas/organization-read";
 import { useUnlinkOrganizationFromClientMutation } from "../mutations/clients-mappings.mutations";
-import { OrganizationRead } from "@/modules/you-track/schemas/organization-read";
 
 export function UnlinkOrganizationFromClientButton({
     clientId,

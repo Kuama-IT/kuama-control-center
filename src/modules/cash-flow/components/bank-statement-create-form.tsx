@@ -1,15 +1,14 @@
 "use client";
-import React from "react";
-import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
+import { Controller, useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import {
+    type BankStatementForm,
     bankStatementFormSchema,
-    BankStatementForm,
 } from "@/modules/cash-flow/schemas/bank-statement-form.schema";
-import { useCreateBankStatementMutation } from "../mutations/bank-statements.mutations";
 import { notifySuccess } from "@/modules/ui/components/notify";
-import { useRouter } from "next/navigation";
+import { useCreateBankStatementMutation } from "../mutations/bank-statements.mutations";
 
 export function BankStatementCreateForm() {
     const {
@@ -35,10 +34,10 @@ export function BankStatementCreateForm() {
     return (
         <form
             onSubmit={handleSubmit(onSubmit)}
-            className="max-w-md flex flex-col items-center mx-auto p-6 bg-white rounded-lg space-y-6"
+            className="mx-auto flex max-w-md flex-col items-center space-y-6 rounded-lg bg-white p-6"
         >
             <div className="flex flex-col gap-2">
-                <label className="font-medium flex-1">
+                <label className="flex-1 font-medium">
                     Bank Statement File
                 </label>
                 <Controller
@@ -46,7 +45,7 @@ export function BankStatementCreateForm() {
                     control={control}
                     render={({ field }) => (
                         <label htmlFor="file" className="inline-block">
-                            <span className="inline-flex items-center justify-center w-full px-4 py-2 bg-blue-600 text-white rounded-lg cursor-pointer hover:bg-blue-700 transition-colors">
+                            <span className="inline-flex w-full cursor-pointer items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-white transition-colors hover:bg-blue-700">
                                 {field.value ? field.value.name : "Choose File"}
                             </span>
                             <input
@@ -62,7 +61,7 @@ export function BankStatementCreateForm() {
                     )}
                 />
                 {errors.file && (
-                    <span className="text-red-600 text-xs mt-1">
+                    <span className="mt-1 text-red-600 text-xs">
                         {errors.file.message}
                     </span>
                 )}

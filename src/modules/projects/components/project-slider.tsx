@@ -1,9 +1,9 @@
 "use client";
 
-import { ImageSlide } from "@/modules/ui/components/image-slide";
-import { useEffect, useRef, useState } from "react";
 import { ArrowLeftCircle, ArrowRightCircle } from "lucide-react";
-import { ProjectMediaRead } from "@/modules/projects/schemas/projects.read.schema";
+import { useEffect, useRef, useState } from "react";
+import { type ProjectMediaRead } from "@/modules/projects/schemas/projects.read.schema";
+import { ImageSlide } from "@/modules/ui/components/image-slide";
 
 export const ProjectSlider = ({
     images,
@@ -19,7 +19,7 @@ export const ProjectSlider = ({
 
     useEffect(() => {
         evaluateShouldSlide();
-    }, [innerContentRef.current?.offsetWidth]);
+    }, [evaluateShouldSlide]);
 
     const evaluateShouldSlide = () => {
         const innerContentWidth = innerContentRef.current?.scrollWidth ?? 0;
@@ -40,16 +40,16 @@ export const ProjectSlider = ({
         const slideLeft = slideElement.offsetLeft;
 
         innerContentRef.current.style.transform = `translateX(-${slideLeft}px)`;
-    }, [currentSlide]);
+    }, [currentSlide, shouldSlide]);
     const windowHeight = window.innerHeight;
     return (
         <div
             style={{ height: `${(windowHeight / 3) * 2}px` }}
-            className={`overflow-hidden relative z-0 p-8 shadow-2xl bg-accent`}
+            className={`relative z-0 overflow-hidden bg-accent p-8 shadow-2xl`}
             ref={containerRef}
         >
             <div
-                className="flex h-full gap-4 pointer-events-none w-fit"
+                className="pointer-events-none flex h-full w-fit gap-4"
                 ref={innerContentRef}
             >
                 {images.map((image) => (
@@ -62,7 +62,7 @@ export const ProjectSlider = ({
                 ))}
             </div>
             {shouldSlide && (
-                <div className="absolute inset-y-0 inset-x-4 flex items-center justify-between">
+                <div className="absolute inset-x-4 inset-y-0 flex items-center justify-between">
                     <ArrowLeftCircle
                         opacity={currentSlide === 0 ? 0.5 : 1}
                         height={40}
@@ -74,7 +74,7 @@ export const ProjectSlider = ({
                                 return prev - 1;
                             })
                         }
-                        className="text-white cursor-pointer"
+                        className="cursor-pointer text-white"
                     />
                     <ArrowRightCircle
                         opacity={currentSlide === images.length - 1 ? 0.5 : 1}
@@ -87,7 +87,7 @@ export const ProjectSlider = ({
                         }
                         height={40}
                         width={40}
-                        className="text-white cursor-pointer"
+                        className="cursor-pointer text-white"
                     />
                 </div>
             )}

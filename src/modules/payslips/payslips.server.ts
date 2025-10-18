@@ -1,14 +1,14 @@
+import { format, parse } from "date-fns";
+import { desc, eq, gt, isNull, or } from "drizzle-orm";
 import { db } from "@/drizzle/drizzle-db";
 import { payslips, pubblicaWebPayslips } from "@/drizzle/schema";
-import { PubblicaWebEmployeeMonthlyCost } from "@/modules/pubblica-web/schemas/pubblica-web-employee-monthly-cost-read";
-import { PubblicaWebPayslipRead } from "@/modules/pubblica-web/schemas/pubblica-web-payslip-read";
-import { format, parse } from "date-fns";
-import { desc, eq, isNull, or, gt } from "drizzle-orm";
+import { type PubblicaWebEmployeeMonthlyCost } from "@/modules/pubblica-web/schemas/pubblica-web-employee-monthly-cost-read";
+import { type PubblicaWebPayslipRead } from "@/modules/pubblica-web/schemas/pubblica-web-payslip-read";
+import { firstOrThrow } from "@/utils/array-utils";
 import { employeesDb } from "../employees/employees.db";
 import { pubblicaWebDb } from "../pubblica-web/pubblica-web.db";
 import { pubblicaWebUtils } from "../pubblica-web/pubblica-web.utils";
 import { payslipsDb } from "./payslips.db";
-import { firstOrThrow } from "@/utils/array-utils";
 
 export const payslipsServer = {
     /**
@@ -113,9 +113,6 @@ export const payslipsServer = {
             const employee = await employeesDb.findByFullName(missing.fullName);
 
             if (!employee) {
-                console.warn(
-                    `Employee with full name ${missing.fullName} not found. Did you import employees?`,
-                );
                 continue;
             }
             const employeeKey = missing.fullName

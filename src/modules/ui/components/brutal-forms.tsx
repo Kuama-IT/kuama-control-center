@@ -1,8 +1,8 @@
-import React from "react";
+import type React from "react";
+import { Badge as ShadcnBadge } from "@/components/ui/badge";
+import { Checkbox as ShadcnCheckbox } from "@/components/ui/checkbox";
 import { Input as ShadcnInput } from "@/components/ui/input";
 import { Label as ShadcnLabel } from "@/components/ui/label";
-import { Checkbox as ShadcnCheckbox } from "@/components/ui/checkbox";
-import { Badge as ShadcnBadge } from "@/components/ui/badge";
 import {
     Select,
     SelectContent,
@@ -53,13 +53,13 @@ export const BrutalLabel: React.FC<BrutalLabelProps> = ({
 };
 
 // Brutal Checkbox Component
-export interface BrutalCheckboxProps {
+export type BrutalCheckboxProps = {
     id?: string;
     checked?: boolean;
     onCheckedChange?: (checked: boolean) => void;
     disabled?: boolean;
     className?: string;
-}
+};
 
 export const BrutalCheckbox: React.FC<BrutalCheckboxProps> = ({
     className,
@@ -83,11 +83,11 @@ export const BrutalCheckbox: React.FC<BrutalCheckboxProps> = ({
 };
 
 // Brutal Badge Component
-export interface BrutalBadgeProps {
+export type BrutalBadgeProps = {
     children: React.ReactNode;
     variant?: "default" | "success" | "warning" | "error" | "info";
     className?: string;
-}
+};
 
 export const BrutalBadge: React.FC<BrutalBadgeProps> = ({
     children,
@@ -107,7 +107,7 @@ export const BrutalBadge: React.FC<BrutalBadgeProps> = ({
             className={cn(
                 variants[variant],
                 brutalTheme.borders.medium,
-                "font-bold uppercase px-4 py-2",
+                "px-4 py-2 font-bold uppercase",
                 brutalTheme.shadows.sm,
                 brutalTheme.base.sharp,
                 className,
@@ -119,14 +119,14 @@ export const BrutalBadge: React.FC<BrutalBadgeProps> = ({
 };
 
 // Brutal Select Component
-export interface BrutalSelectProps {
+export type BrutalSelectProps = {
     children: React.ReactNode;
     value?: string;
     onValueChange?: (value: string) => void;
     placeholder?: string;
     disabled?: boolean;
     className?: string;
-}
+};
 
 export const BrutalSelect: React.FC<BrutalSelectProps> = ({
     children,
@@ -140,9 +140,9 @@ export const BrutalSelect: React.FC<BrutalSelectProps> = ({
                 className={cn(
                     "bg-white",
                     brutalTheme.borders.thick,
-                    "text-black text-xl font-bold",
+                    "font-bold text-black text-xl",
                     brutalTheme.spacing.input,
-                    "focus:outline-none focus:ring-0 focus:border-red-500",
+                    "focus:border-red-500 focus:outline-none focus:ring-0",
                     brutalTheme.transitions.normal,
                     brutalTheme.shadows.lg,
                     "focus:shadow-[12px_12px_0px_0px_#333333]",
@@ -187,13 +187,13 @@ export const BrutalSelectItem: React.FC<{
 };
 
 // Form Field Wrapper
-export interface BrutalFormFieldProps {
+export type BrutalFormFieldProps = {
     label: string;
     children: React.ReactNode;
     description?: string;
     error?: string;
     className?: string;
-}
+};
 
 export const BrutalFormField: React.FC<BrutalFormFieldProps> = ({
     label,
