@@ -1,16 +1,16 @@
 import { serverEnv } from "@/env/server-env";
 import {
-    OrganizationListResponse,
+    type OrganizationListResponse,
     organizationListResponseSchema,
+    type ProjectWithUsersListResponse,
     projectListResponseSchema,
     projectTeamUserListResponseSchema,
     projectWithTeamUsersListResponseSchema,
-    ProjectWithUsersListResponse,
+    type ReducedUser,
     rawReducedUserListResponseSchema,
-    ReducedUser,
     reducedUserListResponseSchema,
     sourcedProjectRolesListResponseSchema,
-    WorkTimeListResponse,
+    type WorkTimeListResponse,
     workTimeListResponseSchema,
 } from "@/modules/you-track/schemas/youtrack-schemas";
 
@@ -229,13 +229,14 @@ class YoutrackApiClient {
             },
         });
         if (!request.ok) {
-            console.log(await request.text());
+            console.error(await request.text());
             throw new Error(`Failed to fetch ${endpoint}`);
         }
 
         try {
             return await request.json();
         } catch (e) {
+            console.error(e);
             throw new Error(`Failed to parse ${endpoint} response`);
         }
     }

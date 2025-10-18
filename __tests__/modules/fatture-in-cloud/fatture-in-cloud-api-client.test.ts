@@ -28,11 +28,11 @@ describe("fatture-in-cloud-api", () => {
   });
   test("get received invoices with date range", async () => {
           const invoices = await fattureInCloudApiClient.getReceivedInvoices({
-              date_from: new Date("2025-09-01"),
-              date_to: new Date("2025-09-31"),
+              from: new Date("2025-01-01"),
+              to: new Date("2025-09-31"),
           });
 
-          expect(invoices.length).eq(20);
+          expect(invoices.length).gt(20);
 
 
   });

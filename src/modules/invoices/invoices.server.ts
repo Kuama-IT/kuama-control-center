@@ -1,8 +1,12 @@
 import { type IssuedDocument } from "@fattureincloud/fattureincloud-ts-sdk";
 import { eq, inArray, sql } from "drizzle-orm";
 import { db } from "@/drizzle/drizzle-db";
-import { invoices, vats } from "@/drizzle/schema";
+import { invoices, invoicesSuppliers, vats } from "@/drizzle/schema";
 import { fattureInCloudApiClient } from "@/modules/fatture-in-cloud/fatture-in-cloud-api";
+import { type VatReadDto } from "@/modules/invoices/schemas/vat.read";
+import { vatsDb } from "@/modules/invoices/vats.db";
+import { type SupplierReadDto } from "@/modules/suppliers/schemas/supplier.read";
+import { suppliersDb } from "@/modules/suppliers/suppliers.db";
 import { firstOrThrow } from "@/utils/array-utils";
 import { type ServerActionResult } from "@/utils/server-actions.utils";
 
@@ -11,14 +15,6 @@ export const invoicesServer = {
         // group invoices by vat
         const invoicesByVat = new Map<string, IssuedDocument[]>();
         for (const fattureInCloudInvoice of issuedDocuments) {
-            // for some reason we are not receiving vat for Nimika...
-            // if (
-            //     fattureInCloudInvoice.entity?.name ===
-            //     "Ennkaye Consulting Limited"
-            // ) {
-            //     fattureInCloudInvoice.entity.vat_number = "13352539";
-            // }
-
             const vat = fattureInCloudInvoice.entity?.vat_number;
 
             if (!vat) {
@@ -141,44 +137,105 @@ export const invoicesServer = {
     }): Promise<ServerActionResult> {
         const fattureInCloudReceivedInvoices =
             await fattureInCloudApiClient.getReceivedInvoices({
-                date_from: dto.from,
-                date_to: dto.to,
+                from: dto.from,
+                to: dto.to,
             });
 
         const insertValues: (typeof invoices.$inferInsert)[] = [];
 
         for (const fattureInCloudInvoice of fattureInCloudReceivedInvoices) {
             const vat = fattureInCloudInvoice.entity?.vat_number;
-            if (!vat) {
-                console.error(fattureInCloudInvoice.entity);
-                throw new Error(
-                    `Invoice entity VAT number is missing for ${fattureInCloudInvoice.invoice_number} - ${fattureInCloudInvoice.entity?.name}`,
-                );
-            }
-            const vatRecord = firstOrThrow(
-                await db.select().from(vats).where(eq(vats.vat, vat)),
-            );
+            let vatRecord: VatReadDto | undefined;
+            let supplier: SupplierReadDto | undefined;
+            if (
+                vat &&
+                fattureInCloudInvoice.entity?.id &&
+                fattureInCloudInvoice.entity.name
+            ) {
+                // ensure we do have this vat in database
 
-            if (!fattureInCloudInvoice.payments_list?.[0]?.due_date) {
+                [vatRecord] = await db
+                    .select()
+                    .from(vats)
+                    .where(eq(vats.vat, vat))
+                    .limit(1);
+
+                if (!vatRecord) {
+                    console.error(fattureInCloudInvoice.entity);
+
+                    vatRecord = await vatsDb.create({
+                        fattureInCloudId:
+                            fattureInCloudInvoice.entity.id.toString(),
+                        companyName: fattureInCloudInvoice.entity.name,
+                        vat,
+                    });
+                }
+            }
+
+            if (
+                fattureInCloudInvoice.entity &&
+                fattureInCloudInvoice.entity.id &&
+                fattureInCloudInvoice.entity.name
+            ) {
+                supplier = await suppliersDb.tryGetByExternalId(
+                    fattureInCloudInvoice.entity.id,
+                );
+                if (!supplier) {
+                    // basically a company that is a supplier, but we did not add to fatture in cloud suppliers
+                    supplier = await suppliersDb.create({
+                        vatId: vatRecord?.id,
+                        name: fattureInCloudInvoice.entity.name,
+                        email: fattureInCloudInvoice.entity.email,
+                        phone: fattureInCloudInvoice.entity.phone,
+                        externalId: fattureInCloudInvoice.entity.id?.toString(),
+                    });
+                }
+            }
+
+            if (!supplier) {
+                console.error(JSON.stringify(fattureInCloudInvoice));
+                throw new Error("Invoice supplier is missing");
+            }
+
+            let date: string | undefined | null =
+                fattureInCloudInvoice.payments_list?.[0]?.due_date;
+            if (!date) {
+                date = fattureInCloudInvoice.date;
+            }
+
+            if (!date) {
+                console.error(JSON.stringify(fattureInCloudInvoice));
                 throw new Error("Invoice due date is missing");
             }
+
             const record: typeof invoices.$inferInsert = {
-                vat: vatRecord.id,
+                vat: vatRecord?.id,
                 subject: fattureInCloudInvoice.description ?? "UNKNOWN",
                 amountNet: fattureInCloudInvoice.amount_net ?? 0,
                 amountGross: fattureInCloudInvoice.amount_gross ?? 0,
                 amountVat: fattureInCloudInvoice.amount_vat ?? 0,
                 date: fattureInCloudInvoice.date ?? "",
-                dueDate: fattureInCloudInvoice.payments_list[0].due_date,
+                dueDate: date,
                 externalId: fattureInCloudInvoice.id?.toString() || "",
                 number: fattureInCloudInvoice.invoice_number ?? "",
                 type: fattureInCloudInvoice.type,
             };
 
+            const res = firstOrThrow(
+                await db
+                    .insert(invoices)
+                    .values(record)
+                    .onConflictDoNothing()
+                    .returning(),
+            );
+
+            await db.insert(invoicesSuppliers).values({
+                supplierId: supplier.id,
+                invoiceId: res.id,
+            });
+
             insertValues.push(record);
         }
-
-        await db.insert(invoices).values(insertValues);
 
         return {
             message: `Imported ${insertValues.length} invoices`,

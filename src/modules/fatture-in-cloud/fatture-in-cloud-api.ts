@@ -2,7 +2,6 @@ import {
     Configuration,
     type IssuedDocument,
     type ListIssuedDocumentsResponse,
-    type ListReceivedDocumentsResponse,
     type ListReceivedDocumentsTypeEnum,
     type ListSuppliersResponse,
     type ReceivedDocument,
@@ -127,8 +126,8 @@ export class FattureInCloudApi {
     }
 
     async getReceivedInvoices(params: {
-        date_from: Date;
-        date_to: Date;
+        from: Date;
+        to: Date;
     }): Promise<ReceivedDocument[]> {
         const receivedInvoices: ReceivedDocument[] = [];
 
@@ -145,75 +144,38 @@ export class FattureInCloudApi {
                 "passive_delivery_note",
                 "self_invoice",
             ] as ListReceivedDocumentsTypeEnum[]
-        ).map((type) =>
-            api.listReceivedDocuments(
-                Number(this.companyId),
-                type,
-                undefined,
-                undefined,
-                undefined,
-                1,
-                100,
-                `date>='${_formatDate(params.date_from)}' AND date<='${_formatDate(params.date_to)}'`,
-                {
-                    adapter: "fetch",
-                },
-            ),
-        );
+        ).map(async (type) => {
+            let responses: ReceivedDocument[] = [];
+            let total = Number.MAX_SAFE_INTEGER;
+            let page = 1;
+            while (responses.length !== total) {
+                const res = await api.listReceivedDocuments(
+                    Number(this.companyId),
+                    type,
+                    undefined,
+                    undefined,
+                    undefined,
+                    page,
+                    100,
+                    `date>='${_formatDate(params.from)}' AND date<='${_formatDate(params.to)}'`,
+                    {
+                        adapter: "fetch",
+                    },
+                );
+                responses.push(...(res.data.data ?? []));
+                if (!res.data.total) {
+                    break;
+                }
+                page += 1;
+                total = res.data.total;
+            }
+            return responses;
+        });
 
         const responses = await Promise.all(requests);
 
         for (const response of responses) {
-            receivedInvoices.push(...(response.data.data ?? []));
-        }
-
-        return receivedInvoices;
-        // Build query parameters (note: received documents API doesn't support date filtering)
-        const queryParams = new URLSearchParams({
-            per_page: "100",
-            type: "expense",
-        });
-
-        if (params?.date_from && params?.date_to) {
-            queryParams.append(
-                "q",
-                `date>='${_formatDate(params.date_from)}' AND date<='${_formatDate(params.date_to)}'`,
-            );
-        }
-
-        let url: string | undefined | null =
-            `${this.baseEndpoint}${this.companyId}/received_documents?fieldset=detailed&search=&year=2025&selected_months=10`;
-
-        while (url) {
-            const res = await fetch(url, {
-                method: "GET",
-                headers: this.baseHeaders,
-            });
-            const data: ListReceivedDocumentsResponse = await res.json();
-            console.log(data);
-            receivedInvoices.push(...(data.data ?? []));
-            url = data.next_page_url;
-        }
-
-        // Filter by date after fetching (since API doesn't support date filtering)
-        if (params?.date_from || params?.date_to) {
-            return receivedInvoices.filter((invoice) => {
-                if (!invoice.date) return false;
-
-                const invoiceDate = new Date(invoice.date);
-
-                if (params.date_from) {
-                    const fromDate = new Date(params.date_from);
-                    if (invoiceDate < fromDate) return false;
-                }
-
-                if (params.date_to) {
-                    const toDate = new Date(params.date_to);
-                    if (invoiceDate > toDate) return false;
-                }
-
-                return true;
-            });
+            receivedInvoices.push(...response);
         }
 
         return receivedInvoices;

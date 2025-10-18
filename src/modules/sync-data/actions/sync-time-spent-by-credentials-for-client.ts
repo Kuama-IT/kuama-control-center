@@ -1,11 +1,11 @@
 "use server";
-import { platformCredentialsServer } from "@/modules/platform-credentials/platform-credentials.server";
-import { EasyRedmineApiClient } from "@/modules/easyredmine/easyredmine-api-client";
-import { handleServerErrors, isFailure } from "@/utils/server-action-utils";
+import { format } from "date-fns";
 import { db } from "@/drizzle/drizzle-db";
 import { spentTimes, tasks } from "@/drizzle/schema";
-import { format } from "date-fns";
+import { EasyRedmineApiClient } from "@/modules/easyredmine/easyredmine-api-client";
+import { platformCredentialsServer } from "@/modules/platform-credentials/platform-credentials.server";
 import { firstOrThrow } from "@/utils/array-utils";
+import { handleServerErrors, isFailure } from "@/utils/server-action-utils";
 
 const action = async (
     credentialId: number,
@@ -90,7 +90,6 @@ const action = async (
     }
 
     await new Promise((resolve) => setTimeout(resolve, 6000));
-    console.log("done internal action");
 };
 
 const handled = handleServerErrors(

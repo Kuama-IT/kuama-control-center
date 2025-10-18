@@ -1,4 +1,12 @@
 /* eslint-disable */
+/** biome-ignore-all lint/nursery/noShadow: <explanation> */
+/** biome-ignore-all lint/complexity/noVoid: <explanation> */
+/** biome-ignore-all lint/style/noNestedTernary: <explanation> */
+/** biome-ignore-all lint/suspicious/noConfusingVoidType: <explanation> */
+/** biome-ignore-all lint/complexity/noUselessTypeConstraint: <explanation> */
+/** biome-ignore-all lint/complexity/noBannedTypes: <explanation> */
+/** biome-ignore-all lint/suspicious/noExplicitAny: <explanation> */
+/** biome-ignore-all lint/nursery/useConsistentTypeDefinitions: <explanation> */
 /* tslint:disable */
 /*
  * ---------------------------------------------------------------

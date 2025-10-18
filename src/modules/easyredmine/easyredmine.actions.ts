@@ -1,6 +1,6 @@
 import { EasyRedmineApiClient } from "@/modules/easyredmine/easyredmine-api-client";
+import { type PlatformCredentialsRead } from "@/modules/platform-credentials/schemas/platform-credentials.schemas";
 import { handleServerErrors } from "@/utils/server-action-utils";
-import { PlatformCredentialsRead } from "@/modules/platform-credentials/schemas/platform-credentials.schemas";
 
 export const easyRedmineGetSpentTimes = handleServerErrors(
     async ({

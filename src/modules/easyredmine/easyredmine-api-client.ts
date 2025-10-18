@@ -1,8 +1,8 @@
+import { format } from "date-fns";
 import {
     Api,
-    TimeEntryApiResponse,
+    type TimeEntryApiResponse,
 } from "@/modules/easyredmine/generated/easyredmine-rest-client";
-import { format } from "date-fns";
 
 export class EasyRedmineApiClient {
     private readonly api: Api<{ headers: { "X-Redmine-API-Key": string } }>;
@@ -81,13 +81,13 @@ export class EasyRedmineApiClient {
             spentTime: string;
             agency: "Kuama";
         }[] = [];
-        for (const [date, timeEntries] of groupedBySpentOn.entries()) {
-            const timeEntriesTotal = timeEntries.reduce(
+        for (const [date, timeEntryList] of groupedBySpentOn.entries()) {
+            const timeEntriesTotal = timeEntryList.reduce(
                 (acc, timeEntry) => acc + parseFloat(timeEntry.hours ?? "0"),
                 0,
             );
             monthTotalHours += timeEntriesTotal;
-            for (const timeEntry of timeEntries) {
+            for (const timeEntry of timeEntryList) {
                 if (timeEntry.issue && timeEntry.issue.id) {
                     const issueResponse = await this.api.issues.getIssues(
                         timeEntry.issue.id,
@@ -116,7 +116,7 @@ export class EasyRedmineApiClient {
                         agency: "Kuama",
                     });
                 } else {
-                    console.log(
+                    console.error(
                         "*** time entry without an issue ***",
                         timeEntry.project?.name,
                         " - ",

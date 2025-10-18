@@ -1,6 +1,7 @@
 import { db } from "@/drizzle/drizzle-db";
-import { suppliers, vats } from "@/drizzle/schema";
+import { vats } from "@/drizzle/schema";
 import { fattureInCloudApiClient } from "@/modules/fatture-in-cloud/fatture-in-cloud-api";
+import { invoicesDb } from "@/modules/invoices/invoices.db";
 import { type VatCreateDto } from "@/modules/invoices/schemas/vat.create";
 import { type VatReadDto } from "@/modules/invoices/schemas/vat.read";
 import { vatsDb } from "@/modules/invoices/vats.db";
@@ -63,18 +64,7 @@ export const suppliersServer = {
 
         for (const supplierValue of supplierValues) {
             try {
-                await db
-                    .insert(suppliers)
-                    .values(supplierValue)
-                    .onConflictDoUpdate({
-                        target: suppliers.externalId,
-                        set: {
-                            vatId: supplierValue.vatId,
-                            name: supplierValue.name,
-                            email: supplierValue.email,
-                            phone: supplierValue.phone,
-                        },
-                    });
+                await suppliersDb.create(supplierValue);
             } catch (e) {
                 console.error(`While creating`, supplierValue);
                 console.error(e);
@@ -95,12 +85,51 @@ export const suppliersServer = {
                 ? await vatsDb.getById(supplier.vatId)
                 : undefined;
 
+            const supplierInvoices = await invoicesDb.getAllBySupplierIdAndYear(
+                supplier.id,
+            );
+
+            const totalInvoiced = supplierInvoices.reduce(
+                (acc, invoice) => {
+                    acc.net += invoice.amountNet;
+                    acc.gross += invoice.amountGross;
+                    acc.vat += invoice.amountVat;
+
+                    return acc;
+                },
+                { net: 0, gross: 0, vat: 0 },
+            );
+
             res.push({
                 ...supplier,
                 vat,
+                totalInvoiced,
             });
         }
 
         return res;
+    },
+    async getTotalInvoiced({
+        id,
+        year,
+    }: {
+        id: number;
+        year?: Date;
+    }): Promise<{ net: number; gross: number; vat: number }> {
+        const supplierInvoices = await invoicesDb.getAllBySupplierIdAndYear(
+            id,
+            year,
+        );
+
+        return supplierInvoices.reduce(
+            (acc, invoice) => {
+                acc.net += invoice.amountNet;
+                acc.gross += invoice.amountGross;
+                acc.vat += invoice.amountVat;
+
+                return acc;
+            },
+            { net: 0, gross: 0, vat: 0 },
+        );
     },
 };

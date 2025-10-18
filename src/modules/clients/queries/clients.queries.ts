@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { OrganizationSuggestionRead } from "@/modules/clients/schemas/organization-suggestion-read";
+import { type OrganizationSuggestionRead } from "@/modules/clients/schemas/organization-suggestion-read";
 
 export const useClientOrganizationSuggestionsQuery = (id: number) => {
     return useQuery({
