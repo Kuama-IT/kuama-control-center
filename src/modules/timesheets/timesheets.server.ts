@@ -152,8 +152,7 @@ export const timesheetsServer = {
                     // an ex employee, we can skip...
                     continue;
                 }
-                const { id: employeeId, name: employeeName } =
-                    firstOrThrow(res);
+                const { id: employeeId } = firstOrThrow(res);
 
                 if (
                     timesheetEntry.reasons &&

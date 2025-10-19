@@ -7,7 +7,7 @@ import {
 } from "date-fns";
 import parsePostgresInterval from "postgres-interval";
 import { EmployeeAvatar } from "@/modules/employees/components/employee-avatar";
-import { type AbsenceDaysList } from "@/modules/timesheets/schemas";
+import { type AbsenceDaysList } from "@/modules/timesheets/schemas/absence-types";
 import { timesheetsServer } from "@/modules/timesheets/timesheets.server";
 import { Title } from "@/modules/ui/components/title";
 
@@ -68,7 +68,7 @@ export default async function WeeklyAbsence() {
                                         format(date, "yyyy-MM-dd")
                                     );
                                 })
-                                .map((absenceEntry, index) => {
+                                .map((absenceEntry) => {
                                     const {
                                         absence_days: absence,
                                         employees: employee,
@@ -85,7 +85,7 @@ export default async function WeeklyAbsence() {
                                     );
                                     return (
                                         <div
-                                            key={index}
+                                            key={`${employee?.id}-${timeStart}-${timeEnd}`}
                                             className="flex gap-4 rounded-lg border p-4"
                                         >
                                             <EmployeeAvatar

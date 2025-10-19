@@ -1,5 +1,4 @@
 "use client";
-// Custom tooltip to show only the four plotted values (including 0)
 import {
     type NameType,
     type Payload,
@@ -58,6 +57,7 @@ function CustomTooltip({
     );
 }
 
+import { useId } from "react";
 import {
     Area,
     AreaChart,
@@ -108,6 +108,11 @@ export function PubblicaWebEmployeeCostBalanceGraph({
         };
     });
 
+    const colorPreviousYearInvoicesId = useId();
+    const colorCurrentYearInvoicesId = useId();
+    const colorPreviousYearBusinessCostId = useId();
+    const colorCurrentYearBusinessCostId = useId();
+
     return (
         <div style={{ width: "100%", height: 400 }}>
             <h3>Employee Cost Balance: Current Year vs Previous Year</h3>
@@ -118,7 +123,7 @@ export function PubblicaWebEmployeeCostBalanceGraph({
                 >
                     <defs>
                         <linearGradient
-                            id="colorCurrentYearBusinessCost"
+                            id={colorCurrentYearBusinessCostId}
                             x1="0"
                             y1="0"
                             x2="0"
@@ -136,7 +141,7 @@ export function PubblicaWebEmployeeCostBalanceGraph({
                             />
                         </linearGradient>
                         <linearGradient
-                            id="colorPreviousYearBusinessCost"
+                            id={colorPreviousYearBusinessCostId}
                             x1="0"
                             y1="0"
                             x2="0"
@@ -154,7 +159,7 @@ export function PubblicaWebEmployeeCostBalanceGraph({
                             />
                         </linearGradient>
                         <linearGradient
-                            id="colorCurrentYearInvoices"
+                            id={colorCurrentYearInvoicesId}
                             x1="0"
                             y1="0"
                             x2="0"
@@ -172,7 +177,7 @@ export function PubblicaWebEmployeeCostBalanceGraph({
                             />
                         </linearGradient>
                         <linearGradient
-                            id="colorPreviousYearInvoices"
+                            id={colorPreviousYearInvoicesId}
                             x1="0"
                             y1="0"
                             x2="0"
@@ -203,7 +208,7 @@ export function PubblicaWebEmployeeCostBalanceGraph({
                         dataKey="currentYearBusinessCost"
                         name="Current Year Business Cost"
                         stroke="#2563eb"
-                        fill="url(#colorCurrentYearBusinessCost)"
+                        fill={`url(#${colorCurrentYearBusinessCostId})`}
                         fillOpacity={1}
                     />
                     <Area
@@ -211,7 +216,7 @@ export function PubblicaWebEmployeeCostBalanceGraph({
                         dataKey="previousYearBusinessCost"
                         name="Previous Year Business Cost"
                         stroke="#a5b4fc"
-                        fill="url(#colorPreviousYearBusinessCost)"
+                        fill={`url(#${colorPreviousYearBusinessCostId})`}
                         fillOpacity={1}
                     />
                     <Area
@@ -219,7 +224,7 @@ export function PubblicaWebEmployeeCostBalanceGraph({
                         dataKey="currentYearInvoices"
                         name="Current Year Invoices"
                         stroke="#059669"
-                        fill="url(#colorCurrentYearInvoices)"
+                        fill={`url(#${colorCurrentYearInvoicesId})`}
                         fillOpacity={1}
                     />
                     <Area
@@ -227,7 +232,7 @@ export function PubblicaWebEmployeeCostBalanceGraph({
                         dataKey="previousYearInvoices"
                         name="Previous Year Invoices"
                         stroke="#fbbf24"
-                        fill="url(#colorPreviousYearInvoices)"
+                        fill={`url(#${colorPreviousYearInvoicesId})`}
                         fillOpacity={1}
                     />
                 </AreaChart>

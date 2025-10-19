@@ -84,7 +84,7 @@
             "nursery": {
                 "noJsxLiterals": "off",
                 "noNextAsyncClientComponent": "error",
-                "noShadow": "warn",
+                "noShadow": "off",
                 "useConsistentTypeDefinitions": {
                     "level": "error",
                     "options": {
@@ -111,7 +111,7 @@
             "style": {
                 "noCommonJs": "error",
                 "noHeadElement": "error",
-                "noNestedTernary": "warn",
+                "noNestedTernary": "off",
                 "noNonNullAssertion": "info",
                 "noParameterAssign": "error",
                 "noUselessElse": "error",

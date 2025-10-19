@@ -1,5 +1,6 @@
 import { Gitlab } from "@gitbeaker/rest";
 
+// biome-ignore lint/correctness/noUnusedVariables: TODO use
 class GitlabApiClient {
     private readonly api: InstanceType<typeof Gitlab<false>>;
     constructor(

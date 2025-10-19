@@ -13,7 +13,7 @@ export const FillParentAreaChart = ({
         bottom: 0,
     },
 }: {
-    data?: any[];
+    data?: unknown[];
     stroke?: string;
     fill?: string;
     margin?: {

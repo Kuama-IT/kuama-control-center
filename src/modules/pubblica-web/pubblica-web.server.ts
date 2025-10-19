@@ -206,7 +206,7 @@ export const pubblicaWebServer = {
                 const doc = await db
                     .select({ content: documents.content })
                     .from(documents)
-                    .where(eq(documents.id, balance.documentId!))
+                    .where(eq(documents.id, balance.documentId))
                     .limit(1);
                 if (!doc.length) {
                     console.error(
@@ -343,7 +343,7 @@ async function _parseAndStorePayslipsSourceFile(sourceFileId: number) {
             extension: documents.extension,
         })
         .from(documents)
-        .where(eq(documents.id, sourceFileResult[0].documentId!))
+        .where(eq(documents.id, sourceFileResult[0].documentId))
         .limit(1);
     if (!sourceDoc.length) {
         throw new Error("Document not found for source file");
