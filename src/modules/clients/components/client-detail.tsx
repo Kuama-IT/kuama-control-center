@@ -49,7 +49,7 @@ const InnerHeader = ({
             <BackButton />
             <Image
                 src={client.avatarUrl ?? "/youtrack-logo.svg"}
-                alt={client.name!}
+                alt={client.name}
                 width={100}
                 height={100}
                 className="animate-fade-in-from-left rounded-full"

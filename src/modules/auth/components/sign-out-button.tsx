@@ -10,7 +10,7 @@ export const SignOutButton = () => {
                 await signOut({ redirectTo: "/sign-in" });
             }}
         >
-            Logout
+            {"Logout"}
         </Button>
     );
 };

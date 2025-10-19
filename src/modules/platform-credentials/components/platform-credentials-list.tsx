@@ -8,7 +8,7 @@ import PlatformCredentialsForm from "./platform-credentials-form";
 
 export default async function PlatformCredentialsList() {
     const credentials = await platformCredentialsServer.all();
-    const clients = await clientsServer.allOrganizations();
+    const organizations = await clientsServer.allOrganizations();
 
     const session = await auth();
 
@@ -19,8 +19,8 @@ export default async function PlatformCredentialsList() {
     if (isFailure(credentials)) {
         return <div>{credentials.message}</div>;
     }
-    if (isFailure(clients)) {
-        return <div>{clients.message}</div>;
+    if (isFailure(organizations)) {
+        return <div>{organizations.message}</div>;
     }
     return (
         <div className="flex flex-col gap-8 p-8">
@@ -35,7 +35,7 @@ export default async function PlatformCredentialsList() {
                 ))}
 
                 <div className="">
-                    <PlatformCredentialsForm clients={clients} />
+                    <PlatformCredentialsForm organizations={organizations} />
                 </div>
             </div>
         </div>

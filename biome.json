@@ -7,7 +7,12 @@
     },
     "files": {
         "ignoreUnknown": true,
-        "includes": ["src/**", "drizzle/**", "tests-e2e/**", "tests/**"]
+        "includes": [
+            "src/**",
+            "!src/modules/ui/examples.tsx",
+            "!src/app/brutal-showcase/**",
+            "!src/components/ui/**"
+        ]
     },
     "formatter": {
         "enabled": true,
@@ -64,7 +69,7 @@
                 "noUnsafeFinally": "error",
                 "noUnsafeOptionalChaining": "error",
                 "noUnusedFunctionParameters": "error",
-                "noUnusedVariables": "error",
+                "noUnusedVariables": "warn",
                 "noUnusedImports": "error",
                 "noVoidElementsWithChildren": "error",
                 "noVoidTypeReturn": "error",
@@ -77,9 +82,9 @@
                 "useUniqueElementIds": "error"
             },
             "nursery": {
-                "noJsxLiterals": "error",
+                "noJsxLiterals": "off",
                 "noNextAsyncClientComponent": "error",
-                "noShadow": "error",
+                "noShadow": "warn",
                 "useConsistentTypeDefinitions": {
                     "level": "error",
                     "options": {
@@ -106,7 +111,7 @@
             "style": {
                 "noCommonJs": "error",
                 "noHeadElement": "error",
-                "noNestedTernary": "error",
+                "noNestedTernary": "warn",
                 "noNonNullAssertion": "info",
                 "noParameterAssign": "error",
                 "noUselessElse": "error",

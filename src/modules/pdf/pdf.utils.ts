@@ -5,9 +5,13 @@ const loadPdfStructure = (pdfBuffer: ArrayBufferLike): Promise<Output> =>
     new Promise((resolve, reject) => {
         const pdfParser = new PDFParser();
 
-        pdfParser.on("pdfParser_dataError", (errData: any) =>
-            reject(errData.parserError || errData),
-        );
+        pdfParser.on("pdfParser_dataError", (errData) => {
+            if (errData instanceof Error) {
+                reject(errData);
+                return;
+            }
+            reject(errData.parserError);
+        });
         pdfParser.on("pdfParser_dataReady", (pdfData) => {
             resolve(pdfData);
         });
@@ -41,8 +45,7 @@ const extractPageAsPdf = async (
     newPdfDoc.addPage(copiedPage);
 
     // Save the new PDF as bytes
-    const pdfBytes = await newPdfDoc.save();
-    return pdfBytes;
+    return await newPdfDoc.save();
 };
 export const pdfUtils = {
     loadPdfStructure,

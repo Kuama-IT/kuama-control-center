@@ -22,11 +22,3 @@ export const handledCreateCashFlowEntriesFromTransactions = handleServerErrors(
         );
     },
 );
-
-export const getCashFlowGraphData = handleServerErrors(
-    async ({ from, to }: { from: Date; to: Date }) => {
-        // this function should return data for graphing a graph that lets us understand
-        // - how many money can be spent next month based on past income and expenses
-        // - it should consider also invoices due in the next month (both incoming and outgoing)
-    },
-);

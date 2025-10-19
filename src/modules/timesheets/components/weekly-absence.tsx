@@ -43,10 +43,10 @@ export default async function WeeklyAbsence() {
         <div className="flex flex-col gap-2">
             <Title>Team members absent this week</Title>
             <div className="flex gap-2">
-                {weekDays.map((date, index) => (
+                {weekDays.map((date) => (
                     <div
                         className={`flex flex-col gap-4 rounded-lg`}
-                        key={index}
+                        key={date.toISOString()}
                     >
                         <div className="flex min-w-52 flex-col items-center rounded-lg bg-accent px-4 py-2">
                             <span className="text-sm uppercase">

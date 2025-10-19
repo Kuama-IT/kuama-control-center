@@ -1,6 +1,7 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
+import { useId } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import {
@@ -31,6 +32,7 @@ export function BankStatementCreateForm() {
         });
     };
 
+    const id = useId();
     return (
         <form
             onSubmit={handleSubmit(onSubmit)}
@@ -38,18 +40,18 @@ export function BankStatementCreateForm() {
         >
             <div className="flex flex-col gap-2">
                 <label className="flex-1 font-medium">
-                    Bank Statement File
+                    {"Bank Statement File"}
                 </label>
                 <Controller
                     name="file"
                     control={control}
                     render={({ field }) => (
-                        <label htmlFor="file" className="inline-block">
+                        <label htmlFor={id} className="inline-block">
                             <span className="inline-flex w-full cursor-pointer items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-white transition-colors hover:bg-blue-700">
                                 {field.value ? field.value.name : "Choose File"}
                             </span>
                             <input
-                                id="file"
+                                id={id}
                                 type="file"
                                 accept=".xlsx"
                                 className="hidden"

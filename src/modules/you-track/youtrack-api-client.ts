@@ -136,7 +136,7 @@ class YoutrackApiClient {
                             relatedLogins.includes(it.email ?? ""),
                     )
                     .filter((it) => it.email)
-                    .map(({ email }) => email!);
+                    .map(({ email }) => email ?? "");
             }
 
             return {

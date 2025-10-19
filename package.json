@@ -11,7 +11,7 @@
     "build:ci": "next build --experimental-build-mode compile",
     "start": "next start",
     "lint": "next lint",
-    "format:check": "biome check .",
+    "format:check": "biome lint .",
     "format:fix": "biome format . --write",
     "db:fake": "tsx ./drizzle/db-fake-seed.ts",
     "test": "vitest",

@@ -27,7 +27,7 @@ export const useCashFlowsQuery = ({ from, to }: { from: Date; to: Date }) => {
             // Transform date strings back to Date objects
             return {
                 ...data,
-                data: data.data.map((entry: any) => ({
+                data: data.data.map((entry) => ({
                     ...entry,
                     date: new Date(entry.date),
                 })),

@@ -13,8 +13,8 @@ export default async function SignIn() {
         <div className="flex min-h-[calc(100svh-(--spacing(32)))] flex-col items-center justify-center">
             <div className="flex flex-col items-center gap-8 rounded-lg p-12 shadow-2xl">
                 <h1 className="font-bold text-2xl uppercase">
-                    Welcome, you are. <br />
-                    Sign in, you must.
+                    {"Welcome, you are."} <br />
+                    {"Sign in, you must."}
                 </h1>
                 <form
                     action={async () => {
@@ -31,7 +31,7 @@ export default async function SignIn() {
                             height={32}
                             src="/youtrack-logo.svg"
                         />
-                        Sign in with YouTrack
+                        {"Sign in with YouTrack"}
                     </Button>
                 </form>
             </div>

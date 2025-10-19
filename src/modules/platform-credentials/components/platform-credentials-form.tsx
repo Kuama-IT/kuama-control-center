@@ -39,41 +39,40 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-import { type ClientListItem } from "@/modules/clients/clients.server";
 import { notifyError, notifySuccess } from "@/modules/ui/components/notify";
 import { useServerActionMutation } from "@/modules/ui/hooks/use-server-action-mutation";
-import { createAction } from "../platform-credentials.actions";
+import { type OrganizationRead } from "@/modules/you-track/schemas/organization-read";
 import {
-    KSupportedPlatforms,
     type PlatformCredentialsValidForm,
     platformCredentialsFormSchema,
+    SupportedPlatforms,
 } from "../schemas/platform-credentials.schemas";
 
 type Props = {
-    clientId?: number;
+    organizationId?: number;
     employeeId?: number;
     projectId?: number;
-    clients?: ClientListItem[];
+    organizations?: OrganizationRead[];
 };
 
 export default function PlatformCredentialsForm({
-    clientId,
+    organizationId,
     employeeId,
     projectId,
-    clients,
+    organizations,
 }: Props) {
-    if (!(clients || clientId)) {
-        throw new Error("[DEV] Missing clients or clientId prop");
+    if (!(organizations || organizationId)) {
+        throw new Error("[DEV] Missing organizations or organizationId prop");
     }
 
     const form = useForm<PlatformCredentialsValidForm>({
         resolver: zodResolver(platformCredentialsFormSchema),
         defaultValues: {
-            platform: KSupportedPlatforms.options[0],
+            platform: SupportedPlatforms.options[0],
             name: "",
             persistentToken: "",
             endpoint: "",
-            clientId: clientId?.toString(),
+            organizationId: organizationId?.toString(),
             employeeId: employeeId?.toString(),
             projectId: projectId?.toString(),
         },
@@ -125,7 +124,7 @@ export default function PlatformCredentialsForm({
                                 <SelectContent>
                                     <SelectGroup>
                                         <SelectLabel>Platform</SelectLabel>
-                                        {KSupportedPlatforms.options.map(
+                                        {SupportedPlatforms.options.map(
                                             (platform) => (
                                                 <SelectItem
                                                     key={platform}
@@ -170,7 +169,7 @@ export default function PlatformCredentialsForm({
                     )}
                 />
 
-                {clients && (
+                {organizations && (
                     <FormField
                         control={form.control}
                         name="clientId"
@@ -181,19 +180,19 @@ export default function PlatformCredentialsForm({
                                     <SearchableCombobox
                                         value={value?.toString()}
                                         onChange={onChange}
-                                        options={clients.map(
+                                        options={organizations.map(
                                             ({ id, name }) => ({
                                                 id: id.toString(),
                                                 name,
                                             }),
                                         )}
-                                        label="Select client..."
-                                        searchLabel="Select client..."
-                                        noResultsLabel="No client found"
+                                        label="Select organization..."
+                                        searchLabel="Select organization..."
+                                        noResultsLabel="No organization found"
                                     />
                                 </FormControl>
                                 <FormDescription>
-                                    Client related to these credentials
+                                    Organization related to these credentials
                                     (optional)
                                 </FormDescription>
                                 <FormMessage />
@@ -202,13 +201,13 @@ export default function PlatformCredentialsForm({
                     />
                 )}
 
-                {clients && formClientId && (
+                {organizations && formClientId && (
                     <FormField
                         control={form.control}
                         name="projectId"
                         render={({ field: { onChange, value } }) => {
                             const clientProjects =
-                                clients.find(
+                                organizations.find(
                                     (client) =>
                                         client.id.toString() ===
                                         formClientId.toString(),
@@ -242,13 +241,13 @@ export default function PlatformCredentialsForm({
                     />
                 )}
 
-                {clients && formClientId && formProjectId && (
+                {organizations && formClientId && formProjectId && (
                     <FormField
                         control={form.control}
                         name="employeeId"
                         render={({ field: { onChange, value } }) => {
                             const clientProjects =
-                                clients.find(
+                                organizations.find(
                                     (client) =>
                                         client.id.toString() ===
                                         formClientId.toString(),

@@ -37,7 +37,7 @@ export const AccessTokenListItem = ({ token }: { token: AccessTokenRead }) => {
                 {!token.expiresAt && (
                     <>
                         <span className="flex items-center gap-2">
-                            Allowed usages:{" "}
+                            {"Allowed usages: "}
                             {token.allowedUsages === -1 ? (
                                 <InfinityIcon />
                             ) : (
@@ -47,19 +47,19 @@ export const AccessTokenListItem = ({ token }: { token: AccessTokenRead }) => {
                             )}
                         </span>
                         <span className="flex items-center gap-2">
-                            Usages:
+                            {"Usages:"}
                             <pre className="mono rounded bg-gray-300 px-2">
                                 {token.usageCount}
                             </pre>
                         </span>
-                        -
+                        {"-"}
                     </>
                 )}
-                <span>Created at: {format(token.createdAt, "PPP")}</span>
+                <span>{`Created at: ${format(token.createdAt, "PPP")}`}</span>
                 {token.allowedUsages === -1 && token.expiresAt && (
                     <>
-                        -
-                        <span>Expires at {format(token.expiresAt, "PPP")}</span>
+                        {"-"}
+                        <span>{`Expires at ${format(token.expiresAt, "PPP")}`}</span>
                     </>
                 )}
                 <Button

@@ -28,7 +28,7 @@ export const UserProfile = async () => {
                 </PopoverTrigger>
                 <PopoverContent align="end" className="flex flex-col gap-2">
                     <p>
-                        {user.name} ({user.isAdmin ? "Admin" : "Employee"})
+                        {`${user.name}(${user.isAdmin ? "Admin" : "Employee"})`}
                     </p>
 
                     <SignOutButton />

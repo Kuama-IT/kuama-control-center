@@ -1,22 +1,15 @@
 "use server";
-import { handleServerErrors } from "@/utils/server-action-utils";
+import { serverActionUtils } from "@/utils/server-actions.utils";
 import { platformCredentialsServer } from "./platform-credentials.server";
 
-export const listAllAction = handleServerErrors(platformCredentialsServer.all);
-export const byClientAction = handleServerErrors(
-    platformCredentialsServer.byClient,
+export const platformCredentialsAllAction = serverActionUtils.createSafeAction(
+    platformCredentialsServer.all,
 );
-export const byIdAction = handleServerErrors(platformCredentialsServer.byId);
-export const createAction = handleServerErrors(
-    platformCredentialsServer.create,
-);
-export const deleteAction = handleServerErrors(
-    platformCredentialsServer.delete,
-);
-
-export type PlatformCredentialsListAllActionResult = Awaited<
-    ReturnType<typeof platformCredentialsServer.all>
->;
-export type PlatformCredentialsByIdActionResult = Awaited<
-    ReturnType<typeof platformCredentialsServer.byId>
->;
+export const platformCredentialsGetByOrganizationAction =
+    serverActionUtils.createSafeAction(platformCredentialsServer.byClient);
+export const platformCredentialsGetByIdAction =
+    serverActionUtils.createSafeAction(platformCredentialsServer.byId);
+export const platformCredentialsCreateAction =
+    serverActionUtils.createSafeAction(platformCredentialsServer.create);
+export const platformCredentialsDeleteAction =
+    serverActionUtils.createSafeAction(platformCredentialsServer.delete);

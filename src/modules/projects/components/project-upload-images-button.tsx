@@ -15,7 +15,7 @@ export const AddImageToProject = ({ projectId }: { projectId: number }) => {
             input={{ projectId }}
             onClientUploadComplete={onUploadCompletedAction}
             onUploadError={(error: Error) => {
-                // TODO Do something with the error.
+                // biome-ignore lint/suspicious/noAlert: TODO Do something with the error.
                 alert(`ERROR! ${error.message}`);
             }}
         />

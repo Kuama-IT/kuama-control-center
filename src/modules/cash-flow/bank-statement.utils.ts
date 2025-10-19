@@ -9,7 +9,11 @@ export const bankStatementUtils = {
     parseBancaIntesaXslx(bytes: Buffer): CellValue[][] {
         const workbook = XLSX.read(bytes, { type: "buffer" });
         const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-        const [firstCell, lastCell] = worksheet["!ref"]?.split(":");
+        const splists = worksheet["!ref"]?.split(":") ?? [];
+        const [firstCell, lastCell] = splists;
+        if (!(firstCell && lastCell)) {
+            throw new Error("Could not read first or last cell");
+        }
         const firstCellLetter = firstCell.replace(/[0-9]/g, "");
         const firstCellNumber = parseInt(firstCell.replace(/[A-Z]/g, ""));
         const lastCellLetter = lastCell.replace(/[0-9]/g, "");

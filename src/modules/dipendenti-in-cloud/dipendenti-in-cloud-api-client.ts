@@ -38,17 +38,15 @@ export class DipendentiInCloudApi {
 
         const employees: DipendentiInCloudEmployeeDetail[] = [];
         for (const employee of parsed.data) {
-            const endpoint = `${this.endpoint}employees/${employee.id}`;
-
-            const rawResponse = await fetch(
-                endpoint,
+            const employeeResponse = await fetch(
+                `${this.endpoint}employees/${employee.id}`,
                 this.authenticationHeaders,
             );
-            const jsonResponse = await rawResponse.json();
+            const employeeJson = await employeeResponse.json();
 
             const employeeDetail =
                 dipendentiInCloudEmployeeDetailResponseSchema.parse(
-                    jsonResponse,
+                    employeeJson,
                 ).data;
             employees.push(employeeDetail);
         }

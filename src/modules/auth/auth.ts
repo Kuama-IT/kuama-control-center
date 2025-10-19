@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/nursery/useConsistentTypeDefinitions: we must do interface here */
 import NextAuth from "next-auth";
 import { serverEnv } from "@/env/server-env";
 import "next-auth/jwt";
@@ -7,16 +8,16 @@ declare module "next-auth" {
     /**
      * Returned by `auth`, `useSession`, `getSession` and received as a prop on the `SessionProvider` React Context
      */
-    export type User = {
+    export interface User {
         /** Whether the user is admin inside YouTrack. */
         isAdmin: boolean;
-    };
+    }
 }
 
 declare module "next-auth/jwt" {
-    export type JWT = {
+    export interface JWT {
         isAdmin: boolean;
-    };
+    }
 }
 
 export const { handlers, signIn, auth } = NextAuth({
@@ -81,8 +82,8 @@ export const { handlers, signIn, auth } = NextAuth({
             return employees.some((employee) => employee.email === user.email);
         },
 
-        authorized: async ({ auth }) => {
-            return !!auth;
+        authorized: async (request) => {
+            return !!request.auth;
         },
     },
     debug: false,

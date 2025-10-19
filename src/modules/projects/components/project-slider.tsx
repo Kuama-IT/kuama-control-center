@@ -12,21 +12,23 @@ export const ProjectSlider = ({
     images: ProjectMediaRead[];
     projectName: string;
 }) => {
-    const containerRef = useRef<HTMLDivElement>(null!);
-    const innerContentRef = useRef<HTMLDivElement>(null!);
+    const containerRef = useRef<HTMLDivElement>(null);
+    const innerContentRef = useRef<HTMLDivElement>(null);
     const [shouldSlide, setShouldSlide] = useState(false);
     const [currentSlide, setCurrentSlide] = useState(0);
 
+    // biome-ignore lint/correctness/useExhaustiveDependencies: coming refactor
     useEffect(() => {
         evaluateShouldSlide();
-    }, [evaluateShouldSlide]);
+    }, [
+        innerContentRef.current?.scrollWidth,
+        containerRef.current?.offsetWidth,
+    ]);
 
     const evaluateShouldSlide = () => {
         const innerContentWidth = innerContentRef.current?.scrollWidth ?? 0;
         const containerWidth = containerRef.current?.offsetWidth ?? 0;
-        const shouldSlide = innerContentWidth > containerWidth;
-
-        setShouldSlide(shouldSlide);
+        setShouldSlide(innerContentWidth > containerWidth);
     };
 
     useEffect(() => {
@@ -55,7 +57,7 @@ export const ProjectSlider = ({
                 {images.map((image) => (
                     <ImageSlide
                         key={image.id}
-                        src={image.url!}
+                        src={image.url ?? ""}
                         alt={projectName ?? ""}
                         onLoaded={evaluateShouldSlide}
                     />

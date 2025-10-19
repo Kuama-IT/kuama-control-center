@@ -1,6 +1,8 @@
 import { count } from "drizzle-orm";
 import { db } from "@/drizzle/drizzle-db";
 import { organizations } from "@/drizzle/schema";
+import { organizationsDb } from "@/modules/clients/organizations.db";
+import { type OrganizationRead } from "@/modules/you-track/schemas/organization-read";
 import { youtrackApiClient } from "@/modules/you-track/youtrack-api-client";
 import { prefixWithYouTrackAvatarBaseUrl } from "@/modules/you-track/youtrack-utils";
 import { firstOrThrow } from "@/utils/array-utils";
@@ -41,5 +43,8 @@ export const organizationsServer = {
 
             return { message: `Now you have ${result.count} organizations` };
         });
+    },
+    getById(id: number): Promise<OrganizationRead> {
+        return organizationsDb.getById(id);
     },
 };

@@ -11,7 +11,7 @@ export const ImageSlide = ({
     src: string;
     onLoaded?: () => void;
 }) => {
-    const ref = useRef<HTMLDivElement>(null!);
+    const ref = useRef<HTMLDivElement>();
 
     useEffect(() => {
         if (!ref.current) return;

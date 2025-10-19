@@ -10,7 +10,7 @@ export default async function AccessTokenList() {
     }
 
     if (accessTokens.length === 0) {
-        return <p>You don't have access tokens yet 😌!</p>;
+        return <p>{"You don't have access tokens yet 😌!"}</p>;
     }
     return (
         <ul className="flex flex-col gap-4 p-4">

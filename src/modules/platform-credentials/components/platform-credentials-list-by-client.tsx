@@ -25,7 +25,7 @@ export default async function PlatformCredentialsListByClient({
             <Title>Time spent import credentials</Title>
 
             <div className="flex gap-4">
-                {credentials.map((credential: any) => (
+                {credentials.map((credential) => (
                     <PlatformCredentialsCard
                         key={credential.id}
                         credentials={credential}
@@ -34,7 +34,7 @@ export default async function PlatformCredentialsListByClient({
 
                 {showAddCredentials && session?.user?.isAdmin && (
                     <div className="">
-                        <PlatformCredentialsForm clientId={clientId} />
+                        <PlatformCredentialsForm organizationId={clientId} />
                     </div>
                 )}
             </div>

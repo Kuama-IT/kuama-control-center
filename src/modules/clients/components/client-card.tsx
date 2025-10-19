@@ -32,8 +32,8 @@ export default async function ClientCard({ client, index = 0 }: Props) {
                     <div className="flex items-center gap-4">
                         <div className="relative flex h-[50px] w-[50px] items-center justify-center overflow-hidden rounded-full bg-white">
                             <Image
-                                src={client?.avatarUrl ?? "/youtrack-logo.svg"}
-                                alt={client.name!}
+                                src={client.avatarUrl ?? "/youtrack-logo.svg"}
+                                alt={client.name}
                                 height={100}
                                 width={100}
                             />

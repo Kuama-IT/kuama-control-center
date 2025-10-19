@@ -1,6 +1,4 @@
 import { z } from "zod";
-import { type EmployeeRead } from "@/modules/employees/schemas/employee-read";
-import { type ProjectRead } from "@/modules/projects/schemas/projects.read.schema";
 
 export const SupportedPlatforms = z.enum([
     "github",
@@ -10,15 +8,12 @@ export const SupportedPlatforms = z.enum([
     "youtrack",
 ]);
 
-// Backward-compat export to ease migration from k- modules
-export const KSupportedPlatforms = SupportedPlatforms;
-
 export const platformCredentialsFormSchema = z.object({
     platform: SupportedPlatforms,
     name: z.string(),
     persistentToken: z.string(),
-    endpoint: z.string().url(),
-    clientId: z.string(),
+    endpoint: z.url(),
+    organizationId: z.string(),
     employeeId: z.string().optional(),
     projectId: z.string().optional(),
 });
@@ -27,8 +22,8 @@ export const platformCredentialsInsertSchema = z.object({
     platform: SupportedPlatforms,
     name: z.string(),
     persistentToken: z.string(),
-    endpoint: z.string().url(),
-    clientId: z
+    endpoint: z.url(),
+    organizationId: z
         .string()
         .transform((val) => (val ? parseInt(val, 10) : undefined)),
     employeeId: z
@@ -54,17 +49,10 @@ export const platformCredentialsReadSchema = z.object({
     platform: SupportedPlatforms,
     name: z.string(),
     persistentToken: z.string(),
+    employeeId: z.number().nullable(),
+    projectId: z.number().nullable(),
     endpoint: z.url(),
 });
 export type PlatformCredentialsRead = z.infer<
     typeof platformCredentialsReadSchema
 >;
-
-export type PlatformCredentialsFullRead = PlatformCredentialsRead & {
-    employee?: EmployeeRead;
-    project?: ProjectRead;
-};
-
-// Backward-compat type aliases for incremental migration
-export type KPlatformCredentialsRead = PlatformCredentialsRead;
-export type KPlatformCredentialsFullRead = PlatformCredentialsFullRead;

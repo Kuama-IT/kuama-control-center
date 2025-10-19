@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { useTransition } from "react";
+import { useId, useTransition } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -77,12 +77,15 @@ export function CashFlowCategoryForm({ category }: CashFlowCategoryFormProps) {
         });
     };
 
+    const sumbitLabel = category ? "Update Category" : "Create Category";
+
+    const id = useId();
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div>
-                <Label htmlFor="name">Category Name</Label>
+                <Label htmlFor={id}>{"Category Name"}</Label>
                 <Input
-                    id="name"
+                    id={id}
                     {...register("name")}
                     placeholder="Enter category name"
                     className="mt-1"
@@ -95,7 +98,7 @@ export function CashFlowCategoryForm({ category }: CashFlowCategoryFormProps) {
             </div>
 
             <div>
-                <Label htmlFor="type">Type</Label>
+                <Label htmlFor="type">{"Type"}</Label>
                 <Controller
                     name="type"
                     control={control}
@@ -108,8 +111,12 @@ export function CashFlowCategoryForm({ category }: CashFlowCategoryFormProps) {
                                 <SelectValue placeholder="Select category type" />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="income">Income</SelectItem>
-                                <SelectItem value="expense">Expense</SelectItem>
+                                <SelectItem value="income">
+                                    {"Income"}
+                                </SelectItem>
+                                <SelectItem value="expense">
+                                    {"Expense"}
+                                </SelectItem>
                             </SelectContent>
                         </Select>
                     )}
@@ -122,11 +129,7 @@ export function CashFlowCategoryForm({ category }: CashFlowCategoryFormProps) {
             </div>
 
             <Button type="submit" disabled={isPending} className="w-full">
-                {isPending
-                    ? "Saving..."
-                    : category
-                      ? "Update Category"
-                      : "Create Category"}
+                {isPending ? "Saving..." : sumbitLabel}
             </Button>
         </form>
     );

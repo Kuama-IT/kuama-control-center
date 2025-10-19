@@ -140,6 +140,7 @@ export type ReportRow = {
     totals: UIDay[];
     monthlyTotal: Duration;
     monthlyTotalLabel: string;
+    id: string;
 };
 
 export const getDataForReport = ({
@@ -203,6 +204,7 @@ export const getDataForReport = ({
                 ChronoUnit.HOURS,
             ),
             monthlyTotalLabel: "",
+            id: crypto.randomUUID(),
         };
 
         const absencesForEmployee = absencesByEmployee.get(employee.id);

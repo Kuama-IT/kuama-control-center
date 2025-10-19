@@ -1,6 +1,7 @@
 import { asc, eq, ilike } from "drizzle-orm";
 import { db, type Transaction } from "@/drizzle/drizzle-db";
 import { absenceDays, employees, presenceDays, teams } from "@/drizzle/schema";
+import { firstOrThrow } from "@/utils/array-utils";
 
 export const employeesDb = {
     listAll(tx?: Transaction) {
@@ -10,8 +11,12 @@ export const employeesDb = {
             .orderBy(asc(employees.payrollRegistrationNumber));
     },
 
-    getById(id: number, tx?: Transaction) {
-        return (tx ?? db).select().from(employees).where(eq(employees.id, id));
+    async getById(id: number, tx?: Transaction) {
+        const res = await (tx ?? db)
+            .select()
+            .from(employees)
+            .where(eq(employees.id, id));
+        return firstOrThrow(res);
     },
 
     async tryGetByEmail(email: string) {

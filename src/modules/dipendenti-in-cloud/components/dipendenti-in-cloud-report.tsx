@@ -87,10 +87,10 @@ const ReportHeader = ({
         <div className={`${dayCellClass} border-black border-r py-2`}></div>
 
         {/* days */}
-        {month.map((day, index) => {
+        {month.map((day) => {
             return (
                 <div
-                    key={`report-header-${index}`}
+                    key={`report-header-${day.formattedDate}`}
                     className={`flex flex-col items-center ${dayCellClass} border-black border-r text-xs print:text-[10px]`}
                 >
                     <span>{getItalianDayLetter(day.date)}</span>
@@ -115,7 +115,7 @@ const ReportBody = ({
 }) => {
     return rows.map((item, index) => {
         return (
-            <tr className="t-body break-inside-avoid" key={index}>
+            <tr className="t-body break-inside-avoid" key={item.id}>
                 <td className="border border-black">
                     <div className="flex uppercase print:text-[10px]">
                         <div

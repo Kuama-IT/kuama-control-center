@@ -1,8 +1,0 @@
-# Ignora le stesse directory/file di .prettierignore
-node_modules
-build
-dist
-.next
-coverage
-*.min.js
-

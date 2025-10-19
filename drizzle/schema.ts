@@ -42,33 +42,10 @@ export const platformCredentials = pgTable("platform_credentials", {
     name: varchar({ length: 256 }).notNull(),
     persistentToken: text().notNull(),
     endpoint: varchar({ length: 500 }).notNull(),
+    employeeId: integer().references(() => employees.id),
+    projectId: integer().references(() => projects.id),
 });
 
-export const platformCredentialsToEmployeesAndProjects = pgTable(
-    "platform_credentials_relations",
-    {
-        platformCredentialsId: serial(),
-        employeeId: serial(),
-        projectId: serial(),
-    },
-    (table) => [
-        foreignKey({
-            columns: [table.platformCredentialsId],
-            foreignColumns: [platformCredentials.id],
-            name: "fk_platform_credential_id",
-        }),
-        foreignKey({
-            columns: [table.employeeId],
-            foreignColumns: [employees.id],
-            name: "fk_employee_id",
-        }),
-        foreignKey({
-            columns: [table.projectId],
-            foreignColumns: [projects.id],
-            name: "fk_project_id",
-        }),
-    ],
-);
 
 export const invoices = pgTable("invoices", {
     id: serial().primaryKey(),

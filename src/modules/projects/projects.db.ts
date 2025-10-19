@@ -1,24 +1,33 @@
 import { eq, inArray } from "drizzle-orm";
-import { db } from "@/drizzle/drizzle-db";
+import { db, type Transaction } from "@/drizzle/drizzle-db";
 import { projectMedias, projects } from "@/drizzle/schema";
+import { firstOrThrow } from "@/utils/array-utils";
 
 export const projectsDb = {
-    async findById(projectId: number) {
-        return db.query.projects.findFirst({
-            where: eq(projects.id, projectId),
-        });
+    async getById(id: number, tx?: Transaction) {
+        const dbClient = tx ?? db;
+        const res = await dbClient
+            .select()
+            .from(projects)
+            .where(eq(projects.id, id))
+            .limit(1);
+        return firstOrThrow(res);
     },
-    async findManyWithClientByIds(projectIds: number[]) {
+    async getByIds(projectIds: number[]) {
         if (projectIds.length === 0) {
             return [];
         }
 
-        return db.query.projects.findMany({
-            with: {
-                client: true,
-            },
-            where: inArray(projects.id, projectIds),
-        });
+        return db
+            .select()
+            .from(projects)
+            .where(inArray(projects.id, projectIds));
+    },
+    async findManyByOrganizationId(organizationId: number) {
+        return db
+            .select()
+            .from(projects)
+            .where(eq(projects.organizationId, organizationId));
     },
     async insertProjectMedias(payload: { projectId: number; url: string }[]) {
         if (payload.length === 0) {

@@ -70,10 +70,10 @@ export const handledGetFattureInCloudEmittedInvoicesGraphData =
         );
 
         // fix amounts to 2 decimals
-        result.forEach((it) => {
+        for (const it of result) {
             it.currentYear = parseFloat(it.currentYear.toFixed(2));
             it.previousYear = parseFloat(it.previousYear.toFixed(2));
-        });
+        }
 
         return result;
     });

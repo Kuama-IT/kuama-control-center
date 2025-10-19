@@ -1,7 +1,7 @@
 "use client";
 
 import { Check, ChevronsUpDown, Plus } from "lucide-react";
-import { useState } from "react";
+import { useId, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
     Command,
@@ -95,6 +95,8 @@ export function CategorySelector({
             setIsCreating(false);
         }
     };
+
+    const categoryNameId = useId();
 
     return (
         <>
@@ -191,11 +193,14 @@ export function CategorySelector({
                     </DialogHeader>
                     <div className="grid gap-4 py-4">
                         <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="name" className="text-right">
+                            <Label
+                                htmlFor={categoryNameId}
+                                className="text-right"
+                            >
                                 Name
                             </Label>
                             <Input
-                                id="name"
+                                id={categoryNameId}
                                 value={newCategoryName}
                                 onChange={(e) =>
                                     setNewCategoryName(e.target.value)

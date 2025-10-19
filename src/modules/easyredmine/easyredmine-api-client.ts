@@ -98,7 +98,7 @@ export class EasyRedmineApiClient {
                     const projectCode = project?.name?.split("-")[0];
                     const projectName = project?.name?.split("-")[1];
                     timesSpent.push({
-                        id: timeEntry.id!,
+                        id: timeEntry.id,
                         project: {
                             id: project?.id,
                             code: projectCode,
@@ -106,7 +106,7 @@ export class EasyRedmineApiClient {
                         },
                         task: {
                             subject: issueResponse.data?.issue?.subject ?? "",
-                            id: timeEntry.issue.id?.toString() ?? "",
+                            id: timeEntry.issue.id.toString(),
                             date: issueResponse.data?.issue?.created_on ?? "",
                         },
                         date: date,
