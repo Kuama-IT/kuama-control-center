@@ -7,6 +7,7 @@ import {
   dipendentiInCloudEmployeesSchema,
   dipendentiInCloudPayrollsSchema,
   dipendentiInCloudTimesheetResponseSchema,
+  dipendentiInCloudJustificationsResponseSchema,
   EmployeeSalaryHistory,
   Salary,
 } from "@/modules/dipendenti-in-cloud/schemas/dipendenti-in-cloud-schemas";
@@ -53,14 +54,40 @@ export class DipendentiInCloudApi {
     return employees;
   }
 
+  async getJustifications(from: Date, to: Date, employees: { id: string }[]) {
+    const formattedStartOfMonth = format(from, "yyyy-MM-dd");
+    const formattedEndOfMonth = format(to, "yyyy-MM-dd");
+    const employeesIds = employees.map((employee) => employee.id);
+    const endpoint = `${this.endpoint}attendance/justifications?`;
+    const params = new URLSearchParams({
+      employees_ids: employeesIds.join("|"),
+      date_from: formattedStartOfMonth,
+      date_to: formattedEndOfMonth,
+      only_presence_related: "0",
+      teams_ids: "",
+    });
+
+    const rawResponse = await fetch(
+      endpoint + params,
+      this.authenticationHeaders,
+    );
+
+    const jsonResponse = await rawResponse.json();
+    const parsed =
+      dipendentiInCloudJustificationsResponseSchema.parse(jsonResponse);
+
+    return parsed.data.justifications;
+  }
+
   async getMonthlyTimesheet(from: Date, to: Date, employees: { id: string }[]) {
     const formattedStartOfMonth = format(from, "yyyy-MM-dd");
     const formattedEndOfMonth = format(to, "yyyy-MM-dd");
     const employeesIds = employees.map((employee) => employee.id);
-    const endpoint = `${this.endpoint}timesheet?`;
+
+    // Fetch timesheet data
+    const endpoint = `${this.endpoint}attendance/timetables?`;
     const params = new URLSearchParams({
-      employees: employeesIds.join(","),
-      version: "2",
+      employees_ids: employeesIds.join("|"),
       date_from: formattedStartOfMonth,
       date_to: formattedEndOfMonth,
     });
@@ -72,9 +99,34 @@ export class DipendentiInCloudApi {
 
     const jsonResponse = await rawResponse.json();
 
+    const result =
+      dipendentiInCloudTimesheetResponseSchema.safeParse(jsonResponse);
+    if (result.error) {
+      console.error(JSON.stringify(result.error));
+    }
     const parsed = dipendentiInCloudTimesheetResponseSchema.parse(jsonResponse);
 
-    return parsed.data.timesheet;
+    // Fetch justifications (absences) data
+    const justifications = await this.getJustifications(from, to, employees);
+
+    // Merge justifications into timesheet data
+    const timesheet = parsed.data;
+
+    // Group justifications by employee_id and date
+    for (const justification of justifications) {
+      const employeeId = justification.employee_id.toString();
+      const date = justification.date;
+
+      if (timesheet[employeeId] && timesheet[employeeId][date]) {
+        // Add justification to the justifications array
+        if (!timesheet[employeeId][date].justifications) {
+          timesheet[employeeId][date].justifications = [];
+        }
+        timesheet[employeeId][date].justifications.push(justification);
+      }
+    }
+
+    return timesheet;
   }
 
   async getPayrolls(id: number, year: number) {

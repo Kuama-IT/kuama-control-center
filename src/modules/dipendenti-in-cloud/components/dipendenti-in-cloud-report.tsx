@@ -111,7 +111,10 @@ const ReportBody = ({
   employeeCellClass: string;
   dayCellClass: string;
 }) => {
-  return rows.map((item, index) => {
+  const filteredRows = rows.filter(
+    (item) => item.employeeNationalInsuranceNumber !== "VLRMTT91H16B563A",
+  );
+  return filteredRows.map((item, index) => {
     return (
       <tr className="t-body break-inside-avoid" key={index}>
         <td className="border border-black">
