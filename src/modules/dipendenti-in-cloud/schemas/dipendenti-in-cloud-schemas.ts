@@ -46,46 +46,69 @@ export const dipendentiInCloudEmployeeDetailResponseSchema = z.object({
   data: dipendentiInCloudEmployeeDetailSchema,
 });
 
+// Justifications (Absences) schema - defined first so it can be used in timesheet
+const justificationSchema = z.object({
+  id: z.number(),
+  employee_id: z.number(),
+  date: z.string(), // "yyyy-MM-dd"
+  legacy: z.number(),
+  pending_legacy: z.number(),
+  uid: z.number(),
+  justification_type_id: z.number(),
+  counter_id: z.number().nullable(),
+  privacy: z.number(),
+  ordinary_presence: z.number(),
+  group_id: z.number().nullable(),
+  created_at: z.string(),
+  updated_at: z.string().nullable(),
+  description: z.string().nullable(),
+  paid: z.number(),
+  presence_influencer: z.number(),
+  presence_coverage: z.number(),
+  category: z.string(), // e.g., "absence"
+  code: z.string(), // e.g., "F"
+  name: z.string(), // e.g., "Ferie"
+  color: z.string(),
+  group: z.string(), // e.g., "vacations"
+  time_start: z.string().nullable(), // "yyyy-MM-dd HH:mm:ss"
+  pending_time_start: z.string().nullable(),
+  time_end: z.string().nullable(), // "yyyy-MM-dd HH:mm:ss"
+  pending_time_end: z.string().nullable(),
+  duration: z.number().nullable(), // in minutes
+  duration_pending: z.number().nullable(),
+  status: z.string(), // e.g., "approved"
+  pending: z.number(),
+  expired: z.boolean(),
+});
+
+const shiftSchema = z.object({
+  date: z.string(), // "yyyy-MM-dd"
+  reference_date: z.string(), // "yyyy-MM-dd"
+  start: z.string(), // "HH:mm:ss"
+  end: z.string(), // "HH:mm:ss"
+  duration: z.number(), // in minutes
+  pauses: z.array(z.unknown()),
+});
+
+const calculatedEntrySchema = z.object({
+  date: z.string(), // "yyyy-MM-dd"
+  reference_date: z.string(), // "yyyy-MM-dd"
+  start: z.string(), // "HH:mm:ss"
+  end: z.string(), // "HH:mm:ss"
+  duration: z.number(), // in minutes
+});
+
 export const dipendentiInCloudTimesheetDaySchema = z.object({
-  closed: z.boolean().optional(),
-  disabled: z.boolean(),
-  error: z.unknown().optional(),
-  hours_type: z.string().optional(), // looks like an enum, one of the values is "fixed"
-  locked: z.boolean(),
-  note: z.boolean().optional(),
-  presence: z
-    .object({
-      by_contract: z.number(),
-      calculated: z.number(),
-      duration: z.number(),
-      duration_pending: z.number().nullable(),
-    })
-    .optional(),
-  reasons: z
-    .array(
-      z.object({
-        reason: z.object({
-          id: z.number(),
-          code: z.string(), // see absenceReasonSchema
-          name: z.string(),
-          color: z.string(),
-          category: z.string(),
-        }),
-        duration: z.number().nullable(),
-        duration_pending: z.number().nullable(),
-        shifts: z
-          .array(
-            z.object({
-              duration: z.number().nullable(),
-              duration_pending: z.number().nullable(),
-              time_start: z.string().nullable(),
-              time_end: z.string().nullable(),
-            }),
-          )
-          .nullable(),
-      }),
-    )
-    .optional(),
+  working_day: z.boolean(),
+  holiday: z.unknown().nullable(),
+  hours_type: z.string(), // e.g., "fixed"
+  legacy: z.boolean(),
+  employee_id: z.number(),
+  date: z.string(), // "yyyy-MM-dd"
+  shifts: z.array(shiftSchema),
+  justifications: z.array(justificationSchema).optional(), // Now properly typed, optional because we merge it in
+  calculated: z.array(calculatedEntrySchema),
+  ordinary_presence: z.array(z.unknown()),
 });
 
 const dipendentiInCloudEmployeeTimesheetSchema = z.record(
@@ -93,14 +116,25 @@ const dipendentiInCloudEmployeeTimesheetSchema = z.record(
   dipendentiInCloudTimesheetDaySchema,
 );
 
-const dipendentiInCloudTimesheetSchema = z.record(
+export const dipendentiInCloudTimesheetSchema = z.record(
   z.string(), // employee id
   dipendentiInCloudEmployeeTimesheetSchema,
 );
 
 export const dipendentiInCloudTimesheetResponseSchema = z.object({
-  data: z.object({ timesheet: dipendentiInCloudTimesheetSchema }),
+  data: dipendentiInCloudTimesheetSchema,
 });
+
+// Export justifications response schema
+export const dipendentiInCloudJustificationsResponseSchema = z.object({
+  data: z.object({
+    justifications: z.array(justificationSchema),
+  }),
+});
+
+export type DipendentiInCloudJustification = z.infer<
+  typeof justificationSchema
+>;
 
 const payrollSchema = z.object({
   id: z.number(),

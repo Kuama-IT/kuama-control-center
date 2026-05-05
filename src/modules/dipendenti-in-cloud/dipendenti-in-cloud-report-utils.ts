@@ -60,17 +60,28 @@ export type MonthDayItem = {
 };
 
 const toMonthDayItem = (date: Date, closures: KClosuresList) => {
-  const dayWeekNumber = getDay(parseISO(date.toISOString()));
-  const dayMonthNumber = getDate(date.toISOString());
+  const dayWeekNumber = getDay(date);
+  const dayMonthNumber = getDate(date);
   const isSaturday = dayWeekNumber === 6;
   const isSunday = dayWeekNumber === 0;
 
   const isClosure = closures.some((closure) => {
-    return (
-      closure.date === date ||
-      (closure.day === dayMonthNumber &&
-        closure.month === date.getUTCMonth() + 1)
-    ); // closures can be "year" independent, ex. 25th of December
+    if (closure.date) {
+      return closure.date === date;
+    }
+    if (closure.day && closure.month) {
+      if (closure.year) {
+        return (
+          closure.day === dayMonthNumber &&
+          closure.month === date.getMonth() + 1 &&
+          closure.year === date.getFullYear()
+        );
+      }
+      return (
+        closure.day === dayMonthNumber && closure.month === date.getMonth() + 1
+      );
+    }
+    return false;
   });
 
   return {

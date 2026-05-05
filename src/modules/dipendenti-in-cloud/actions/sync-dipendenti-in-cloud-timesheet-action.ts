@@ -11,6 +11,18 @@ import { revalidateTag } from "next/cache";
 import { kAbsenceDaysListCacheTag } from "@/modules/k-absence-days/k-absence-days-cache-tags";
 
 const syncTimesheet = async ({ from, to }: { from: Date; to: Date }) => {
+  const extractTimePart = (
+    dateTime: string | null | undefined,
+    fallback: string,
+  ) => {
+    if (!dateTime) {
+      return fallback;
+    }
+
+    const timePart = dateTime.includes(" ") ? dateTime.split(" ")[1] : dateTime;
+    return timePart || fallback;
+  };
+
   const employees = await db
     .select({ id: kEmployees.dipendentiInCloudId })
     .from(kEmployees)
@@ -47,7 +59,8 @@ const syncTimesheet = async ({ from, to }: { from: Date; to: Date }) => {
       if (!timesheetEntry) {
         continue;
       }
-      if (timesheetEntry.closed || timesheetEntry.disabled) {
+      // Skip non-working days
+      if (!timesheetEntry.working_day) {
         continue;
       }
 
@@ -61,47 +74,56 @@ const syncTimesheet = async ({ from, to }: { from: Date; to: Date }) => {
       }
       const { id: employeeId, name: employeeName } = firstOrThrow(res);
 
-      if (timesheetEntry.reasons && timesheetEntry.reasons.length > 0) {
-        await db.insert(kAbsenceDays).values(
-          timesheetEntry.reasons
-            .map(({ reason, shifts, duration, duration_pending }) => {
-              console.log(employeeName, reason.name);
-              return (
-                shifts?.map((shift) => {
-                  return {
-                    date,
-                    employeeId,
-                    description: reason.name,
-                    reasonCode: reason.code,
-                    duration: `${shift.duration ?? shift.duration_pending} minutes`,
-                    pending: shift.duration_pending !== null,
-                    timeStart: shift.time_start,
-                    timeEnd: shift.time_end,
-                  };
-                }) ?? [
-                  {
-                    date,
-                    employeeId,
-                    description: reason.name,
-                    reasonCode: reason.code,
-                    duration: `${duration ?? duration_pending} minutes`,
-                    pending: duration_pending !== null,
-                    timeStart: "08:00:00",
-                    timeEnd: "18:00:00",
-                  },
-                ]
-              );
-            })
-            .flat(),
+      if (
+        timesheetEntry.justifications &&
+        timesheetEntry.justifications.length > 0
+      ) {
+        const absencesToInsert = timesheetEntry.justifications.map(
+          (justification) => {
+            const timeStart = extractTimePart(
+              justification.time_start ?? justification.pending_time_start,
+              "08:00:00",
+            );
+            const timeEnd = extractTimePart(
+              justification.time_end ?? justification.pending_time_end,
+              "18:00:00",
+            );
+
+            return {
+              date,
+              employeeId,
+              description: justification.name,
+              reasonCode: justification.code,
+              duration: `${justification.duration ?? justification.duration_pending ?? 0} minutes`,
+              pending: justification.pending === 1,
+              timeStart,
+              timeEnd,
+            };
+          },
         );
+
+        if (absencesToInsert.length > 0) {
+          console.log(
+            `${employeeName}: ${absencesToInsert.length} absences on ${date}`,
+          );
+          await db.insert(kAbsenceDays).values(absencesToInsert);
+        }
       }
 
-      if (timesheetEntry.presence) {
-        await db.insert(kPresenceDays).values({
-          date,
-          employeeId,
-          duration: `${timesheetEntry.presence.duration} minutes`,
-        });
+      // Handle presence from shifts
+      if (timesheetEntry.shifts && timesheetEntry.shifts.length > 0) {
+        const totalDuration = timesheetEntry.shifts.reduce(
+          (sum, shift) => sum + (shift.duration || 0),
+          0,
+        );
+
+        if (totalDuration > 0) {
+          await db.insert(kPresenceDays).values({
+            date,
+            employeeId,
+            duration: `${totalDuration} minutes`,
+          });
+        }
       }
     }
   }
